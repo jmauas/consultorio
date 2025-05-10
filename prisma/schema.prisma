@@ -1,0 +1,225 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  enabled       Boolean   @default(true)
+  token         String?
+  tokenExpires  DateTime?
+  accounts      Account[]
+  sessions      Session[]
+  pacientesCreados   Paciente[] @relation("PacienteCreatedBy")
+  pacientesEditados  Paciente[] @relation("PacienteUpdatedBy")
+  turnosCreados      Turno[]    @relation("TurnoCreatedBy")
+  turnosEditados     Turno[]    @relation("TurnoUpdatedBy")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model ConfiguracionConsultorio {
+  id                String   @id @default(cuid())
+  nombreConsultorio String
+  domicilio         String
+  telefono          String
+  mail              String
+  horarioAtencion   String
+  web               String?
+  coberturas        String
+  limite            DateTime
+  feriados          String[]
+  envio             Boolean  @default(false)
+  horaEnvio         String?
+  diasEnvio         String?
+  envioMail         Boolean  @default(false)
+  horaEnvioMail     String?
+  diasEnvioMail     String?
+  urlApp            String
+  logoUrl           String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Consultorio {
+  id              String            @id @default(cuid())
+  nombre          String
+  direccion       String?
+  telefono        String?
+  email           String?
+  color           String?           @default("#CCCCCC") // Nuevo campo color con valor predeterminado gris claro
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @default(now()) @updatedAt
+  turnos          Turno[]
+  agendaDoctor    AgendaDoctor[] 
+  tiposTurno      TipoTurnoDoctor[] @relation("TipoTurnoConsultorio") // Relación inversa con TipoTurnoDoctor
+}
+
+model Doctor {
+  id              String            @id @default(cuid())
+  nombre          String
+  emoji           String
+  feriados        String[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  AgendaDoctor    AgendaDoctor[]
+  TipoTurnoDoctor TipoTurnoDoctor[]
+  Turno           Turno[]
+}
+
+model AgendaDoctor {
+  id            String       @id @default(cuid())
+  doctorId      String
+  consultorioId String? // Added consultorioId field
+  dia           Int
+  nombre        String
+  atencion      Boolean
+  desde         String
+  hasta         String
+  corteDesde    String?
+  corteHasta    String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  doctor        Doctor       @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  consultorio   Consultorio? @relation(fields: [consultorioId], references: [id])
+}
+
+model TipoTurnoDoctor {
+  id              String        @id @default(cuid())
+  doctorId        String
+  nombre          String
+  duracion        String
+  habilitado      Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @default(now()) @updatedAt
+  doctor          Doctor        @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  consultorios    Consultorio[] @relation("TipoTurnoConsultorio") // Nueva relación muchos a muchos con Consultorio
+  turnos          Turno[]       // Relación inversa con Turno
+}
+
+model Paciente {
+  id                String          @id @default(cuid())
+  nombre            String
+  apellido          String?
+  dni               String?
+  celular           String
+  email             String?
+  cobertura         String?         // Mantenemos este campo por compatibilidad
+  coberturaMedicaId String?         // Nuevo campo para la relación
+  observaciones     String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  createdById       String?         // ID del usuario que creó el registro
+  updatedById       String?         // ID del usuario que actualizó el registro
+  turnos            Turno[]
+  coberturaMedica   CoberturaMedica? @relation(fields: [coberturaMedicaId], references: [id])
+  createdBy         User?           @relation("PacienteCreatedBy", fields: [createdById], references: [id])
+  updatedBy         User?           @relation("PacienteUpdatedBy", fields: [updatedById], references: [id])
+
+  @@unique([dni, celular])
+}
+
+model Turno {
+  id                String          @id @default(cuid())
+  desde             DateTime
+  hasta             DateTime
+  servicio          String
+  duracion          Int
+  pacienteId        String
+  confirmado        Boolean         @default(false)
+  estado            String?
+  fhCambioEstado    DateTime?
+  hsAviso           String?
+  penal             String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  createdById       String?         // ID del usuario que creó el registro
+  updatedById       String?         // ID del usuario que actualizó el registro
+  consultorioId     String
+  doctorId          String
+  observaciones     String?
+  token             String?         @unique
+  coberturaMedicaId String?         // Nuevo campo para la relación
+  tipoDeTurnoId     String?         // Nuevo campo para relacionar con TipoTurnoDoctor
+  consultorio       Consultorio     @relation(fields: [consultorioId], references: [id])
+  doctor            Doctor          @relation(fields: [doctorId], references: [id])
+  paciente          Paciente        @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+  coberturaMedica   CoberturaMedica? @relation(fields: [coberturaMedicaId], references: [id])
+  tipoDeTurno       TipoTurnoDoctor? @relation(fields: [tipoDeTurnoId], references: [id])
+  createdBy         User?           @relation("TurnoCreatedBy", fields: [createdById], references: [id])
+  updatedBy         User?           @relation("TurnoUpdatedBy", fields: [updatedById], references: [id])
+}
+
+model EmailToken {
+  email     String   @id @unique
+  token     String
+  expires   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("email_tokens")
+}
+
+model CoberturaMedica {
+  id        String   @id @default(cuid())
+  nombre    String
+  codigo    String?  // Campo código añadido
+  habilitado Boolean @default(true)
+  color     String?  @default("#CCCCCC") // Nuevo campo color con valor predeterminado gris claro
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  pacientes Paciente[] // Relación inversa con Paciente
+  turnos    Turno[]    // Relación inversa con Turno
+}
+
+model CuentasWhatsapp {
+  id        String   @id @default(cuid())
+  nombre    String
+  url       String
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

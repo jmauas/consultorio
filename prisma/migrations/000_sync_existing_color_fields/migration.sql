@@ -1,0 +1,2 @@
+-- Este archivo es para sincronizar el esquema con la base de datos existente
+-- No hace cambios reales, solo reconoce los campos color que ya existen
