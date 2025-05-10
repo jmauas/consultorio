@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { obtenerConfig } from '@/lib/services/configService';
+import { obtenerConfig } from '@/lib/services/configService.js';
 import { savePaciente, getPaciente } from '@/lib/services/pacientes/pacientesService';
 import { prisma } from '@/lib/prisma';
 

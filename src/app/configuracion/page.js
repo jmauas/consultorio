@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { obtenerConfig } from '@/lib/services/configService';
+import { obtenerConfig } from '@/lib/services/configService.js';
 import Loader from '@/components/Loader';
 
 export default function ConfiguracionPage() {

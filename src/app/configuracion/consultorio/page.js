@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Tab } from '@headlessui/react';
 import toast from 'react-hot-toast';
 import { obtenerCoberturasDesdeDB } from '@/lib/utils/coberturasUtils';
-import { obtenerConfig, registrarConfig } from '@/lib/services/configService';
+import { obtenerConfig, registrarConfig } from '@/lib/services/configService.js';
 import Loader from '@/components/Loader';
 
 // Importar los componentes de pestañas

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { obtenerConfig, registrarConfig } from '@/lib/services/configService';
+import { obtenerConfig, registrarConfig } from '@/lib/services/configService.js';
 import { revalidatePath } from 'next/cache';
 
 /**

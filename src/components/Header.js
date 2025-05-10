@@ -4,7 +4,7 @@ import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
-import { obtenerConfig } from '@/lib/services/configService';
+import { obtenerConfig } from '@/lib/services/configService.js';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 

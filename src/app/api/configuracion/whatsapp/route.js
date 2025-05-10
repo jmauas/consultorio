@@ -5,7 +5,7 @@ import {
   crearCuentaWhatsapp, 
   actualizarCuentaWhatsapp, 
   eliminarCuentaWhatsapp 
-} from '@/lib/services/configService';
+} from '@/lib/services/configService.js';
 
 // GET /api/configuracion/whatsapp
 export async function GET(request) {

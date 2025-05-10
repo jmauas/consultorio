@@ -4,7 +4,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { v4 as uuidv4 } from 'uuid';
-import { verificarDirectorio } from '@/lib/services/configService';
+import { verificarDirectorio } from '@/lib/services/configService.js';
 
 /**
  * POST - Sube un archivo de logo para la empresa

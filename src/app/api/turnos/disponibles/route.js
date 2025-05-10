@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
-import { obtenerConfig } from '@/lib/services/configService';
+import { obtenerConfig } from '@/lib/services/configService.js';
 
 // Handle GET request for available appointments
 export async function GET(request) {

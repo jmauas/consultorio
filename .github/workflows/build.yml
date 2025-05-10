@@ -11,28 +11,6 @@ on:
 jobs:
   build:
     runs-on: self-hosted
-    env:
-      MONGO_URI: ${{ secrets.MONGO_URI }}
-      MONGO_DB: ${{ vars.MONGO_DB }}
-      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-      NEXTAUTH_URL: ${{ vars.NEXTAUTH_URL }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-      RESEND_RTE: ${{ vars.RESEND_RTE }}
-      URL_APP: ${{ vars.URL_APP }}
-      URL_WHATSAPP: ${{ vars.URL_WHATSAPP }}
-      TOKEN_WHATSAPP: ${{ secrets.TOKEN_WHATSAPP }}
-      VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
-      NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY }}
-      VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
-      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-      NEXT_PUBLIC_NUMERO_WP: ${{ vars.NEXT_PUBLIC_NUMERO_WP }}
-      CLOUDINARY_API: ${{ secrets.CLOUDINARY_API }}
-      CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
-      NEXT_PUBLIC_CLOUDINARY_API_KEY: ${{ secrets.NEXT_PUBLIC_CLOUDINARY_API_KEY }}
-      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{ secrets.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME }}
-
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} on an self hosted server !"

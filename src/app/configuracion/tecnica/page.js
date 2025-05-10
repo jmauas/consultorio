@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { obtenerConfig, registrarConfig } from '@/lib/services/configService';
+import { obtenerConfig, registrarConfig } from '@/lib/services/configService.js';
 import { toast } from 'react-hot-toast';
 
 export default function TecnicaPage() {
