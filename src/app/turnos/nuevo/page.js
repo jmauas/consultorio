@@ -74,7 +74,7 @@ const NuevoTurnoPage = () => {
         // Objeto para acumular cambios al estado del turno
         let turnoUpdates = {};
         
-            // Procesar fecha y hora (desde)
+        // Procesar fecha y hora (desde)
         if (desdeParam) {
           try {
             const fecha = new Date(desdeParam);

@@ -5,7 +5,7 @@
   "scripts": {
     "copy-env": "node scripts/copy-env.js",
     "dev": "npm run copy-env && next dev --turbopack",
-    "build": "npm run next build",
+    "build": "next build",
     "build2": "npm run copy-env && next build",
     "start": "npm run copy-env && next start",
     "lint": "next lint",
