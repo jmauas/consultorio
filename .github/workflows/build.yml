@@ -11,6 +11,15 @@ on:
 jobs:
   build:
     runs-on: self-hosted
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL }}
+      NEXTAUTH_URL: ${{ vars.NEXTAUTH_URL }}
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      RESEND_RTE: ${{ vars.RESEND_RTE }}
+      URL_WHATSAPP: ${{ vars.URL_WHATSAPP }}
+      TOKEN_WHATSAPP: ${{ secrets.TOKEN_WHATSAPP }} 
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} on an self hosted server !"
