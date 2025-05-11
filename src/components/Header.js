@@ -140,6 +140,15 @@ export default function Header() {
                       <i className="fa-solid fa-users mr-2 text-orange-500"></i>
                       Administrar usuarios
                     </Link>
+                    <Link
+                      href="/configuracion" 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <i className="fa-solid fa-cogs mr-2 text-orange-500"></i>
+                      Panel de Configuración
+                    </Link>
+                    
                     <button 
                       onClick={handleSignOut}
                       className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-gray-100"

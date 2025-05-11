@@ -150,7 +150,7 @@ const SignIn = () => {
               </>
             ) : (
               <>
-                <i className="fa-solid fa-user-lock text-orange-400 mr-2"></i>Iniciar sesión
+                <i className="fa-solid fa-user-lock text-orange-400 mr-2"></i>Iniciar Sesión
               </>
             )}
           </h2>
@@ -325,7 +325,30 @@ const SignIn = () => {
                   </div>
                 )}
               </div>
-
+              <div className="mt-6">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="group relative flex w-full justify-center rounded-md bg-orange-400 px-3 py-4 text-lg font-semibold text-white hover:bg-orange-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-orange-400 disabled:bg-orange-300"
+                >
+                  {loading ? (
+                    <div>
+                      <i className="fa-solid fa-spinner fa-spin mr-2"></i>
+                      Procesando...
+                    </div>
+                  ) : authMethod === "credentials" ? (
+                    <div className="flex items-center gap-4">
+                      <i className="fa-solid fa-right-to-bracket mr-2 fa-lg"></i>
+                      Iniciar Sesión
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-4">
+                      <i className="fa-solid fa-paper-plane mr-2"></i>
+                      Enviar Enlace de Acceso
+                    </div>
+                  )}
+                </button>
+              </div>
               {/* Botón de olvidé mi contraseña (solo para modo credentials) */}
               {authMethod === "credentials" && (
                 <div className="flex justify-end">
@@ -338,31 +361,6 @@ const SignIn = () => {
                   </button>
                 </div>
               )}
-
-              <div className="mt-6">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="group relative flex w-full justify-center rounded-md bg-orange-400 px-3 py-2 text-sm font-semibold text-white hover:bg-orange-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-orange-400 disabled:bg-orange-300"
-                >
-                  {loading ? (
-                    <>
-                      <i className="fa-solid fa-spinner fa-spin mr-2"></i>
-                      Procesando...
-                    </>
-                  ) : authMethod === "credentials" ? (
-                    <>
-                      <i className="fa-solid fa-right-to-bracket mr-2"></i>
-                      Iniciar sesión
-                    </>
-                  ) : (
-                    <>
-                      <i className="fa-solid fa-paper-plane mr-2"></i>
-                      Enviar enlace de acceso
-                    </>
-                  )}
-                </button>
-              </div>
             </form>
           )}
         </div>

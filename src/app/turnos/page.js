@@ -585,7 +585,7 @@ export default function TurnosPage() {
           
           {/* Filtros avanzados (ocultos por defecto) */}
           <div 
-            className={`col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4 overflow-hidden transition-all duration-300 ${
+            className={`col-span-3 flex flex-wrap gap-4 overflow-hidden transition-all duration-300 ${
               mostrarFiltros 
                 ? 'max-h-[1000px] opacity-100 mt-4' 
                 : 'max-h-0 opacity-0'

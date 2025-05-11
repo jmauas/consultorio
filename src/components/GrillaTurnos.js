@@ -246,7 +246,7 @@ export default function GrillaTurnos({
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {turno.servicio || 'No especificado'}
+                    {turno.tipoDeTurno.nombre || 'No especificado'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${obtenerColorEstado(turno.estado || 'sin confirmar')}`}>
@@ -374,7 +374,7 @@ export default function GrillaTurnos({
                 </div>
                 <div className="col-span-2">
                   <p className="text-sm font-medium text-gray-500">Tipo</p>
-                  <p className="mt-1 text-sm font-bold">{turno.servicio || 'No especificado'}</p>
+                  <p className="mt-1 text-sm font-bold">{turno.tipoDeTurno.nombre || 'No especificado'}</p>
                 </div>
               </div>
             </div>

@@ -160,6 +160,106 @@ export default function CuentasPage() {
     }
   };
 
+  // Renderizar cuentas en formato de cards para móviles
+  const cardsView = (
+    <div className="grid grid-cols-1 gap-4 mt-4">
+      {cuentas.map((cuenta) => (
+        <div key={cuenta.id} className="bg-white rounded-lg shadow p-4 border border-gray-200">
+          <div className="flex justify-between items-start mb-3">
+            <div className="font-medium text-lg text-gray-900">{cuenta.nombre}</div>
+            <div className="flex space-x-2">
+              <button
+                type="button"
+                onClick={() => abrirModalEditar(cuenta)}
+                className="text-blue-500 hover:text-blue-700 transition-colors"
+                aria-label="Editar"
+              >
+                <i className="fas fa-edit"></i>
+              </button>
+              <button
+                type="button"
+                onClick={() => confirmarEliminacion(cuenta.id)}
+                className="text-red-500 hover:text-red-700 transition-colors"
+                aria-label="Eliminar"
+              >
+                <i className="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <div>
+              <span className="text-gray-600 text-sm font-medium">URL:</span>
+              <div className="truncate text-gray-800" title={cuenta.url}>
+                {cuenta.url}
+              </div>
+            </div>
+            
+            <div>
+              <span className="text-gray-600 text-sm font-medium">Token:</span>
+              <div className="truncate text-gray-800" title={cuenta.token}>
+                {cuenta.token.substring(0, 15)}...
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  // Renderizar tabla para pantallas grandes
+  const tableView = (
+    <div className="space-y-4 mt-4">
+      <div className="grid grid-cols-12 gap-4 font-medium text-gray-700 p-2 border-b">
+        <div className="col-span-3">Nombre</div>
+        <div className="col-span-4">URL</div>
+        <div className="col-span-4">Token</div>
+        <div className="col-span-1">Acciones</div>
+      </div>
+      
+      {cuentas.map((cuenta) => (
+        <div key={cuenta.id} className="grid grid-cols-12 gap-4 items-center py-3 border-b border-gray-200">
+          <div className="col-span-3">
+            {cuenta.nombre}
+          </div>
+          <div className="col-span-4">
+            <div className="truncate" title={cuenta.url}>
+              {cuenta.url}
+            </div>
+          </div>
+          <div className="col-span-4">
+            <div className="truncate" title={cuenta.token}>
+              {cuenta.token.substring(0, 15)}...
+            </div>
+          </div>
+          <div className="col-span-1 flex justify-center space-x-3">
+            <button
+              type="button"
+              onClick={() => abrirModalEditar(cuenta)}
+              className="text-blue-500 hover:text-blue-700 transition-colors"
+              aria-label="Editar"
+            >
+              <i className="fas fa-edit"></i>
+            </button>
+            <button
+              type="button"
+              onClick={() => confirmarEliminacion(cuenta.id)}
+              className="text-red-500 hover:text-red-700 transition-colors"
+              aria-label="Eliminar"
+            >
+              <i className="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  // Contenido para mostrar cuando no hay cuentas
+  const emptyContent = (
+    <p className="text-gray-500 italic text-center py-4">No hay cuentas configuradas</p>
+  );
+
   if (loading) {
     return (
       <Loader titulo={''}/>
@@ -193,59 +293,25 @@ export default function CuentasPage() {
         </div>
         
         <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-200">
-          <div className="grid grid-cols-12 gap-4 font-medium text-gray-700 p-2 border-b">
-            <div className="col-span-3">Nombre</div>
-            <div className="col-span-4">URL</div>
-            <div className="col-span-4">Token</div>
-            <div className="col-span-1">Acciones</div>
-          </div>        
-          
           {cuentas.length === 0 ? (
-            <p className="text-gray-500 italic text-center py-4">No hay cuentas configuradas</p>
+            emptyContent
           ) : (
-            <div className="space-y-4 mt-4">
-              {cuentas.map((cuenta) => (
-                <div key={cuenta.id} className="grid grid-cols-12 gap-4 items-center py-3 border-b border-gray-200">
-                  <div className="col-span-3">
-                    {cuenta.nombre}
-                  </div>
-                  <div className="col-span-4">
-                    <div className="truncate" title={cuenta.url}>
-                      {cuenta.url}
-                    </div>
-                  </div>
-                  <div className="col-span-4">
-                    <div className="truncate" title={cuenta.token}>
-                      {cuenta.token.substring(0, 15)}...
-                    </div>
-                  </div>
-                  <div className="col-span-1 flex justify-center space-x-3">
-                    <button
-                      type="button"
-                      onClick={() => abrirModalEditar(cuenta)}
-                      className="text-blue-500 hover:text-blue-700 transition-colors"
-                      aria-label="Editar"
-                    >
-                      <i className="fas fa-edit"></i>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => confirmarEliminacion(cuenta.id)}
-                      className="text-red-500 hover:text-red-700 transition-colors"
-                      aria-label="Eliminar"
-                    >
-                      <i className="fas fa-trash"></i>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <>
+              {/* Vista condicional según el tamaño de pantalla */}
+              <div className="block lg:hidden">
+                {cardsView}
+              </div>
+
+              <div className="hidden lg:block">
+                {tableView}
+              </div>
+            </>
           )}
         </div>
       </div>
       
-       {/* Modal para agregar/editar cuenta usando el componente Modal */}
-       <Modal
+      {/* Modal para agregar/editar cuenta usando el componente Modal */}
+      <Modal
         isOpen={modalAbierto}
         onClose={cerrarModal}
         title={editandoCuenta ? 'Editar Cuenta WhatsApp' : 'Nueva Cuenta WhatsApp'}

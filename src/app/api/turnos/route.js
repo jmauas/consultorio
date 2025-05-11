@@ -359,6 +359,7 @@ export async function GET(request) {
         doctor: true,
         consultorio: true,
         coberturaMedica: true,
+        tipoDeTurno: true,
         createdBy: {
           select: {
             id: true,
