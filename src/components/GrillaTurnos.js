@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useeffect } from 'react';
+import React, { useState, useeffect } from 'react';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
 import { formatoFecha } from '@/lib/utils/dateUtils';
@@ -188,13 +188,10 @@ export default function GrillaTurnos({
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {turnos.map((turno, index) => (
-              <>
-                {/* Fila para disponibilidad anterior */}
+              <React.Fragment key={turno.id || `turno-${index}`}>
                 {turno.disponibilidadAnterior && (
-                  filaLibre(turno.disponibilidadAnterior, 'Disponibilidad Turno Anterior', 'blue')
+                  filaLibre(turno.disponibilidadAnterior, 'Disponibilidad Turno Anterior', 'blue', index)
                 )}
-
-                {/* Fila del turno actual */}
                 <tr key={turno.id || index} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-2">
@@ -292,22 +289,21 @@ export default function GrillaTurnos({
                     </div>
                   </td>
                 </tr>    
-
-                {/* Fila para disponibilidad posterior */}
-                {turno.disponibilidadPosterior && (
-                  filaLibre(turno.disponibilidadPosterior, 'Disponibilidad Turno Posterior', 'green')
-                )}
-              </>
-            ))}      
+                  {turno.disponibilidadPosterior && (
+                    filaLibre(turno.disponibilidadPosterior, 'Disponibilidad Turno Posterior', 'green', index)
+                  )}
+              </React.Fragment>              
+                ))}      
           </tbody>
         </table>
       </div>
 
       {/* Vista de cards para pantallas pequeñas */}
       <div className="md:hidden space-y-4 p-4">
-        {turnos.map((turno, index) => (<>
+        {turnos.map((turno, index) => (
+        <React.Fragment key={turno.id || `turno-${index}`}>
           {turno.disponibilidadAnterior && (
-            cardLibre(turno.disponibilidadAnterior, 'Disponibilidad Turno Anterior', 'blue')
+            cardLibre(turno.disponibilidadAnterior, 'Disponibilidad Turno Anterior', 'blue', index)
           )}
           <div 
             key={turno.id || index} 
@@ -422,9 +418,9 @@ export default function GrillaTurnos({
             </div>
           </div>
           {turno.disponibilidadPosterior && (
-            cardLibre(turno.disponibilidadPosterior, 'Disponibilidad Turno Posterior', 'green')
+            cardLibre(turno.disponibilidadPosterior, 'Disponibilidad Turno Posterior', 'green', index)
           )}
-        </>
+        </React.Fragment>
         ))}
       </div>
       
@@ -483,16 +479,16 @@ export default function GrillaTurnos({
 }
 
 
-const filaLibre = (turno, titulo, color) => {  
+const filaLibre = (turno, titulo, color, index) => {  
   return (
     <tr
-      key={`${turno.id}-${titulo}`} 
+      key={`${turno.id}-${titulo.replaceAll(' ', '-')}-${index}`} 
       className={`bg-white text-slate-600 font-bold`}>
       <td colSpan="7" className="px-6 py-1 text-center">
         {/* {titulo} */}
         <div className={`text-${color}-500 text-center text-sm flex items-center justify-between`}>
           <div className={`border-t-3 border-${color}-500 my-1 w-full`}></div>
-          <i class="fa-solid fa-arrow-right fa-2xl"></i>
+          <i className="fa-solid fa-arrow-right fa-2xl"></i>
         </div>
       </td>
       <td className="px-6 py-1 text-center">
@@ -507,11 +503,11 @@ const filaLibre = (turno, titulo, color) => {
   )
 }
 
-const cardLibre = (turno, titulo, color) => {  
+const cardLibre = (turno, titulo, color, index) => {  
   return (<>   
         <Link href={`/turnos/nuevo?desde=${turno.desde}&duracion=${turno.duracion}&doctorId=${turno.doctor.id}&tipoTurnoId=${turno.tipoDeTurnoId}`} 
           target="_blank"
-          key={`${turno.id}-${titulo}`} 
+          key={`${turno.id}-${titulo.replaceAll(' ', '-')}-${index}`} 
           className={`text-orange-600 hover:text-orange-900 p-1 bg-${color}-100 rounded-lg flex items-center justify-evenly`}
           >
             <div className={`my-1 text-slate-800 text-center text-sm`}>
