@@ -6,7 +6,8 @@ import { toast } from 'react-hot-toast';
 
 export default function TecnicaPage() {
   const [datos, setDatos] = useState({
-    urlApp: ''
+    urlApp: '',
+    urlAppDev: ''
   });
   const [loading, setLoading] = useState(true);
   const [guardando, setGuardando] = useState(false);
@@ -18,7 +19,8 @@ export default function TecnicaPage() {
         const config = await obtenerConfig();
         
         setDatos({
-          urlApp: config.urlApp || ''
+          urlApp: config.urlApp || '',
+          urlAppDev: config.urlAppDev || ''
         });
       } catch (error) {
         console.error('Error al cargar opciones técnicas:', error);
@@ -40,19 +42,16 @@ export default function TecnicaPage() {
     }));
   };
 
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setGuardando(true);
       
-      // Preparar modelo de IA según el proveedor seleccionado
-      const iaModel = datos.iaModel[datos.ia];
-      
       // Preparar solo los datos de la sección técnica
       // Solo incluir campos que existen en el modelo ConfiguracionConsultorio
       const datosTecnicos = {
-        urlApp: datos.urlApp
+        urlApp: datos.urlApp,
+        urlAppDev: datos.urlAppDev
       };
       
       // Usar el parámetro 'tecnica' para indicar que solo se actualicen los campos de esta sección
@@ -66,8 +65,7 @@ export default function TecnicaPage() {
     }
   };
 
-
-    if (loading) {
+  if (loading) {
     return <div className="text-center">Cargando datos...</div>;
   }
 
@@ -89,8 +87,19 @@ export default function TecnicaPage() {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
               />
-            </div>          
-           
+            </div>
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                URL de la aplicación en desarrollo
+              </label>
+              <input
+                type="text"
+                name="urlAppDev"
+                value={datos.urlAppDev}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+              />
+            </div>
           </div>
         </section>
         

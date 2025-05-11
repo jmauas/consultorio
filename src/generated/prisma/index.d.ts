@@ -6822,6 +6822,7 @@ export namespace Prisma {
     horaEnvioMail: string | null
     diasEnvioMail: string | null
     urlApp: string | null
+    urlAppDev: string | null
     logoUrl: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -6844,6 +6845,7 @@ export namespace Prisma {
     horaEnvioMail: string | null
     diasEnvioMail: string | null
     urlApp: string | null
+    urlAppDev: string | null
     logoUrl: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -6867,6 +6869,7 @@ export namespace Prisma {
     horaEnvioMail: number
     diasEnvioMail: number
     urlApp: number
+    urlAppDev: number
     logoUrl: number
     createdAt: number
     updatedAt: number
@@ -6891,6 +6894,7 @@ export namespace Prisma {
     horaEnvioMail?: true
     diasEnvioMail?: true
     urlApp?: true
+    urlAppDev?: true
     logoUrl?: true
     createdAt?: true
     updatedAt?: true
@@ -6913,6 +6917,7 @@ export namespace Prisma {
     horaEnvioMail?: true
     diasEnvioMail?: true
     urlApp?: true
+    urlAppDev?: true
     logoUrl?: true
     createdAt?: true
     updatedAt?: true
@@ -6936,6 +6941,7 @@ export namespace Prisma {
     horaEnvioMail?: true
     diasEnvioMail?: true
     urlApp?: true
+    urlAppDev?: true
     logoUrl?: true
     createdAt?: true
     updatedAt?: true
@@ -7032,6 +7038,7 @@ export namespace Prisma {
     horaEnvioMail: string | null
     diasEnvioMail: string | null
     urlApp: string
+    urlAppDev: string | null
     logoUrl: string | null
     createdAt: Date
     updatedAt: Date
@@ -7072,6 +7079,7 @@ export namespace Prisma {
     horaEnvioMail?: boolean
     diasEnvioMail?: boolean
     urlApp?: boolean
+    urlAppDev?: boolean
     logoUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -7095,6 +7103,7 @@ export namespace Prisma {
     horaEnvioMail?: boolean
     diasEnvioMail?: boolean
     urlApp?: boolean
+    urlAppDev?: boolean
     logoUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -7118,6 +7127,7 @@ export namespace Prisma {
     horaEnvioMail?: boolean
     diasEnvioMail?: boolean
     urlApp?: boolean
+    urlAppDev?: boolean
     logoUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -7141,12 +7151,13 @@ export namespace Prisma {
     horaEnvioMail?: boolean
     diasEnvioMail?: boolean
     urlApp?: boolean
+    urlAppDev?: boolean
     logoUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ConfiguracionConsultorioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nombreConsultorio" | "domicilio" | "telefono" | "mail" | "horarioAtencion" | "web" | "coberturas" | "limite" | "feriados" | "envio" | "horaEnvio" | "diasEnvio" | "envioMail" | "horaEnvioMail" | "diasEnvioMail" | "urlApp" | "logoUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["configuracionConsultorio"]>
+  export type ConfiguracionConsultorioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nombreConsultorio" | "domicilio" | "telefono" | "mail" | "horarioAtencion" | "web" | "coberturas" | "limite" | "feriados" | "envio" | "horaEnvio" | "diasEnvio" | "envioMail" | "horaEnvioMail" | "diasEnvioMail" | "urlApp" | "urlAppDev" | "logoUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["configuracionConsultorio"]>
 
   export type $ConfiguracionConsultorioPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ConfiguracionConsultorio"
@@ -7169,6 +7180,7 @@ export namespace Prisma {
       horaEnvioMail: string | null
       diasEnvioMail: string | null
       urlApp: string
+      urlAppDev: string | null
       logoUrl: string | null
       createdAt: Date
       updatedAt: Date
@@ -7612,6 +7624,7 @@ export namespace Prisma {
     readonly horaEnvioMail: FieldRef<"ConfiguracionConsultorio", 'String'>
     readonly diasEnvioMail: FieldRef<"ConfiguracionConsultorio", 'String'>
     readonly urlApp: FieldRef<"ConfiguracionConsultorio", 'String'>
+    readonly urlAppDev: FieldRef<"ConfiguracionConsultorio", 'String'>
     readonly logoUrl: FieldRef<"ConfiguracionConsultorio", 'String'>
     readonly createdAt: FieldRef<"ConfiguracionConsultorio", 'DateTime'>
     readonly updatedAt: FieldRef<"ConfiguracionConsultorio", 'DateTime'>
@@ -18533,6 +18546,7 @@ export namespace Prisma {
     horaEnvioMail: 'horaEnvioMail',
     diasEnvioMail: 'diasEnvioMail',
     urlApp: 'urlApp',
+    urlAppDev: 'urlAppDev',
     logoUrl: 'logoUrl',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -19072,6 +19086,7 @@ export namespace Prisma {
     horaEnvioMail?: StringNullableFilter<"ConfiguracionConsultorio"> | string | null
     diasEnvioMail?: StringNullableFilter<"ConfiguracionConsultorio"> | string | null
     urlApp?: StringFilter<"ConfiguracionConsultorio"> | string
+    urlAppDev?: StringNullableFilter<"ConfiguracionConsultorio"> | string | null
     logoUrl?: StringNullableFilter<"ConfiguracionConsultorio"> | string | null
     createdAt?: DateTimeFilter<"ConfiguracionConsultorio"> | Date | string
     updatedAt?: DateTimeFilter<"ConfiguracionConsultorio"> | Date | string
@@ -19095,6 +19110,7 @@ export namespace Prisma {
     horaEnvioMail?: SortOrderInput | SortOrder
     diasEnvioMail?: SortOrderInput | SortOrder
     urlApp?: SortOrder
+    urlAppDev?: SortOrderInput | SortOrder
     logoUrl?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -19121,6 +19137,7 @@ export namespace Prisma {
     horaEnvioMail?: StringNullableFilter<"ConfiguracionConsultorio"> | string | null
     diasEnvioMail?: StringNullableFilter<"ConfiguracionConsultorio"> | string | null
     urlApp?: StringFilter<"ConfiguracionConsultorio"> | string
+    urlAppDev?: StringNullableFilter<"ConfiguracionConsultorio"> | string | null
     logoUrl?: StringNullableFilter<"ConfiguracionConsultorio"> | string | null
     createdAt?: DateTimeFilter<"ConfiguracionConsultorio"> | Date | string
     updatedAt?: DateTimeFilter<"ConfiguracionConsultorio"> | Date | string
@@ -19144,6 +19161,7 @@ export namespace Prisma {
     horaEnvioMail?: SortOrderInput | SortOrder
     diasEnvioMail?: SortOrderInput | SortOrder
     urlApp?: SortOrder
+    urlAppDev?: SortOrderInput | SortOrder
     logoUrl?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -19173,6 +19191,7 @@ export namespace Prisma {
     horaEnvioMail?: StringNullableWithAggregatesFilter<"ConfiguracionConsultorio"> | string | null
     diasEnvioMail?: StringNullableWithAggregatesFilter<"ConfiguracionConsultorio"> | string | null
     urlApp?: StringWithAggregatesFilter<"ConfiguracionConsultorio"> | string
+    urlAppDev?: StringNullableWithAggregatesFilter<"ConfiguracionConsultorio"> | string | null
     logoUrl?: StringNullableWithAggregatesFilter<"ConfiguracionConsultorio"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"ConfiguracionConsultorio"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"ConfiguracionConsultorio"> | Date | string
@@ -20243,6 +20262,7 @@ export namespace Prisma {
     horaEnvioMail?: string | null
     diasEnvioMail?: string | null
     urlApp: string
+    urlAppDev?: string | null
     logoUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20266,6 +20286,7 @@ export namespace Prisma {
     horaEnvioMail?: string | null
     diasEnvioMail?: string | null
     urlApp: string
+    urlAppDev?: string | null
     logoUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20289,6 +20310,7 @@ export namespace Prisma {
     horaEnvioMail?: NullableStringFieldUpdateOperationsInput | string | null
     diasEnvioMail?: NullableStringFieldUpdateOperationsInput | string | null
     urlApp?: StringFieldUpdateOperationsInput | string
+    urlAppDev?: NullableStringFieldUpdateOperationsInput | string | null
     logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20312,6 +20334,7 @@ export namespace Prisma {
     horaEnvioMail?: NullableStringFieldUpdateOperationsInput | string | null
     diasEnvioMail?: NullableStringFieldUpdateOperationsInput | string | null
     urlApp?: StringFieldUpdateOperationsInput | string
+    urlAppDev?: NullableStringFieldUpdateOperationsInput | string | null
     logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20335,6 +20358,7 @@ export namespace Prisma {
     horaEnvioMail?: string | null
     diasEnvioMail?: string | null
     urlApp: string
+    urlAppDev?: string | null
     logoUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20358,6 +20382,7 @@ export namespace Prisma {
     horaEnvioMail?: NullableStringFieldUpdateOperationsInput | string | null
     diasEnvioMail?: NullableStringFieldUpdateOperationsInput | string | null
     urlApp?: StringFieldUpdateOperationsInput | string
+    urlAppDev?: NullableStringFieldUpdateOperationsInput | string | null
     logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20381,6 +20406,7 @@ export namespace Prisma {
     horaEnvioMail?: NullableStringFieldUpdateOperationsInput | string | null
     diasEnvioMail?: NullableStringFieldUpdateOperationsInput | string | null
     urlApp?: StringFieldUpdateOperationsInput | string
+    urlAppDev?: NullableStringFieldUpdateOperationsInput | string | null
     logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -21571,6 +21597,7 @@ export namespace Prisma {
     horaEnvioMail?: SortOrder
     diasEnvioMail?: SortOrder
     urlApp?: SortOrder
+    urlAppDev?: SortOrder
     logoUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -21593,6 +21620,7 @@ export namespace Prisma {
     horaEnvioMail?: SortOrder
     diasEnvioMail?: SortOrder
     urlApp?: SortOrder
+    urlAppDev?: SortOrder
     logoUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -21615,6 +21643,7 @@ export namespace Prisma {
     horaEnvioMail?: SortOrder
     diasEnvioMail?: SortOrder
     urlApp?: SortOrder
+    urlAppDev?: SortOrder
     logoUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder

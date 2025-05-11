@@ -175,6 +175,7 @@ exports.Prisma.ConfiguracionConsultorioScalarFieldEnum = {
   horaEnvioMail: 'horaEnvioMail',
   diasEnvioMail: 'diasEnvioMail',
   urlApp: 'urlApp',
+  urlAppDev: 'urlAppDev',
   logoUrl: 'logoUrl',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

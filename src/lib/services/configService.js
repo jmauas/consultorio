@@ -13,6 +13,11 @@ export const obtenerConfig = async () => {
       orderBy: { createdAt: 'desc' }
     });
     
+    // Si estamos en modo desarrollo y hay una URL de desarrollo configurada, la usamos
+    if (process.env.DEV === 'true' && config?.urlAppDev) {
+      return { ...config, urlApp: config.urlAppDev };
+    }
+    
     return config || {};
   } catch (error) {
     console.error('Error al obtener configuración:', error);
@@ -78,7 +83,8 @@ export const registrarConfig = async (datos, seccion = 'completo') => {
       // Datos específicos de la sección técnica
       dataToSave = {
         ...dataToSave,
-        ...(datos.urlApp !== undefined && { urlApp: datos.urlApp || '' })
+        ...(datos.urlApp !== undefined && { urlApp: datos.urlApp || '' }),
+        ...(datos.urlAppDev !== undefined && { urlAppDev: datos.urlAppDev || '' })
       };
     }
     

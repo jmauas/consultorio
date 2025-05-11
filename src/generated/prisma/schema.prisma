@@ -79,6 +79,7 @@ model ConfiguracionConsultorio {
   horaEnvioMail     String?
   diasEnvioMail     String?
   urlApp            String
+  urlAppDev         String? // Nueva columna para entorno de desarrollo
   logoUrl           String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
