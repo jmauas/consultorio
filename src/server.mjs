@@ -3,7 +3,7 @@ import next from 'next';
 import { createServer } from 'http';
 // Otros imports que puedas tener...
 
-const dev = process.env.NODE_ENV !== 'production';
+const dev = false;
 const app = next({ dev });
 const handle = app.getRequestHandler();
 

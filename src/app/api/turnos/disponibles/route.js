@@ -12,7 +12,7 @@ export async function GET(request) {
     const isPublicEndpoint = request.headers.get('x-api-source') === 'whatsapp';
     const url = new URL(request.url);
     
-    // Extract query parameters
+    // Extract query parametersf
     const doctor = url.searchParams.get('doctor');
     const tipo = url.searchParams.get('tipo') || 'turno';
     const minutosTurno = Number(url.searchParams.get('duracion'));
@@ -70,7 +70,6 @@ export async function GET(request) {
         });
         dr.agenda = agenda;
         doctores.push(dr);
-        console.log('Doctor encontrado:', dr);
       }
     } else {
       doctores = await prisma.doctor.findMany({
@@ -122,7 +121,6 @@ export async function GET(request) {
         estado: { not: 'cancelado' }
       }
     });
-    console.log('Turnos existentes:', turnos);
     const disp = [];
     doctores.forEach(doctor => {
       // Verificar si el doctor tiene agenda
@@ -187,8 +185,8 @@ export async function GET(request) {
           const minCorteDesde = aten.corteDesde.split(':')[1] ? Number(aten.corteDesde.split(':')[1]): 0;
           const minCorteHasta = aten.corteHasta.split(':')[1] ? Number(aten.corteHasta.split(':')[1]) : 0;
 
-          console.log(new Date().toLocaleString()+'  -  '+'diaSemana', dia, 'hoy', hoy, 'Fecha para feriado', fechaFer, 'fecha', fecha, 'hora', hora, 'minutos', minutos, 'hrInicio', hrInicio, 'minInicio', minInicio, 'hrFin', hrFin, 'minFin', minFin)
-          console.log(new Date().toLocaleString()+'  -  '+'hora', hora, 'minutos', minutos, 'hrCorte', hrCorteDesde, minCorteDesde, 'hrCorteHasta', hrCorteHasta, minCorteHasta)
+          //console.log(new Date().toLocaleString()+'  -  '+'diaSemana', dia, 'hoy', hoy, 'Fecha para feriado', fechaFer, 'fecha', fecha, 'hora', hora, 'minutos', minutos, 'hrInicio', hrInicio, 'minInicio', minInicio, 'hrFin', hrFin, 'minFin', minFin)
+          //console.log(new Date().toLocaleString()+'  -  '+'hora', hora, 'minutos', minutos, 'hrCorte', hrCorteDesde, minCorteDesde, 'hrCorteHasta', hrCorteHasta, minCorteHasta)
           if (hora < hrInicio) {
             hoy.setHours(hrInicio);
             hoy.setMinutes(hoy.getMinutes() - minutosTurno);

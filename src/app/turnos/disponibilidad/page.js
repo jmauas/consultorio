@@ -9,6 +9,18 @@ import { obtenerCoberturasDesdeDB } from '@/lib/utils/coberturasUtils';
 import { useSearchParams } from 'next/navigation';
 import Loader from '@/components/Loader';
 
+// Polyfill seguro para window.ethereum (fuera del componente)
+if (typeof window !== 'undefined') {
+  // Solo ejecutar en el cliente
+  window.ethereum = window.ethereum || {
+    isMetaMask: false,
+    selectedAddress: null,
+    request: async () => {},
+    on: () => {},
+    removeListener: () => {}
+  };
+}
+
 const DisponibilidadPage = () => {
   const searchParams = useSearchParams();
   
@@ -65,77 +77,7 @@ const DisponibilidadPage = () => {
     servicio: false
   });
 
-  // Cargar datos iniciales
-  useEffect(() => {
-    const cargarDatosIniciales = async () => {
-      try {
-        setShowLoading(true);
-        const response = await fetch('/api/configuracion', {
-          headers: {
-            'x-api-source': 'whatsapp'
-          },
-          cache: 'no-store'
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        // Guardar doctores si existen
-        if (data.doctores && Array.isArray(data.doctores) && data.doctores.length > 0) {
-          console.log('Doctores cargados en disponibilidad:', data.doctores);
-          setDoctores(data.doctores);
-        } else {
-          console.warn('No se encontraron doctores en la configuración');
-          setDoctores([]);
-        }
-        
-        // Guardar la configuración del consultorio
-        if (data.config) {
-          setConfiguracion(data.config);
-        }
-        
-        setShowLoading(false);
-        
-        // Verificar si hay parámetros de búsqueda en la URL
-        const dniParam = searchParams.get('dni');
-        const celularParam = searchParams.get('celular');
-        const idParam = searchParams.get('pacienteId');
 
-        if (dniParam) {
-          // Actualizar estado y buscar paciente por DNI
-          setFormData(prev => ({
-            ...prev,
-            dni: dniParam
-          }));
-          buscarPacientePorParam(`?dni=${dniParam}`);
-        } else if (celularParam) {
-          // Actualizar estado y buscar paciente por celular
-          setFormData(prev => ({
-            ...prev,
-            celular: celularParam
-          }));
-          buscarPacientePorParam(`?celular=${celularParam}`);
-        } else if (idParam) {
-          buscarPacientePorParam(`/${idParam}`);;
-        }
-      } catch (error) {
-        console.error('Error al cargar datos:', error);
-        setShowLoading(false);
-      }
-    };
-    
-    // Cargar coberturas y datos iniciales
-    const inicializarDatos = async () => {
-      await cargarCoberturasDisponibles();
-      await cargarDatosIniciales();
-    };
-    
-    inicializarDatos();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
 
   // Búsqueda de paciente por DNI desde parámetros de URL
   const buscarPacientePorParam = async (param) => {
@@ -227,7 +169,6 @@ const DisponibilidadPage = () => {
 
   // Combine appointment types from all doctors
   const unificarTipos = (doctores) => {
-    console.log("Unificando tipos de turnos de doctores:", doctores);
     let unifiedTypes = [];
     if (!doctores || !Array.isArray(doctores)) return unifiedTypes;
     
@@ -366,38 +307,6 @@ const DisponibilidadPage = () => {
         setExistingTurno(turnoData);
       }
     }
-    
-    // Force an immediate check of fields completeness
-    const { nombre, apellido, dni, celular, coberturaMedicaId, servicio, doctor } = {
-      ...formData, 
-      nombre: paciente.nombre || '',
-      apellido: paciente.apellido || '',
-      dni: paciente.dni || '',
-      celular: paciente.celular || '',
-      coberturaMedicaId: paciente.coberturaMedicaId || ''
-    };
-    
-    const isComplete = 
-      nombre && nombre.length >= 3 && 
-      apellido && apellido.length >= 3 && 
-      dni && dni.length >= 7 && 
-      celular && celular.length >= 8 && 
-      coberturaMedicaId && coberturaMedicaId !== '' &&
-      servicio && servicio !== '' &&
-      doctor && doctor !== '';
-    
-    console.log("Campos completos después de cargar paciente:", { 
-      nombre: nombre && nombre.length >= 3,
-      apellido: apellido && apellido.length >= 3,
-      dni: dni && dni.length >= 7,
-      celular: celular && celular.length >= 8,
-      coberturaMedicaId: coberturaMedicaId && coberturaMedicaId !== '',
-      servicio: servicio && servicio !== '',
-      doctor: doctor && doctor !== '',
-      resultado: isComplete
-    });
-    
-    setAllFieldsComplete(isComplete);
   };
 
   // Generic form field change handler
@@ -413,24 +322,6 @@ const DisponibilidadPage = () => {
       if (id === 'dni' && value.length >= 7 && showErrorTurno) {
         setShowErrorTurno(false);
       }
-      
-      
-        const updatedFormData = { ...formData, [id]: value };
-        const { nombre, apellido, dni, celular, coberturaMedicaId, servicio } = updatedFormData;
-        
-        const isComplete = 
-          nombre && nombre.length >= 3 && 
-          apellido && apellido.length >= 3 && 
-          dni && dni.length >= 7 && 
-          celular && celular.length >= 8 && 
-          coberturaMedicaId && coberturaMedicaId !== '' &&
-          servicio && servicio !== '';
-        
-        if (isComplete) {
-          setShowErrorTurno(false);
-          setAllFieldsComplete(true)
-        }
-        console.log("Verificando campos completos después de cambio:", isComplete)
     }
   };
 
@@ -443,7 +334,7 @@ const DisponibilidadPage = () => {
   };
 
   // Check if all required fields are complete
-  const checkAllFieldsComplete = () => {
+  const  checkAllFieldsComplete = () => {
     const { nombre, apellido, dni, celular, coberturaMedicaId, servicio, doctor } = formData;
     
     const isComplete = 
@@ -454,18 +345,7 @@ const DisponibilidadPage = () => {
       coberturaMedicaId && coberturaMedicaId !== '' &&
       servicio && servicio !== '' &&
       doctor && doctor !== '';
-    
-    console.log("Verificando campos completos:", { 
-      nombre: nombre && nombre.length >= 3,
-      apellido: apellido && apellido.length >= 3,
-      dni: dni && dni.length >= 7,
-      celular: celular && celular.length >= 8,
-      coberturaMedicaId: coberturaMedicaId && coberturaMedicaId !== '',
-      servicio: servicio && servicio !== '',
-      doctor: doctor && doctor !== '',
-      resultado: isComplete
-    });
-    
+   
     setAllFieldsComplete(isComplete);
     return isComplete;
   };
@@ -567,11 +447,19 @@ const DisponibilidadPage = () => {
     setShowRegistrarTurno(true);
     
     // Create appointment date objects
-    const ano = new Date(fecha).getFullYear();
-    const mes = new Date(fecha).getMonth();
-    const dia = new Date(fecha).getDate();
-    const desde = new Date(ano, mes, dia, turno.hora, turno.min);
-    const hasta = new Date(ano, mes, dia, turno.hora, turno.min);
+    let ano, mes, dia, desde, hasta;
+    if (fecha.includes('-')) {
+      ano = fecha.split('-')[0];
+      mes = fecha.split('-')[1] - 1; // Month is 0-indexed
+      dia = fecha.split('-')[2];
+    } else {
+      ano = new Date(fecha).getFullYear();
+      mes = new Date(fecha).getMonth();
+      dia = new Date(fecha).getDate();
+      fecha = new Date(fecha)
+    }
+    desde = new Date(ano, mes, dia, turno.hora, turno.min);
+    hasta = new Date(ano, mes, dia, turno.hora, turno.min);
     hasta.setMinutes(hasta.getMinutes() + duracion);
     
     // Validate required fields
@@ -602,13 +490,13 @@ const DisponibilidadPage = () => {
       coberturaMedicaId: formData.coberturaMedicaId,
       observaciones: formData.observaciones,
     };
-    console.log(turnoData)
     setTurno(turnoData);
   };
 
   // Register appointment
   const handleRegistrarTurno = async () => {
     // Hide buttons
+    setShowLoading(true);
     document.getElementById('btnRegistrar').style.display = 'none';
     document.getElementById('btnVolver').style.display = 'none';
     ocultarTodosLosDias();
@@ -687,10 +575,89 @@ const DisponibilidadPage = () => {
     setShowSuccessMessage(false);
   };
 
+    // Cargar datos iniciales
+    useEffect(() => {
+      const cargarDatosIniciales = async () => {
+        try {
+          setShowLoading(true);
+          const response = await fetch('/api/configuracion', {
+            headers: {
+              'x-api-source': 'whatsapp'
+            },
+            cache: 'no-store'
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Error: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          
+          // Guardar doctores si existen
+          if (data.doctores && Array.isArray(data.doctores) && data.doctores.length > 0) {
+            console.log('Doctores cargados en disponibilidad:', data.doctores);
+            setDoctores(data.doctores);
+          } else {
+            console.warn('No se encontraron doctores en la configuración');
+            setDoctores([]);
+          }
+          
+          // Guardar la configuración del consultorio
+          if (data.config) {
+            setConfiguracion(data.config);
+          }
+          
+          setShowLoading(false);
+          
+          // Verificar si hay parámetros de búsqueda en la URL
+          const dniParam = searchParams.get('dni');
+          const celularParam = searchParams.get('celular');
+          const idParam = searchParams.get('pacienteId');
+  
+          if (dniParam) {
+            // Actualizar estado y buscar paciente por DNI
+            setFormData(prev => ({
+              ...prev,
+              dni: dniParam
+            }));
+            buscarPacientePorParam(`?dni=${dniParam}`);
+          } else if (celularParam) {
+            // Actualizar estado y buscar paciente por celular
+            setFormData(prev => ({
+              ...prev,
+              celular: celularParam
+            }));
+            buscarPacientePorParam(`?celular=${celularParam}`);
+          } else if (idParam) {
+            buscarPacientePorParam(`/${idParam}`);;
+          }
+        } catch (error) {
+          console.error('Error al cargar datos:', error);
+          setShowLoading(false);
+        }
+      };
+      
+      // Cargar coberturas y datos iniciales
+      const inicializarDatos = async () => {
+        await cargarCoberturasDisponibles();
+        await cargarDatosIniciales();
+      };
+      
+      inicializarDatos();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchParams]);
+
+    useEffect(() => {
+      checkAllFieldsComplete();
+    }, [formData]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="flex justify-evenly items-center p-5 md:p-8 bg-white shadow-md">
-        <h1 className="text-3xl font-bold text-gray-800">Nuevo Turno</h1>
+        <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+          <h1 className="text-3xl font-bold text-gray-800">Nuevo Turno</h1>
+          <i className="fa-solid fa-calendar-plus fa-2xl text-orange-500"></i>
+        </div>
         {configuracion.logoUrl ? (         
           <Image
             src={`${configuracion.logoUrl}`}

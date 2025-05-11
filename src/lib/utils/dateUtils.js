@@ -8,48 +8,115 @@
  * @param {boolean} hs - Incluir horas y minutos
  * @param {boolean} sec - Incluir segundos
  * @param {boolean} americana - Formato americano (YYYY-MM-DD)
- * @param {boolean} dia - Incluir el día de la semana
+ * @param {boolean} diaSem - Incluir el día de la semana
  * @returns {string} Fecha formateada
  */
-export const formatoFecha = (sfecha, hs = false, sec = false, americana = false, dia = false, soloHora = false, sinAno = false) => {
+export const formatoFecha = (sfecha, hs = false, sec = false, americana = false, diaSem = false, soloHora = false, sinAno = false) => {
   if (sfecha !== undefined) {
     let fh;
+    let fallbackMode = false;    
     try {
-      fh = new Date(sfecha.toString().replace(/\s/, 'T'));
-      if (fh.toString() === "Invalid Date") {
-        fh = sfecha;
+      // Mejor manejo para dispositivos iOS
+      if (typeof sfecha === 'string') {
+        // Normalizar el formato de fecha para iOS
+        const normalizedDate = sfecha
+          .toString()
+          .replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3-$2-$1") // Convertir DD/MM/YYYY a YYYY-MM-DD
+          .replace(/\s+/g, 'T');  // Reemplazar TODOS los espacios con T
+        
+        fh = new Date(normalizedDate);
+      } else {
+        fh = new Date(sfecha);
       }
-    } catch {
-      fh = sfecha;
-    }
-    
-    let fhtxt = zfill(parseInt(fh.getDate()), 2) + '/' + zfill((parseInt(fh.getMonth()) + 1), 2);
-    if (!sinAno) fhtxt += "/" + parseInt(fh.getFullYear());
-    
-    if (americana) {
-      fhtxt = fechaAmericana(fhtxt);
-    }
-    
-    if (hs) {
-      fhtxt += ' ' + zfill(parseInt(fh.getHours()), 2) + ':' + zfill(parseInt(fh.getMinutes()), 2);
-    }
-    
-    if (sec) {
-      fhtxt += ':' + zfill(parseInt(fh.getSeconds()), 2);
-    }
-    
-    if (dia) {
-      fhtxt += ' ' + diaSemana(fh.getDay());
-    }
-
-    if (soloHora) {
-      fhtxt = zfill(parseInt(fh.getHours()), 2) + ':' + zfill(parseInt(fh.getMinutes()), 2);
-      if (sec) {
-        fhtxt += ':' + zfill(parseInt(fh.getSeconds()), 2);
+      
+      // Verificación adicional para iOS
+      if (isNaN(fh.getTime())) {
+        // Si aún falla, intentar con formato ISO explícito
+        if (typeof sfecha === 'string' && sfecha.includes('/')) {
+          const parts = sfecha.split(/[\/\s:]/);
+          if (parts.length >= 3) {
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1;
+            const year = parseInt(parts[2], 10);
+            const hours = parts.length > 3 ? parseInt(parts[3], 10) : 0;
+            const minutes = parts.length > 4 ? parseInt(parts[4], 10) : 0;
+            fh = new Date(year, month, day, hours, minutes);
+          }
+        }
+        
+        // Si sigue siendo inválido, usar una fecha por defecto
+        if (isNaN(fh.getTime())) {
+          console.warn('Fecha inválida, usando valor por defecto:', sfecha);
+          fh = new Date(); // Usar fecha actual como fallback
+          fallbackMode = true;
+        }
       }
+    } catch (error) {
+      console.warn('Error al procesar fecha:', error);
+      fh = new Date(); // Usar fecha actual como fallback
+      fallbackMode = true;
     }
     
-    return fhtxt;
+    try {
+      // Verificar que fh sea un objeto Date válido antes de usar sus métodos
+      if (!(fh instanceof Date) || isNaN(fh.getTime())) {
+        fh = new Date(); // Asegurar que sea un Date válido
+        fallbackMode = true;
+      }
+      
+      // Si estamos en modo fallback y la fecha original era un string, intentar devolverlo formateado básicamente
+      if (fallbackMode && typeof sfecha === 'string') {
+        if (sfecha.includes('-')) {
+          const parts = sfecha.split('-');
+          if (parts.length >= 3) {
+            const year = parts[0];
+            const month = parts[1];
+            const day = parts[2].split(' ')[0]; // Ignorar la hora si existe
+            return `${zfill(day, 2)}/${zfill(month, 2)}/${zfill(year, 2)}`; // Devolver en formato DD/MM/YYYY
+          }
+        }
+        return sfecha; // Devolver el string original si no pudimos parsearlo
+      }
+      
+      // FORMATEO EXPLÍCITO - FUNCIONA EN TODAS LAS PLATAFORMAS
+      // A partir de aquí fh es un objeto Date válido
+      const dia = zfill(fh.getDate(), 2);
+      const mes = zfill((fh.getMonth() + 1), 2);
+      const anio = fh.getFullYear();
+      
+      let fhtxt = '';
+      
+      // Crear el formato de fecha manualmente para evitar problemas de plataforma
+      if (soloHora) {
+        fhtxt = zfill(fh.getHours(), 2) + ':' + zfill(fh.getMinutes(), 2);
+        if (sec) {
+          fhtxt += ':' + zfill(fh.getSeconds(), 2);
+        }
+        return fhtxt;
+      }
+      if (americana) {
+        fhtxt = anio + '-' + mes + '-' + dia;
+      } else {
+        fhtxt = dia + '/' + mes;
+        if (!sinAno) fhtxt += '/' + anio;
+      }
+      
+      if (hs) {
+        fhtxt += ' ' + zfill(fh.getHours(), 2) + ':' + zfill(fh.getMinutes(), 2);
+        if (sec) {
+          fhtxt += ':' + zfill(fh.getSeconds(), 2);
+        }
+      }
+      
+      if (diaSem) {
+        fhtxt += ' ' + diaSemana(fh.getDay());
+      }
+      
+      return fhtxt;
+    } catch (error) {
+      console.error('Error al formatear fecha:', error);
+      return typeof sfecha === 'string' ? sfecha : '01/01/1900';
+    }
   } else {
     return '01/01/1900';
   }
