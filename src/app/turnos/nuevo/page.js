@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import TurnoNuevo from '@/components/TurnoNuevo';
+import Loader from '@/components/Loader';
 
-export default function NuevoTurnoPage() {
+const  NuevoTurnoPage = () => {
   const searchParams = useSearchParams();
   // Creo los estados para cada uno de los parametros que voy a leer
   const [desde, setDesde] = useState(null);
@@ -43,17 +44,24 @@ export default function NuevoTurnoPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
+  return (   
+      <TurnoNuevo 
+        desdeParam={desde}
+        duracionParam={duracion}
+        doctorIdParam={doctorId}
+        tipoTurnoIdParam={tipoTurnoId}
+        dniParam={dni}
+        celularParam={celular}
+        pacienteIdParam={pacienteId}
+      />   
+  )
+}
 
+ export default function Page() {
   return (
-    <TurnoNuevo 
-      desdeParam={desde}
-      duracionParam={duracion}
-      doctorIdParam={doctorId}
-      tipoTurnoIdParam={tipoTurnoId}
-      dniParam={dni}
-      celularParam={celular}
-      pacienteIdParam={pacienteId}
-    />
+    <Suspense fallback={<Loader titulo={'Cargando Datos Turno'} />}>
+      <NuevoTurnoPage />
+    </Suspense>
   );
 }
 

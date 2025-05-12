@@ -1,14 +1,14 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import TurnoDisponibilidad from '@/components/TurnoDisponibilidad';
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation';
+import Loader from '@/components/Loader';
 
-export default function Page() {
+const  TurnoPage = () => {
     const searchParams = useSearchParams();
     const [dni, setDni] = useState(null);
     const [celular, setCelular] = useState(null);
-    const [pacienteId, setPacienteId] = useState(null);
-  
+    const [pacienteId, setPacienteId] = useState(null);  
   
     // Cargar datos iniciales
     useEffect(() => {
@@ -32,3 +32,9 @@ export default function Page() {
       />
   );
 }
+
+export default function Page() {(
+  <Suspense fallback={<Loader titulo={'Cargando Datos Turno'} />}>
+    <TurnoPage />
+  </Suspense>
+)};
