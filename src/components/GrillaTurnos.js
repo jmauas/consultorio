@@ -169,15 +169,21 @@ export default function GrillaTurnos({
   };
 
   
-const filaLibre = (turno, titulo, color, index) => {  
+const filaLibre = (turno, anterior, color, index) => {  
   return (
     <tr
-      key={`${turno.id}-${titulo.replaceAll(' ', '-')}-${index}`} 
+      key={`${turno.id}-${anterior}-${index}`} 
       className={`bg-white text-slate-600 font-bold`}>
       <td colSpan="7" className="px-6 py-1 text-center">
-        {/* {titulo} */}
-        <div className={`text-${color}-500 text-center text-sm flex items-center justify-between`}>
+        <div className={`text-${color}-500 text-center text-sm flex items-center justify-between gap-4`}>
           <div className={`border-t-3 border-${color}-500 my-1 w-full`}></div>
+          <span className="whitespace-nowrap">
+            {anterior 
+              ? <><span className="text-slate-700 font-normal">Disponibilidad Antes de Este Turno</span><i class="fa-solid fa-arrow-down ml-2 fa-lg"></i></>
+              : <><span className="text-slate-700 font-normal">Disponibilidad Despues de Este Turno</span><i class="fa-solid fa-arrow-up ml-2 fa-lg"></i></>
+            }
+          </span>  
+          <span className="px-1 py-2 border rounded-lg">{formatoFecha(turno.desde, true, false, false, false, true)}</span>
           <i className="fa-solid fa-arrow-right fa-2xl"></i>
         </div>
       </td>
@@ -193,17 +199,19 @@ const filaLibre = (turno, titulo, color, index) => {
   )
 }
 
-const cardLibre = (turno, titulo, color, index) => {  
+const cardLibre = (turno, anterior, color, index) => {  
   return (<>   
         <button 
           onClick={() => abrirModalNuevoTurnoDispo(turno)}
-          key={`${turno.id}-${titulo.replaceAll(' ', '-')}-${index}`} 
-          className={`text-orange-600 hover:text-orange-900 p-1 bg-${color}-100 rounded-lg flex items-center justify-evenly`}
-        >
-            <div className={`my-1 text-slate-800 text-center text-sm`}>
-              {titulo}
-            </div>
-          <i className="fas fa-plus fa-lg"></i>
+          key={`${turno.id}-${anterior}-${index}`} 
+          className={`p-1 text-sm bg-${color}-100 rounded-lg flex items-center justify-evenly gap-3`}
+        >           
+          {anterior 
+            ? <><span>Disponibilidad Antes de Este Turno</span><i class="fa-solid fa-arrow-down ml-2 fa-lg text-orange-500"></i></>
+            : <><span>Disponibilidad Despues de Este Turno</span><i class="fa-solid fa-arrow-up ml-2 fa-lg text-orange-500"></i></>
+          }
+          <span className="px-1 py-2 font-bold border rounded-lg text-orange-500">{formatoFecha(turno.desde, true, false, false, false, true)}</span>
+          <i className="fas fa-plus fa-2xl text-orange-500"></i>
         </button>      
     </>    
   )
@@ -248,7 +256,7 @@ const cardLibre = (turno, titulo, color, index) => {
             {turnos.map((turno, index) => (
               <React.Fragment key={turno.id || `turno-${index}`}>
                 {turno.disponibilidadAnterior && (
-                  filaLibre(turno.disponibilidadAnterior, 'Disponibilidad Turno Anterior', 'blue', index)
+                  filaLibre(turno.disponibilidadAnterior, true, 'blue', index)
                 )}
                 <tr key={turno.id || index} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
@@ -304,7 +312,7 @@ const cardLibre = (turno, titulo, color, index) => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {turno.tipoDeTurno.nombre || 'No especificado'}
+                    {turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${obtenerColorEstado(turno.estado || 'sin confirmar')}`}>
@@ -348,7 +356,7 @@ const cardLibre = (turno, titulo, color, index) => {
                   </td>
                 </tr>    
                   {turno.disponibilidadPosterior && (
-                    filaLibre(turno.disponibilidadPosterior, 'Disponibilidad Turno Posterior', 'green', index)
+                    filaLibre(turno.disponibilidadPosterior, false, 'green', index)
                   )}
               </React.Fragment>              
                 ))}      
@@ -361,7 +369,7 @@ const cardLibre = (turno, titulo, color, index) => {
         {turnos.map((turno, index) => (
         <React.Fragment key={turno.id || `turno-${index}`}>
           {turno.disponibilidadAnterior && (
-            cardLibre(turno.disponibilidadAnterior, 'Disponibilidad Turno Anterior', 'blue', index)
+            cardLibre(turno.disponibilidadAnterior, true, 'blue', index)
           )}
           <div 
             key={turno.id || index} 
@@ -432,7 +440,7 @@ const cardLibre = (turno, titulo, color, index) => {
                 </div>
                 <div className="col-span-2">
                   <p className="text-sm font-medium text-gray-500">Tipo</p>
-                  <p className="mt-1 text-sm font-bold">{turno.tipoDeTurno.nombre || 'No especificado'}</p>
+                  <p className="mt-1 text-sm font-bold">{turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}</p>
                 </div>
               </div>
             </div>
@@ -476,7 +484,7 @@ const cardLibre = (turno, titulo, color, index) => {
             </div>
           </div>
           {turno.disponibilidadPosterior && (
-            cardLibre(turno.disponibilidadPosterior, 'Disponibilidad Turno Posterior', 'green', index)
+            cardLibre(turno.disponibilidadPosterior, false, 'green', index)
           )}
         </React.Fragment>
         ))}

@@ -52,9 +52,27 @@ export const analizarTurnosDisponibles = async (turnos) => {
           const corteDesde = agendaDoctor.corteDesde ? convertirHoraAMinutos(agendaDoctor.corteDesde) : null;
           const corteHasta = agendaDoctor.corteHasta ? convertirHoraAMinutos(agendaDoctor.corteHasta) : null;
           
-          const turnoAnterior = i > 0 ? turnos[i - 1] : null;
-          const turnoSiguiente = i < turnos.length - 1 ? turnos[i + 1] : null;
-  
+          let turnoAnterior = null;
+          let turnoSiguiente = null;
+          // buscar turno anterior, que no esté en estado cancelado
+          if (i > 0) {
+            for (let j = i - 1; j >= 0; j--) {
+              if (turnos[j].estado !== 'cancelado') {
+                turnoAnterior = turnos[j];
+                break;
+              }
+            }
+          }       
+          // buscar turno siguiente, que no esté en estado cancelado
+          if (i < turnos.length - 1) {
+            for (let j = i + 1; j < turnos.length; j++) {
+              if (turnos[j].estado !== 'cancelado') {
+                turnoSiguiente = turnos[j];
+                break;
+              }
+            }
+          }
+
           // Convertir horas de turno a minutos desde medianoche
           const turnoDesdeMin = convertirFechaAMinutos(turno.desde);
           const turnoHastaMin = convertirFechaAMinutos(turno.hasta);

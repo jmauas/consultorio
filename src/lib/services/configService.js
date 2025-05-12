@@ -155,9 +155,10 @@ export const registrarConfig = async (datos, seccion = 'completo') => {
       // Eliminar doctores que ya no están en la lista y sus relaciones
       if (idsDoctoresAEliminar.length > 0) {
         // Eliminar relaciones
-        await prisma.tipoTurnoDoctor.deleteMany({
-          where: {
-            doctorId: { in: idsDoctoresAEliminar }
+        await prisma.tipoTurnoDoctor.update({
+          where: {  doctorId: { in: idsDoctoresAEliminar }},
+          data: {
+            doctorId: '',
           }
         });
         await prisma.agendaDoctor.deleteMany({
@@ -211,24 +212,54 @@ export const registrarConfig = async (datos, seccion = 'completo') => {
               });
             }
           }
-          
-          // Procesar tipos de turno
+            // Procesar tipos de turno
           if (doctor.tiposTurno && Array.isArray(doctor.tiposTurno)) {
-            // Eliminar tipos de turno anteriores
-            await prisma.tipoTurnoDoctor.deleteMany({
+            // Obtener los tipos de turno existentes para este doctor
+            const tiposTurnoExistentes = await prisma.tipoTurnoDoctor.findMany({
               where: { doctorId: doctor.id }
             });
             
-            // Crear nuevos tipos de turno
-            for (const tipoTurno of doctor.tiposTurno) {
-              await prisma.tipoTurnoDoctor.create({
-                data: {
-                  doctorId: doctor.id,
-                  nombre: tipoTurno.nombre,
-                  duracion: tipoTurno.duracion,
-                  habilitado: tipoTurno.habilitado
-                }
+            // Mapear los tipos existentes por nombre para facilitar la búsqueda
+            const tiposTurnoExistentesMap = new Map(tiposTurnoExistentes.map(t => [t.nombre, t]));
+            
+            // Identificar nombres de tipos de turno que vendrán en la actualización
+            const nombresTiposNuevos = new Set(doctor.tiposTurno.map(t => t.nombre));
+            
+            // Identificar tipos de turno que ya no están en la lista pero existen en la BD
+            const tiposParaDesactivar = tiposTurnoExistentes.filter(t => !nombresTiposNuevos.has(t.nombre));
+            
+            // Desactivar (no eliminar) los tipos que ya no están en la lista
+            for (const tipo of tiposParaDesactivar) {
+              await prisma.tipoTurnoDoctor.update({
+                where: { id: tipo.id },
+                data: { habilitado: false }
               });
+            }
+            
+            // Actualizar o crear tipos de turno según corresponda
+            for (const tipoTurno of doctor.tiposTurno) {
+              const tipoExistente = tiposTurnoExistentesMap.get(tipoTurno.nombre);
+              
+              if (tipoExistente) {
+                // Actualizar tipo existente
+                await prisma.tipoTurnoDoctor.update({
+                  where: { id: tipoExistente.id },
+                  data: {
+                    duracion: tipoTurno.duracion,
+                    habilitado: tipoTurno.habilitado
+                  }
+                });
+              } else {
+                // Crear nuevo tipo de turno
+                await prisma.tipoTurnoDoctor.create({
+                  data: {
+                    doctorId: doctor.id,
+                    nombre: tipoTurno.nombre,
+                    duracion: tipoTurno.duracion,
+                    habilitado: tipoTurno.habilitado
+                  }
+                });
+              }
             }
           }
         } else {

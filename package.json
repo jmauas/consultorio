@@ -12,6 +12,8 @@
     "lint": "next lint",
     "pm2": "pm2 start ./pm2.config.cjs",
     "pm2-restart": "pm2 restart \"Consultorio App\"",
+    "pm2-stop": "pm2 stop \"Consultorio App\"",
+    "pm2-start": "pm2 start \"Consultorio App\"",
     "okBuild": "node ./src/test/envioWA.mjs"
   },
   "prisma": {
