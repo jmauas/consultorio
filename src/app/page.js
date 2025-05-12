@@ -209,13 +209,14 @@ export default function Home() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">
+      <h1 className="text-lg md:text-3xl font-bold text-gray-800 mb-2 md:mb-8">
         <i className="fa-solid fa-user-circle mr-2"></i>
         Bienvenido, {session.user?.name || 'Usuario'}
       </h1>
       
       {/* Tarjetas de estadísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      {/* Pantallas Grandes */}
+      <div className="hidden md:grid md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-semibold text-gray-700 mb-2">
             <i className="fa-solid fa-calendar-day mr-2"></i>
@@ -250,10 +251,56 @@ export default function Home() {
             Pacientes Registrados
           </h2>
           <p className="text-3xl font-bold text-purple-600">{stats.pacientes}</p>
-          <span className="text-sm text-gray-500 mt-2 inline-block">
-            <i className="fa-solid fa-info-circle mr-1"></i>
-            Total en el sistema
-          </span>
+          <Link 
+            href="/pacientes" 
+            className="text-sm text-blue-500 hover:underline mt-2 inline-block"
+          >
+            Ver todos <i className="fa-solid fa-arrow-right"></i>
+          </Link>
+        </div>
+      </div>
+      {/* Pantallas Pequeñas */}
+      <div className="flex flex-col md:hidden gap-2 mb-4">
+        <div className="bg-white rounded-lg shadow-md p-4 flex gap-4 items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-700">
+            <i className="fa-solid fa-calendar-day mr-2"></i>
+            Turnos de Hoy
+          </h2>
+          <span className="text-3xl font-bold text-blue-600">{stats.turnosHoy}</span>
+          <Link 
+            href={`/turnos?desde=${new Date().toISOString().split('T')[0]}&hasta=${new Date().toISOString().split('T')[0]}`} 
+            className="text-sm text-blue-500 hover:underline inline-block"
+          >
+            Ver todos <i className="fa-solid fa-arrow-right"></i>
+          </Link>
+        </div>
+        
+        <div className="bg-white rounded-lg shadow-md p-4 flex gap-4 items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-700 mb-2">
+            <i className="fa-solid fa-calendar-week mr-2"></i>
+            Próximos Turnos
+          </h2>
+          <span className="text-3xl font-bold text-green-600">{stats.turnosProximos}</span>
+          <Link 
+            href="/turnos" 
+            className="text-sm text-blue-500 hover:underline inline-block"
+          >
+            Ver todos <i className="fa-solid fa-arrow-right"></i>
+          </Link>
+        </div>
+        
+        <div className="bg-white rounded-lg shadow-md p-4 flex gap-4 items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-700">
+            <i className="fa-solid fa-users mr-2"></i>
+            Pacientes
+          </h2>
+          <span className="text-3xl font-bold text-purple-600">{stats.pacientes}</span>
+          <Link 
+            href="/pacientes" 
+            className="text-sm text-blue-500 hover:underline inline-block"
+          >
+            Ver todos <i className="fa-solid fa-arrow-right"></i>
+          </Link>
         </div>
       </div>
       

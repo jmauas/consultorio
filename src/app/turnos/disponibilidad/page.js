@@ -4,7 +4,7 @@ import TurnoDisponibilidad from '@/components/TurnoDisponibilidad';
 import { useSearchParams } from 'next/navigation';
 import Loader from '@/components/Loader';
 
-const  TurnoPage = () => {
+const NuevoTurnoPage = () => {
     const searchParams = useSearchParams();
     const [dni, setDni] = useState(null);
     const [celular, setCelular] = useState(null);
@@ -33,8 +33,10 @@ const  TurnoPage = () => {
   );
 }
 
-export default function Page() {(
+export default function Page() {
+  return (
   <Suspense fallback={<Loader titulo={'Cargando Datos Turno'} />}>
-    <TurnoPage />
+    <NuevoTurnoPage />
   </Suspense>
-)};
+  )
+};
