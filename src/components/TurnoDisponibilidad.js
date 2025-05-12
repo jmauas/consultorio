@@ -982,7 +982,7 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                           <i className="fa-solid fa-list-check text-orange-500"></i> Tipo Turno:
                         </div>
                         <div className="bg-white px-3 py-2 rounded border border-gray-300 font-medium">
-                          {turno.servicio}
+                          {turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}
                         </div>
                       </div>
                       

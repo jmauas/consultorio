@@ -76,13 +76,13 @@ export const postAdjunto = async (cel, adj, ruta, externa, urlAdj) => {
  * @param {object} turno - Datos del turno
  * @returns {Promise<object>} - Resultado de la operación
  */
-export async function enviarRecordatorioTurno(turno) {
+export async function enviarRecordatorioTurno(turno, cambioEstado) {
   try {
     if (!turno) {
       throw new Error('Datos de turno insuficientes');
     }
    
-    const msg = await textoMensajeConfTurno(turno);    
+    const msg = await textoMensajeConfTurno(turno, cambioEstado);    
     // Normalizar número de celular
     const celularNormalizado = normalizarNumeroCelular(turno.paciente.celular);
     if (!celularNormalizado) {
@@ -106,20 +106,20 @@ export async function enviarRecordatorioTurno(turno) {
   }
 }
 
-export const textoMensajeConfTurno = async (turno) => {
+export const textoMensajeConfTurno = async (turno, cambioEstado) => {
   const enlaceCancelacion = turno.token 
   ? `${config.urlApp}/turnos/cancelar/${turno.token}`
   : '';
-  const msg = `Hola ${turno.paciente.nombre}. 👋
+  let msg = `Hola ${turno.paciente.nombre}. 👋
 Desde *${config.nombreConsultorio}*, te confirmamos tu Turno Agendado. 👍
 
 ✅ Te Detallamos los datos:
 🧑‍⚕️ Paciente: ${turno.paciente.nombre} ${turno.paciente.apellido || ''}.
 📅 Fecha del Turno: *${formatoFecha(turno.desde, true, false, false, true)}*.
-🦷 Tipo Turno: ${turno.servicio}.
+🦷 Tipo Turno: ${turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}.
 💉 Profesional: ${turno.doctor.nombre}.
 🏥 Domicilio: *${turno.consultorio.direccion || config.domicilio}*.
-📱 Celular: ${turno.consultorio.telefono || config.celular}.
+📱 Celular: ${turno.consultorio.telefono || config.telefono}.
 📧 Email: ${turno.consultorio.email || config.mail}.
 
 Recordá llegar 5 minutos antes.
@@ -129,7 +129,23 @@ ${enlaceCancelacion}
 
 Gracias, y que tengas buen día! 👋👋👋.
       `;
-    return msg
+if (cambioEstado) {   
+  msg = `Hola ${turno.paciente.nombre}. 👋
+Desde *${config.nombreConsultorio}*, te notificamos el cambio del estado de tu turno a *${turno.estado.toUpperCase()}* ‼️
+
+✅ Te Recordamos los datos del Turno Modificado:
+🧑‍⚕️ Paciente: ${turno.paciente.nombre} ${turno.paciente.apellido || ''}.
+📅 Fecha del Turno: *${formatoFecha(turno.desde, true, false, false, true)}*.
+🦷 Tipo Turno: ${turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}.
+💉 Profesional: ${turno.doctor.nombre}.
+🏥 Domicilio: *${turno.consultorio.direccion || config.domicilio}*.
+📱 Celular: ${turno.consultorio.telefono || config.telefono}.
+📧 Email: ${turno.consultorio.email || config.mail}.
+
+Gracias, y que tengas buen día! 👋👋👋.
+      `;
+}
+  return msg
 }
 
 /**

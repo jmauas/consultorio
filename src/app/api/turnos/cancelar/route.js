@@ -4,7 +4,6 @@ import { obtenerConfig } from '@/lib/services/configService.js';
 
 const config = await obtenerConfig();
     
-
 // Ruta para manejar la cancelación de turnos mediante token
 export async function POST(request) {
   try {

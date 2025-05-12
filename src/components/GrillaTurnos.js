@@ -179,8 +179,8 @@ const filaLibre = (turno, anterior, color, index) => {
           <div className={`border-t-3 border-${color}-500 my-1 w-full`}></div>
           <span className="whitespace-nowrap">
             {anterior 
-              ? <><span className="text-slate-700 font-normal">Disponibilidad Antes de Este Turno</span><i class="fa-solid fa-arrow-down ml-2 fa-lg"></i></>
-              : <><span className="text-slate-700 font-normal">Disponibilidad Despues de Este Turno</span><i class="fa-solid fa-arrow-up ml-2 fa-lg"></i></>
+              ? <><span className="text-slate-700 font-normal">Disponibilidad Antes de Este Turno</span><i className="fa-solid fa-arrow-down ml-2 fa-lg"></i></>
+              : <><span className="text-slate-700 font-normal">Disponibilidad Despues de Este Turno</span><i className="fa-solid fa-arrow-up ml-2 fa-lg"></i></>
             }
           </span>  
           <span className="px-1 py-2 border rounded-lg">{formatoFecha(turno.desde, true, false, false, false, true)}</span>
@@ -207,8 +207,8 @@ const cardLibre = (turno, anterior, color, index) => {
           className={`p-1 text-sm bg-${color}-100 rounded-lg flex items-center justify-evenly gap-3`}
         >           
           {anterior 
-            ? <><span>Disponibilidad Antes de Este Turno</span><i class="fa-solid fa-arrow-down ml-2 fa-lg text-orange-500"></i></>
-            : <><span>Disponibilidad Despues de Este Turno</span><i class="fa-solid fa-arrow-up ml-2 fa-lg text-orange-500"></i></>
+            ? <><span>Disponibilidad Antes de Este Turno</span><i className="fa-solid fa-arrow-down ml-2 fa-lg text-orange-500"></i></>
+            : <><span>Disponibilidad Despues de Este Turno</span><i className="fa-solid fa-arrow-up ml-2 fa-lg text-orange-500"></i></>
           }
           <span className="px-1 py-2 font-bold border rounded-lg text-orange-500">{formatoFecha(turno.desde, true, false, false, false, true)}</span>
           <i className="fas fa-plus fa-2xl text-orange-500"></i>

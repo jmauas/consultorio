@@ -267,7 +267,7 @@ export default function DetalleTurno({
       }
       // const fechaTurno = formatoFecha(turno.desde, true, false, false, true);
       
-      // const mensaje = `Hola ${turno.nombre}, te recordamos tu turno de ${turno.servicio} con el Dr. ${turno.doctor} para el día ${fechaTurno}. Por favor confirma tu asistencia respondiendo a este mensaje. Gracias!`;
+      // const mensaje = `Hola ${turno.nombre}, te recordamos tu turno de ${turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'} con el Dr. ${turno.doctor} para el día ${fechaTurno}. Por favor confirma tu asistencia respondiendo a este mensaje. Gracias!`;
       
       // const resultado = await enviarMensaje(turno.celular, mensaje);
       
@@ -462,7 +462,7 @@ export default function DetalleTurno({
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div>
               <h2 className="text-xl font-semibold text-gray-800">
-                Turno {turno.servicio || 'Médico'}
+                Turno {turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado' || 'Médico'}
               </h2>
               <p className="text-gray-600 mt-1">
                 {formatoFecha(turno.desde, true, false, false, true)}
@@ -523,7 +523,7 @@ export default function DetalleTurno({
                 <div className="space-y-3">
                   <div>
                     <p className="text-sm text-gray-500">Tipo de Turno</p>
-                    <p className="font-medium">{turno.servicio}</p>
+                    <p className="font-medium">{turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Doctor</p>
@@ -590,7 +590,7 @@ export default function DetalleTurno({
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Turno</label>
                     <p className="text-sm text-gray-500">
-                      (No editable: {turno.servicio})
+                      (No editable: {turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'})
                     </p>
                   </div>
                   <div>
@@ -706,8 +706,12 @@ export default function DetalleTurno({
                 >
                   <option value="">Seleccionar estado</option>
                   {estados.map((estado) => (
-                    <option key={estado.id} value={estado.id}>
-                      {estado.nombre}
+                    <option 
+                      key={estado.id} 
+                      value={estado.id}
+                      className={`text-lg font-bold ${obtenerColorEstado(estado.id)}`}
+                    >
+                        {estado.nombre}
                     </option>
                   ))}
                 </select>

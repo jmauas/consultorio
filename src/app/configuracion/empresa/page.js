@@ -39,7 +39,7 @@ export default function EmpresaPage() {
           nombreConsultorio: config.nombreConsultorio || '',
           domicilio: config.domicilio || '',
           telefono: config.telefono || '',
-          email: config.email || '',
+          email: config.mail || '',
           web: config.web || '',
           horarioAtencion: config.horarioAtencion || '',
           logo: null,

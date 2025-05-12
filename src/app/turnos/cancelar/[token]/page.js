@@ -141,7 +141,7 @@ export default function CancelarTurnoPage({ }) {
           {turno && (
             <div className="mb-6 p-4 bg-gray-50 rounded-lg">
               <p className="font-semibold">Detalles del turno cancelado:</p>
-              <p>Servicio: {turno.servicio}</p>
+              <p>Servicio: {turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}</p>
               <p>Fecha: {formatoFecha(turno.desde)}</p>
               <p>Profesional: {turno.doctor.nombre}</p>
             </div>
@@ -184,7 +184,7 @@ export default function CancelarTurnoPage({ }) {
           {turno && (
             <div className="mb-6 p-4 bg-gray-50 rounded-lg">
               <p className="font-semibold">Detalles del turno:</p>
-              <p>Servicio: {turno.servicio}</p>
+              <p>Servicio: {turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}</p>
               <p>Fecha: {formatoFecha(turno.desde)}</p>
               <p>Profesional: {turno.doctor.nombre}</p>
             </div>
@@ -226,7 +226,7 @@ export default function CancelarTurnoPage({ }) {
             <div className="p-4 bg-gray-50 rounded-lg mb-6">
               <h2 className="text-lg font-semibold mb-2">Detalles del Turno</h2>
               <p><span className="font-medium">Paciente:</span> {turno.paciente.nombre} {turno.paciente.apellido}</p>
-              <p><span className="font-medium">Servicio:</span> {turno.servicio}</p>
+              <p><span className="font-medium">Servicio:</span> {turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}</p>
               <p><span className="font-medium">Fecha:</span> {formatoFecha(turno.desde)}</p>
               <p><span className="font-medium">Profesional:</span> {turno.doctor.nombre}</p>
               <p><span className="font-medium">Consultorio:</span> {turno.consultorio.nombre}</p>

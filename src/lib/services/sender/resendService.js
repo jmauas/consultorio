@@ -23,16 +23,19 @@ if (!resendRte) {
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 
-export const enviarMailConfTurno = async (turno) => {   
+export const enviarMailConfTurno = async (turno, cambioEstado) => {   
     const mail = ValidarEmail(turno.paciente.email);
     if (mail && mail !== '') {
         // Enviar el correo usando el servicio de Resend
-        const html = await htmlMensajeConfTurno(turno);
+        const html = await htmlMensajeConfTurno(turno, cambioEstado);
         const ics = await generarArchivoICS(turno);
-        const text = await textoMailConfTurno(turno); 
+        const text = await textoMailConfTurno(turno, cambioEstado);
+        const asunto = cambioEstado
+         ? `Cambio de Estado del Turno a ${turno.estado.toUpperCase()} - ${config.nombreConsultorio}`
+         : `Recordatorio Turno ${formatoFecha(turno.desde, true, false, false, true)} - ${config.nombreConsultorio}`;
         const result = await enviarMail(
             mail,
-            `Recordatorio Turno ${formatoFecha(turno.desde, true, false, false, true)} - ${config.nombreConsultorio}`,
+            asunto,
             html,
             ics,
             text,
@@ -110,7 +113,7 @@ export const enviarMail = async (email, asunto, mensaje, ics = null, text = null
 }
 
 
-export const htmlMensajeConfTurno = async (turno) => {
+export const htmlMensajeConfTurno = async (turno, cambioEstado) => {
     // Construir enlace de cancelación si existe token
     const enlaceCancelacion = turno.token 
         ? `${config.urlApp}/turnos/cancelar/${turno.token}`
@@ -229,7 +232,10 @@ export const htmlMensajeConfTurno = async (turno) => {
         </head>
         <body>
         <div class="header">
-            <h1>Confirmación de Turno</h1>
+            ${cambioEstado 
+              ? `<h1>Cambio de Estado del Turno a ${turno.estado.toUpperCase()}</h1>`
+              : `<h1>Confirmación de Turno</h1>`
+            }
         </div>
         <div class="content">
             <div class="greeting">
@@ -237,7 +243,9 @@ export const htmlMensajeConfTurno = async (turno) => {
             </div>
             
             <div class="confirmation">
-            <span class="emoji">👍</span> Desde ${config.nombreConsultorio}, te confirmamos tu turno agendado.
+            <span class="emoji">👍</span> Desde ${config.nombreConsultorio}, ${ cambioEstado 
+              ? `te notificamos el cambio del estado de tu turno a ${turno.estado.toUpperCase()} ‼️`
+              : `te confirmamos tu turno agendado. ✔️✔️`}
             </div>
             
             <h2><span class="emoji">✅</span> Detalles del turno:</h2>
@@ -252,7 +260,7 @@ export const htmlMensajeConfTurno = async (turno) => {
             </div>
             
             <div class="detail-item">
-                <span class="emoji">🦷</span> <strong>Tipo de Turno:</strong> ${turno.servicio}
+                <span class="emoji">🦷</span> <strong>Tipo de Turno:</strong> ${turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}
             </div>
             
             <div class="detail-item">
@@ -268,11 +276,11 @@ export const htmlMensajeConfTurno = async (turno) => {
             </div>
 
             <div class="detail-item">
-                <span class="emoji">📱</span> <strong>Celular contacto:</strong> ${turno.consultorio.telefono || config.celular}
+                <span class="emoji">📱</span> <strong>Celular contacto:</strong> ${turno.consultorio.telefono || config.telefono}
             </div>
             </div>
-            
-            <div class="reminder">
+            ${!cambioEstado
+            ? `<div class="reminder">
             <span class="emoji">⏰</span> Recordá llegar 5 minutos antes de tu turno
             </div>
             
@@ -292,6 +300,9 @@ export const htmlMensajeConfTurno = async (turno) => {
                 <span class="emoji">❌</span> Cancelar Turno
             </a>
             ` : ''}
+
+            `
+            : ``}
             
             <div class="footer">
             <p>Gracias, y que tengas buen día! <span class="emoji">👋👋👋</span></p>
@@ -303,14 +314,17 @@ export const htmlMensajeConfTurno = async (turno) => {
     return htmlMsg;
 }
 
-export const textoMailConfTurno = async (turno) => {
+export const textoMailConfTurno = async (turno, cambioEstado) => {
     const enlaceCancelacion = turno.token 
         ? `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/cancelar-turno/${turno.token}`
         : '';
 
     const textoMsg = `👋 Hola ${turno.paciente.nombre}!
   
-  👍 Desde ${config.nombreConsultorio}, te confirmamos tu turno agendado.
+  ${cambioEstado
+    ?  `👍 Desde ${config.nombreConsultorio}, te confirmamos tu turno agendado.`
+    :  `‼️ Desde ${config.nombreConsultorio}, te notificamos el cambio del estado de tu turno a ${turno.estado.toUpperCase()}`
+  }
   
   ✅ DETALLES DEL TURNO:
   -----------------------------------------
@@ -319,7 +333,7 @@ export const textoMailConfTurno = async (turno) => {
   
   📅 Fecha del Turno: ${formatoFecha(turno.desde, true, false, false, true)}
   
-  🦷 Tipo de Turno: ${turno.servicio}
+  🦷 Tipo de Turno: ${turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}}
   
   💉 Profesional: ${turno.doctor.nombre}
   
@@ -327,17 +341,19 @@ export const textoMailConfTurno = async (turno) => {
   
   📧 Email de contacto: ${turno.consultorio.email || config.mail}
 
-  📱 Celular Contacto: ${turno.consultorio.telefono || config.celular}
+  📱 Celular Contacto: ${turno.consultorio.telefono || config.telefono}
   
   -----------------------------------------
+  ${!cambioEstado
+    ? `⏰ RECORDÁ LLEGAR 5 MINUTOS ANTES DE TU TURNO
   
-  ⏰ RECORDÁ LLEGAR 5 MINUTOS ANTES DE TU TURNO
+    ❗ POR FAVOR CONFIRMA TU ASISTENCIA RESPONDIENDO A ESTE MENSAJE ❗
   
-  ❗ POR FAVOR CONFIRMA TU ASISTENCIA RESPONDIENDO A ESTE MENSAJE ❗
+    📅 Podes agregar este turno a tu calendario abriendo el archivo adjunto "turno.ics"
   
-  📅 Podes agregar este turno a tu calendario abriendo el archivo adjunto "turno.ics"
-  
-  ${turno.token ? `❌ Si necesitas cancelar tu turno, por favor utiliza el siguiente enlace: ${enlaceCancelacion}` : ''}
+      ${turno.token ? `❌ Si necesitas cancelar tu turno, por favor utiliza el siguiente enlace: ${enlaceCancelacion}` : ''}`
+    : ``
+  }  
   
   👋👋👋 Gracias, y que tengas buen día!
   `;
@@ -385,9 +401,9 @@ export const generarArchivoICS = async (turno) => {
         endInputType: 'local',
         startOutputType: 'local',
         endOutputType: 'local',
-        title: `Turno: ${config.nombreConsultorio} - ${turno.servicio}`,
+        title: `Turno: ${config.nombreConsultorio} - ${turno.tipoDeTurno && turno.tipoDeTurno.nombre || ''}}`,
         location: turno.consultorio.direccion || config.domicilio,
-        description: `Paciente: ${turno.paciente.nombre} ${turno.paciente.apellido || ''}\nProfesional: ${turno.doctor.nombre}\nTipo: ${turno.servicio}\n\nPor favor, confirme su asistencia a través del siguiente enlace.\n\n${url}`,
+        description: `Paciente: ${turno.paciente.nombre} ${turno.paciente.apellido || ''}\nProfesional: ${turno.doctor.nombre}\nTipo: ${turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}\n\nPor favor, confirme su asistencia a través del siguiente enlace.\n\n${url}`,
         //url: url,
         status: 'CONFIRMED',
         busyStatus: 'BUSY',

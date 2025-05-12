@@ -622,7 +622,7 @@ export default function PacienteDetallePage() {
                         <p className="text-sm mt-1">
                           {turno.doctor.nombre || 'Sin doctor asignado'}
                           {' - '}
-                          {turno.servicio || 'Consulta general'}
+                          {turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}
                         </p>
                       </div>
                       <div>
@@ -666,7 +666,7 @@ export default function PacienteDetallePage() {
                         <p className="text-sm mt-1">
                           {turno.doctor.nombre || 'Sin doctor asignado'}
                           {' - '}
-                          {turno.servicio || 'Consulta general'}
+                          {turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}
                         </p>
                       </div>
                       <div>

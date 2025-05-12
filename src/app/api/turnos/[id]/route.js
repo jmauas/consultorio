@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
+import { enviarRecordatorioTurno } from '@/lib/services/sender/whatsappService';
+import { enviarMailConfTurno } from "@/lib/services/sender/resendService";
 
 // Esta función permite obtener un turno específico por ID
 export async function GET(request, { params }) {
@@ -128,7 +130,9 @@ export async function PATCH(request, { params }) {
       }, { status: 404 });
     }
 
+    let notificar = false;
     if (datos && datos.estado === 'cancelado' && turnoExistente.estado !== 'cancelado') {
+      notificar = true
       const fhTurno = new Date(turnoExistente.desde);
       const ahora = new Date();
       const diffInMs = fhTurno - ahora;
@@ -143,7 +147,9 @@ export async function PATCH(request, { params }) {
           datos.penal = 'ccr';
       }
     }    
-    
+    if (datos && datos.estado != turnoExistente.estado) {
+      notificar = true
+    }
     // Agregar el ID del usuario que actualiza el registro
     datos.updatedById = userId;
     
@@ -159,6 +165,14 @@ export async function PATCH(request, { params }) {
         tipoDeTurno: true // Incluir el tipo de turno en la respuesta
       }
     });
+
+    if (notificar) {
+      // Enviar notificación por WhatsApp
+      await enviarRecordatorioTurno(turnoActualizado, true);
+     
+      // Enviar correo electrónico
+      await enviarMailConfTurno(turnoActualizado, true);
+    }
     
     return NextResponse.json({ 
       ok: true, 

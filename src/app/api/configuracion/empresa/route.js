@@ -26,7 +26,7 @@ export async function GET(request) {
       codigoPostal: config.codigoPostal || '',
       telefono: config.telefono || '',
       telefonoAlternativo: config.telefonoAlternativo || '',
-      email: config.email || '',
+      email: config.mail || '',
       web: config.web || '',
       horarioAtencion: config.horarioAtencion || '',
       descripcion: config.descripcion || '',

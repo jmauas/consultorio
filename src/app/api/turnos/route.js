@@ -195,7 +195,9 @@ export async function POST(request) {
       email: paciente.email,
       cobertura: turno.coberturaMedica,
       observaciones: paciente.observaciones,
-      consultorio: consultorio.nombre
+      consultorio: consultorio.nombre,
+      tipoDeTurno: turno.tipoDeTurno,
+      estado: turno.estado
     };
     
     return NextResponse.json({ 
