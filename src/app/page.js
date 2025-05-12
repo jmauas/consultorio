@@ -6,11 +6,17 @@ import { useSession } from 'next-auth/react';
 import { formatoFecha } from '@/lib/utils/dateUtils';
 import GrillaTurnos from '@/components/GrillaTurnos';
 import Loader from '@/components/Loader';
+import Modal from '@/components/Modal';
+import TurnoNuevo from '@/components/TurnoNuevo';
+import TurnoDisponibilidad from '@/components/TurnoDisponibilidad';
 
 export default function Home() {
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(true);
   const [loadingTurnos, setLoadingTurnos] = useState(true);
+  const [tituloModal, setTituloModal] = useState('');
+  const [modalTurnoNuevo, setModalTurnoNuevo] = useState(false);
+  const [modalTurnoDisponibilidad, setModalTurnoDisponibilidad] = useState(false);
   const [stats, setStats] = useState({
     turnosHoy: 0,
     turnosProximos: 0,
@@ -18,6 +24,12 @@ export default function Home() {
   });
   const [ultimosTurnos, setUltimosTurnos] = useState([]);
   const [allTurnos, setAllTurnos] = useState([]);
+
+  // Cerrar modal
+  const cerrarModal = () => {
+    setModalTurnoNuevo(false);
+    setModalTurnoDisponibilidad(false);
+  };
 
   // Función para actualizar la lista de turnos después de una acción
   const handleTurnoActualizado = (action, turno) => {
@@ -151,6 +163,17 @@ export default function Home() {
     }
   };
 
+  const handleModalTurnoNuevo = () => {
+    setTituloModal('Nuevo Turno');
+    setModalTurnoNuevo(true);
+
+  };
+
+  const handleModalTurnoDisponibilidad = () => {
+    setTituloModal('Turno Disponibilidad');
+    setModalTurnoDisponibilidad(true);
+  };
+
   if (loading) {
     return (
       <Loader />
@@ -241,24 +264,22 @@ export default function Home() {
           Acciones Rápidas
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          <Link 
-            href="/turnos/nuevo" 
+          <button 
+            onClick={handleModalTurnoNuevo} 
             className="bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2"
-            target="_blank"
           >
             <i className="fa-solid fa-calendar-plus"></i>
             <i className="fa-solid fa-plus"></i>
             Turno
-          </Link>
-          <Link 
-            href="/turnos/disponibilidad" 
+          </button>
+          <button
+            onClick={handleModalTurnoDisponibilidad}
             className="bg-orange-500 hover:bg-orange-600 text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2 "
-            target="_blank"
           >
             <i className="fa-solid fa-clock"></i>
             <i className="fa-solid fa-plus"></i>
             Turno Disponibilidad
-          </Link>
+          </button>
           <Link 
             href="/turnos" 
             className="bg-green-500 hover:bg-green-600 text-white text-center py-3 px-4 rounded-md transition duration-200 flex items-center justify-center "
@@ -328,7 +349,19 @@ export default function Home() {
             </div>
           </>
         )}
-      </div>     
+      </div>
+       {/* Modal para nuevo Turno */}
+        <Modal
+          isOpen={modalTurnoNuevo || modalTurnoDisponibilidad}
+          onClose={cerrarModal}
+          size="large"
+          title={tituloModal}
+        >
+          {modalTurnoNuevo 
+          ? <TurnoNuevo />
+          : modalTurnoDisponibilidad && <TurnoDisponibilidad />  
+          }
+        </Modal>   
     </div>
   );
 }

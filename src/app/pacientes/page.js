@@ -8,6 +8,8 @@ import { toast } from 'react-hot-toast';
 import Modal from '@/components/Modal';
 import { obtenerCoberturasDesdeDB } from '@/lib/utils/coberturasUtils';
 import Loader from '@/components/Loader';
+import TurnoNuevo from '@/components/TurnoNuevo';
+import TurnoDisponibilidad from '@/components/TurnoDisponibilidad';
 
 export default function PacientesPage() {
   const router = useRouter();
@@ -25,6 +27,9 @@ export default function PacientesPage() {
     total: 0,
     porPagina: 20
   });
+  const [tituloModal, setTituloModal] = useState('');
+  const [modalTurnoNuevo, setModalTurnoNuevo] = useState(false);
+  const [modalTurnoDisponibilidad, setModalTurnoDisponibilidad] = useState(false);
   
   // Estado para coberturas médicas
   const [coberturas, setCoberturas] = useState([]);
@@ -32,21 +37,6 @@ export default function PacientesPage() {
   // Estado para el modal de nuevo turno
   const [modalNuevoTurnoAbierto, setModalNuevoTurnoAbierto] = useState(false);
   const [pacienteSeleccionado, setPacienteSeleccionado] = useState(null);
-
-  useEffect(() => {
-    cargarPacientes();
-    // Cargar las coberturas médicas al inicializar
-    const cargarCoberturas = async () => {
-      try {
-        const coberturasData = await obtenerCoberturasDesdeDB();
-        setCoberturas(coberturasData || []);
-      } catch (error) {
-        console.error('Error al cargar coberturas médicas:', error);
-      }
-    };
-    cargarCoberturas();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paginacion.pagina]);
 
   const cargarPacientes = async (usarFiltros = false) => {
     try {
@@ -185,22 +175,23 @@ export default function PacientesPage() {
     setModalNuevoTurnoAbierto(false);
     setPacienteSeleccionado(null);
   };
+    // Cerrar modal
+  const cerrarModal = () => {
+    setModalTurnoNuevo(false);
+    setModalTurnoDisponibilidad(false);
+  };
   
   // Funciones de navegación para nuevo turno
   const irANuevoTurno = () => {
-    if (pacienteSeleccionado && pacienteSeleccionado.id) {
-      const url = `/turnos/nuevo?pacienteId=${pacienteSeleccionado.id}`;
-      window.open(url, '_blank');
-    }
+    setModalTurnoNuevo(true);
     setModalNuevoTurnoAbierto(false);
+    setTituloModal('Nuevo Turno');
   };
   
   const irADisponibilidad = () => {
-    if (pacienteSeleccionado && pacienteSeleccionado.id) {
-      const url = `/turnos/disponibilidad?pacienteId=${pacienteSeleccionado.id}`;
-      window.open(url, '_blank');
-    }
     setModalNuevoTurnoAbierto(false);
+    setTituloModal('Turno Disponibilidad');
+    setModalTurnoDisponibilidad(true);
   };
 
   // Calcular índices para paginación
@@ -208,6 +199,22 @@ export default function PacientesPage() {
   const indiceFinal = Math.min(indiceInicial + paginacion.porPagina, paginacion.total);
   const pacientesPaginados = pacientes.slice(indiceInicial, indiceFinal);
   const totalPaginas = Math.ceil(paginacion.total / paginacion.porPagina);
+
+   useEffect(() => {
+    cargarPacientes();
+    // Cargar las coberturas médicas al inicializar
+    const cargarCoberturas = async () => {
+      try {
+        const coberturasData = await obtenerCoberturasDesdeDB();
+        setCoberturas(coberturasData || []);
+      } catch (error) {
+        console.error('Error al cargar coberturas médicas:', error);
+      }
+    };
+    cargarCoberturas();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paginacion.pagina]);
+
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -607,6 +614,24 @@ export default function PacientesPage() {
           </div>
         </div>
       </Modal>
+      {/* Modal para nuevo Turno */}
+      <Modal
+        isOpen={modalTurnoNuevo || modalTurnoDisponibilidad}
+        onClose={cerrarModal}
+        size="large"
+        title={tituloModal}
+      >
+        {modalTurnoNuevo 
+        ? <TurnoNuevo 
+            pacienteIdParam={pacienteSeleccionado?.id}
+          />
+        : modalTurnoDisponibilidad 
+          ? <TurnoDisponibilidad 
+              pacienteIdParam={pacienteSeleccionado?.id}
+            />
+          : null  
+        }
+      </Modal>   
     </div>
   );
 }

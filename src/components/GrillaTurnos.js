@@ -12,6 +12,8 @@ import { enviarMailConfTurno } from "@/lib/services/sender/resendService";
 import { enviarRecordatorioTurno } from '@/lib/services/sender/whatsappService';
 import Loader from '@/components/Loader';
 import { isColorLight } from '@/lib/utils/variosUtils';
+import TurnoNuevo from '@/components/TurnoNuevo';
+import TurnoDisponibilidad from '@/components/TurnoDisponibilidad';
 
 const estados = obtenerEstados();
 
@@ -26,10 +28,14 @@ export default function GrillaTurnos({
   // Estado para el modal de detalle de turno
   const [modalAbierto, setModalAbierto] = useState(false);
   const [turnoSeleccionado, setTurnoSeleccionado] = useState(null);
+  const [tituloModal, setTituloModal] = useState('');
+  const [modalTurnoNuevo, setModalTurnoNuevo] = useState(false);
+  const [modalTurnoDisponibilidad, setModalTurnoDisponibilidad] = useState(false);
   
   // Estado para el modal de nuevo turno
   const [modalNuevoTurnoAbierto, setModalNuevoTurnoAbierto] = useState(false);
   const [pacienteSeleccionado, setPacienteSeleccionado] = useState(null);
+  const [turnoParaNuevoTurno, setTurnoParaNuevoTurno] = useState(null); 
 
   // Obtener color y nombre del estado
   const obtenerColorEstado = (estado) => {
@@ -105,16 +111,16 @@ export default function GrillaTurnos({
   // Funciones de navegación para nuevo turno
   const irANuevoTurno = () => {
     if (pacienteSeleccionado && pacienteSeleccionado.id) {
-      const url = `/turnos/nuevo?pacienteId=${pacienteSeleccionado.id}`;
-      window.open(url, '_blank');
+      setModalTurnoNuevo(true);
+      setTituloModal('Nuevo Turno');
     }
     setModalNuevoTurnoAbierto(false);
   };
   
   const irADisponibilidad = () => {
     if (pacienteSeleccionado && pacienteSeleccionado.id) {
-      const url = `/turnos/disponibilidad?pacienteId=${pacienteSeleccionado.id}`;
-      window.open(url, '_blank');
+      setModalTurnoDisponibilidad(true);
+      setTituloModal('Turno Por Disponibilidad');
     }
     setModalNuevoTurnoAbierto(false);
   };
@@ -129,6 +135,17 @@ export default function GrillaTurnos({
     setModalNuevoTurnoAbierto(false);
     setPacienteSeleccionado(null);
   };
+
+  const cerrarModalTurnoNuevo = () => {
+    setModalTurnoNuevo(false);
+    setModalTurnoDisponibilidad(false);
+    
+  };
+
+  const abrirModalNuevoTurnoDispo = (turno) => {
+    setTurnoParaNuevoTurno(turno);
+    setModalTurnoNuevo(true);
+  }
   
   // Manejar cambios exitosos en el turno desde el modal
   const handleTurnoActualizado = (tipo, datos) => {
@@ -150,6 +167,47 @@ export default function GrillaTurnos({
       }
     }
   };
+
+  
+const filaLibre = (turno, titulo, color, index) => {  
+  return (
+    <tr
+      key={`${turno.id}-${titulo.replaceAll(' ', '-')}-${index}`} 
+      className={`bg-white text-slate-600 font-bold`}>
+      <td colSpan="7" className="px-6 py-1 text-center">
+        {/* {titulo} */}
+        <div className={`text-${color}-500 text-center text-sm flex items-center justify-between`}>
+          <div className={`border-t-3 border-${color}-500 my-1 w-full`}></div>
+          <i className="fa-solid fa-arrow-right fa-2xl"></i>
+        </div>
+      </td>
+      <td className="px-6 py-1 text-center">
+        <button 
+          onClick={() => abrirModalNuevoTurnoDispo(turno)}
+          className="text-orange-600 hover:text-orange-900 p-1"
+        >
+          <i className="fas fa-plus fa-lg"></i>
+        </button>
+      </td>
+    </tr>
+  )
+}
+
+const cardLibre = (turno, titulo, color, index) => {  
+  return (<>   
+        <button 
+          onClick={() => abrirModalNuevoTurnoDispo(turno)}
+          key={`${turno.id}-${titulo.replaceAll(' ', '-')}-${index}`} 
+          className={`text-orange-600 hover:text-orange-900 p-1 bg-${color}-100 rounded-lg flex items-center justify-evenly`}
+        >
+            <div className={`my-1 text-slate-800 text-center text-sm`}>
+              {titulo}
+            </div>
+          <i className="fas fa-plus fa-lg"></i>
+        </button>      
+    </>    
+  )
+}
   
   if (loading) {
     return (
@@ -475,46 +533,32 @@ export default function GrillaTurnos({
           </div>
         </div>
       </Modal>
+       {/* Modal para nuevo Turno */}
+        <Modal
+          isOpen={modalTurnoNuevo || modalTurnoDisponibilidad}
+          onClose={cerrarModalTurnoNuevo}
+          size="large"
+          title={tituloModal}
+        >
+          {modalTurnoNuevo 
+          ? <TurnoNuevo 
+              pacienteIdParam={pacienteSeleccionado?.id}
+              desdeParam={turnoParaNuevoTurno?.desde}
+              duracionParam={turnoParaNuevoTurno?.duracion}
+              doctorIdParam={turnoParaNuevoTurno?.doctor.id}
+              tipoTurnoIdParam={turnoParaNuevoTurno?.tipoDeTurnoId}
+            />
+          : modalTurnoDisponibilidad 
+            ? <TurnoDisponibilidad 
+                pacienteIdParam={pacienteSeleccionado?.id}
+                desdeParam={turnoParaNuevoTurno?.desde}
+                duracionParam={turnoParaNuevoTurno?.duracion}
+                doctorIdParam={turnoParaNuevoTurno?.doctor.id}
+                tipoTurnoIdParam={turnoParaNuevoTurno?.tipoDeTurnoId}
+              />
+            : null  
+          }
+        </Modal>   
   </>)
 }
 
-
-const filaLibre = (turno, titulo, color, index) => {  
-  return (
-    <tr
-      key={`${turno.id}-${titulo.replaceAll(' ', '-')}-${index}`} 
-      className={`bg-white text-slate-600 font-bold`}>
-      <td colSpan="7" className="px-6 py-1 text-center">
-        {/* {titulo} */}
-        <div className={`text-${color}-500 text-center text-sm flex items-center justify-between`}>
-          <div className={`border-t-3 border-${color}-500 my-1 w-full`}></div>
-          <i className="fa-solid fa-arrow-right fa-2xl"></i>
-        </div>
-      </td>
-      <td className="px-6 py-1 text-center">
-        <Link href={`/turnos/nuevo?desde=${turno.desde}&duracion=${turno.duracion}&doctorId=${turno.doctor.id}&tipoTurnoId=${turno.tipoDeTurnoId}`} 
-          target="_blank"
-          className="text-orange-600 hover:text-orange-900 p-1"
-        >
-          <i className="fas fa-plus fa-lg"></i>
-        </Link>
-      </td>
-    </tr>
-  )
-}
-
-const cardLibre = (turno, titulo, color, index) => {  
-  return (<>   
-        <Link href={`/turnos/nuevo?desde=${turno.desde}&duracion=${turno.duracion}&doctorId=${turno.doctor.id}&tipoTurnoId=${turno.tipoDeTurnoId}`} 
-          target="_blank"
-          key={`${turno.id}-${titulo.replaceAll(' ', '-')}-${index}`} 
-          className={`text-orange-600 hover:text-orange-900 p-1 bg-${color}-100 rounded-lg flex items-center justify-evenly`}
-          >
-            <div className={`my-1 text-slate-800 text-center text-sm`}>
-              {titulo}
-            </div>
-          <i className="fas fa-plus fa-lg"></i>
-        </Link>      
-    </>    
-  )
-}

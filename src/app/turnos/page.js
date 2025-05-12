@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import Link from 'next/link';
 import { toast } from 'react-hot-toast';
 import { formatoFecha, calcularProximosDias } from '@/lib/utils/dateUtils';
 import { obtenerEstados } from '@/lib/utils/estadosUtils';
@@ -9,6 +8,9 @@ import { obtenerCoberturasDesdeDB } from '@/lib/utils/coberturasUtils';
 import GrillaTurnos from '@/components/GrillaTurnos';
 import { handleExcelTurnos } from '@/lib/services/excel';
 import Loader from '@/components/Loader';
+import TurnoNuevo from '@/components/TurnoNuevo';
+import TurnoDisponibilidad from '@/components/TurnoDisponibilidad';
+import Modal from '@/components/Modal';
 
 // Memoizar los estados para evitar recálculos en cada renderizado
 const estados = obtenerEstados();
@@ -24,7 +26,10 @@ export default function TurnosPage() {
   const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date());
   const [diasCalendario, setDiasCalendario] = useState([]);
   const [filtroDoctor, setFiltroDoctor] = useState('todos');
-  const [doctores, setDoctores] = useState([]);  
+  const [doctores, setDoctores] = useState([]);
+  const [tituloModal, setTituloModal] = useState('');
+  const [modalTurnoNuevo, setModalTurnoNuevo] = useState(false);
+  const [modalTurnoDisponibilidad, setModalTurnoDisponibilidad] = useState(false);
 
   // Estados para filtros de fecha avanzados
   const fechaHoy = new Date();
@@ -54,6 +59,22 @@ export default function TurnosPage() {
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
   const [filtroCobertura, setFiltroCobertura] = useState('todos');
   const [coberturas, setCoberturas] = useState([]);
+
+  const handleModalTurnoNuevo = () => {
+    setTituloModal('Nuevo Turno');
+    setModalTurnoNuevo(true);
+  };
+
+  const handleModalTurnoDisponibilidad = () => {
+    setTituloModal('Turno Disponibilidad');
+    setModalTurnoDisponibilidad(true);
+  };
+
+    // Cerrar modal
+  const cerrarModal = () => {
+    setModalTurnoNuevo(false);
+    setModalTurnoDisponibilidad(false);
+  };
   
   // Objeto de filtros memoizado para evitar recálculos innecesarios
   const filtrosActuales = useMemo(() => ({
@@ -391,24 +412,22 @@ export default function TurnosPage() {
         <h1 className="text-2xl font-bold text-gray-800">Gestión de Turnos</h1>
         
         <div className="mt-4 md:mt-0 flex flex-wrap gap-2">
-          <Link 
-            href="/turnos/nuevo" 
+          <button 
+            onClick={handleModalTurnoNuevo} 
             className="bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2"
-            target="_blank"
           >
             <i className="fa-solid fa-calendar-plus"></i>
             <i className="fa-solid fa-plus"></i>
             Turno
-          </Link>
-          <Link 
-            href="/turnos/disponibilidad" 
+          </button>
+          <button
+            onClick={handleModalTurnoDisponibilidad}
             className="bg-orange-500 hover:bg-orange-600 text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2 "
-            target="_blank"
           >
             <i className="fa-solid fa-clock"></i>
             <i className="fa-solid fa-plus"></i>
             Turno Disponibilidad
-          </Link>
+          </button>
         </div>
       </div>
       
@@ -719,7 +738,19 @@ export default function TurnosPage() {
           onCancelarTurno={cancelarTurno}
           onTurnoActualizado={handleTurnoActualizado}
         />
-      </div>      
+      </div>
+       {/* Modal para nuevo Turno */}
+        <Modal
+          isOpen={modalTurnoNuevo || modalTurnoDisponibilidad}
+          onClose={cerrarModal}
+          size="large"
+          title={tituloModal}
+        >
+          {modalTurnoNuevo 
+          ? <TurnoNuevo />
+          : modalTurnoDisponibilidad && <TurnoDisponibilidad />  
+          }
+        </Modal>       
     </div>    
   );
   

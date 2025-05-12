@@ -9,7 +9,6 @@ import { isColorLight } from '@/lib/utils/variosUtils';
 import Link from 'next/link';
 import Loader from '@/components/Loader';
 
-
 export default function DetalleTurno({ 
   turnoId, 
   onClose, 
