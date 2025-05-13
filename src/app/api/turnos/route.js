@@ -13,14 +13,6 @@ export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);
     
-    // Verificar si el usuario está autenticado (solo para usuarios internos)
-    // Para la API pública (desde WhatsApp) no requeriría autenticación
-    const isPublicEndpoint = request.headers.get('x-api-source') === 'whatsapp';
-    
-    if (!session && !isPublicEndpoint) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-    }
-    
     // Obtener los datos del turno del cuerpo de la solicitud
     const datos = await request.json();    
    
@@ -30,6 +22,8 @@ export async function POST(request) {
       where: { id: datos.doctorId}
     });
     
+    console.log('Doctor encontrado:', doctor);
+
     if (!doctor) {
       return NextResponse.json({ 
         ok: false, 
@@ -41,6 +35,8 @@ export async function POST(request) {
     let consultorio = await prisma.consultorio.findFirst({
       where: { id: datos.consultorioId }
     });
+
+    console.log('Consultorio encontrado:', consultorio);
     
     if (!consultorio) {
       // Si no hay consultorios, 
@@ -75,7 +71,7 @@ export async function POST(request) {
       }
     });
     
-    if (turnosExistentes.length > 0 && !datos.confirmado) {
+    if (turnosExistentes.length > 0) {
       return NextResponse.json({ 
         ok: false, 
         message: 'Ya hay un turno en ese horario', 
@@ -170,6 +166,8 @@ export async function POST(request) {
         tipoDeTurno: true // Incluir el tipo de turno en la respuesta
       }
     });
+
+    console.log('Turno creado:', turno);
     
     // Enviar confirmación por WhatsApp si hay número de celular
     if (paciente.celular && paciente.celular.length >= 10) {

@@ -302,7 +302,7 @@ export const htmlMensajeConfTurno = async (turno, cambioEstado) => {
             ` : ''}
 
             `
-            : ``}
+            : ``}@v4
             
             <div class="footer">
             <p>Gracias, y que tengas buen día! <span class="emoji">👋👋👋</span></p>

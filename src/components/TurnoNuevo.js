@@ -20,6 +20,7 @@ const TurnoNuevo = ({
    const [success, setSuccess] = useState(false);
    const [doctores, setDoctores] = useState([]);
    const [tiposTurnos, setTiposTurnos] = useState([]);
+   const [consultorios, setConsultorios] = useState([]);
    const [tiposTurnosDisponibles, setTiposTurnosDisponibles] = useState([]);
    const [buscandoPaciente, setBuscandoPaciente] = useState(false);
    const [coberturas, setCoberturas] = useState([]);
@@ -37,7 +38,8 @@ const TurnoNuevo = ({
      tipoDeTurnoId: '', 
      desde: new Date().toISOString().slice(0, 16), 
      duracion: 30,
-     observaciones: ''
+     observaciones: '',
+     consultorioId: '',
    });   
  
    // Búsqueda de paciente por celular desde parámetros de URL
@@ -150,21 +152,23 @@ const TurnoNuevo = ({
        const doctorSeleccionado = doctores.find(doc => doc.id=== value);
        console.log(value, doctores, 'Doctor seleccionado:', doctorSeleccionado);
        if (doctorSeleccionado && doctorSeleccionado.tiposTurno) {
-         const tiposFiltrados = doctorSeleccionado.tiposTurno.filter(tipo => tipo.habilitado !== false);
-         setTiposTurnosDisponibles(tiposFiltrados);
+          const tiposFiltrados = doctorSeleccionado.tiposTurno.filter(tipo => tipo.habilitado !== false);
+          setTiposTurnosDisponibles(tiposFiltrados);
          
-         // Si hay un solo tipo de turno disponible, seleccionarlo automáticamente
-         if (tiposFiltrados.length === 1) {
-           const unicoTipo = tiposFiltrados[0];
-           setTurno(prev => ({
-             ...prev,
-             [name]: value,
-             servicio: unicoTipo.id,
-             tipoDeTurnoId: unicoTipo.id, // Asignar el ID del tipo de turno
-             duracion: parseInt(unicoTipo.duracion)
-           }));
-           return; // Salimos para evitar limpiar el servicio
-         }
+          // Si hay un solo tipo de turno disponible, seleccionarlo automáticamente
+          if (tiposFiltrados.length === 1) {
+            const unicoTipo = tiposFiltrados[0];
+            setTurno(prev => ({
+              ...prev,
+              servicio: unicoTiponombre,
+              servicioId: unicoTipo.id, 
+              tipoDeTurnoId: unicoTipo.id, // Asignar el ID del tipo de turno
+              duracion: parseInt(unicoTipo.duracion),
+              doctorId: doctorSeleccionado.id, 
+              doctor: doctorSeleccionado.nombre,
+            }));
+            return; // Salimos para evitar limpiar el servicio
+          }
        } else {
          setTiposTurnosDisponibles([]);
        }
@@ -180,14 +184,25 @@ const TurnoNuevo = ({
      } else if (name === 'servicio') {
        // Actualizar duración según el tipo de turno seleccionado
        if (turno.doctor && tiposTurnosDisponibles.length > 0) {
-         const tipoSeleccionado = tiposTurnosDisponibles.find(tipo => tipo.id === value);
+        const tipoSeleccionado = tiposTurnosDisponibles.find(tipo => tipo.id === value);
          
-         setTurno(prev => ({
-           ...prev,
-           [name]: value,
-           tipoDeTurnoId: tipoSeleccionado ? tipoSeleccionado.id : '', // Asignar el ID del tipo de turno
-           duracion: tipoSeleccionado ? parseInt(tipoSeleccionado.duracion) : 30
-         }));
+        setTurno(prev => ({
+          ...prev,
+          servicio: tipoSeleccionado.nombre,
+          servicioId: tipoSeleccionado.id, 
+          tipoDeTurnoId: tipoSeleccionado.id, // Asignar el ID del tipo de turno
+          duracion: parseInt(tipoSeleccionado.duracion),
+        }));
+        // Filtrar los consultorios disponibles para el tipo de turno seleccionado
+        if (tipoSeleccionado.consultorios && tipoSeleccionado.consultorios.length > 0) {
+          setConsultorios(tipoSeleccionado.consultorios);
+          if (tipoSeleccionado.consultorios.length === 1) {
+            setTurno(prev => ({
+              ...prev,
+              consultorioId: tipoSeleccionado.consultorios[0].id
+            }));
+          }
+        }
        } else {
          setTurno(prev => ({
            ...prev,
@@ -225,8 +240,8 @@ const TurnoNuevo = ({
      e.preventDefault();
      
      // Validaciones básicas
-     if (!turno.nombre || !turno.dni || !turno.celular || !turno.servicio || !turno.doctor || !turno.desde || !turno.coberturaMedicaId) {
-       setError('Complete todos los campos obligatorios');
+     if (!turno.nombre || !turno.dni || !turno.celular || !turno.servicio || !turno.doctor || !turno.desde || !turno.coberturaMedicaId || !turno.consultorioId) { 
+       setError('Completá todos los campos obligatorios');
        return;
      }
      
@@ -298,15 +313,21 @@ const TurnoNuevo = ({
            throw new Error(`Error: ${response.status}`);
          }        
          const config = await response.json();
- 
+         console.log(config)
          // Verificar que doctores sea un array y tenga elementos
          if (Array.isArray(config.doctores) && config.doctores.length > 0) {
-           console.log('Doctores cargados:', config.doctores);
            setDoctores(config.doctores);
          } else {
            console.warn('No se encontraron doctores en la configuración');
            setDoctores([]);
          }
+
+        if (Array.isArray(config.consultorios) && config.consultorios.length > 0) {
+           setConsultorios(config.consultorios);
+        } else {
+           console.warn('No se encontraron Consultorios');
+           setConsultorios([]);
+        }
          
          setTiposTurnos(config.tiposTurnos || []);
          
@@ -608,9 +629,28 @@ const TurnoNuevo = ({
                 className="w-full border border-gray-300 rounded px-3 py-2 text-lg"
               />
             </div>
+
+            {/* Consultorios */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Consultorio *</label>
+              <select
+                name="consultorioId"
+                value={turno.consultorioId}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded px-3 py-2 font-bold"
+                disabled={!turno.doctor}
+              >
+                <option value="">Seleccioná Consultorio</option>
+                {consultorios.map((tipo) => (
+                  <option key={tipo.nombre} value={tipo.id}>
+                    {tipo.nombre} 
+                  </option>
+                ))}
+              </select>
+            </div>
             
             {/* Observaciones */}
-            <div className="md:col-span-2">
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
               <textarea
                 name="observaciones"
@@ -631,6 +671,13 @@ const TurnoNuevo = ({
             </div>
           )}
           
+          {error && (
+          <div className="bg-red-200 border-l-4 border-red-500 text-red-800 p-4 mb-6 font-bold rounded-lg">
+            <p className="font-medium">{error}</p>
+            <p className="text-sm mt-1"></p>
+          </div>
+          )}
+
           <div className="flex justify-end space-x-2">
             <button
               type="button"

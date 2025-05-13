@@ -324,7 +324,18 @@ export const obtenerDoctores = async () => {
     const doctores = await prisma.doctor.findMany({
       include: {
         AgendaDoctor: true,
-        TipoTurnoDoctor: true
+        TipoTurnoDoctor: {
+          where: {
+            habilitado: true
+          },
+          select: {
+            id: true,
+            nombre: true,
+            duracion: true,
+            habilitado: true,
+            consultorios: true
+          }
+        }
       },
       orderBy: {
         nombre: 'asc'

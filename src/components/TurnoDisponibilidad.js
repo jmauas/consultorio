@@ -138,7 +138,8 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
       setFormData(prev => ({ 
         ...prev, 
         servicio: singleType.nombre,
-        servicioId: singleType.id
+        servicioId: singleType.id,
+        tipoDeTurnoId: singleType.id
       }));
       // Also update the duration and show the DNI field
       const typeDuration = Number(singleType.duracion) > 0 ? Number(singleType.duracion) : 30;
@@ -465,6 +466,7 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
       doctor: selectedDoctor.nombre,
       servicio: formData.servicio,
       servicioId: formData.servicioId,
+      tipoDeTurnoId: formData.servicioId,
       duracion: turno.duracion,
       consultorioId: turno.consultorio[0].id,
       nombre: formData.nombre,
@@ -982,7 +984,7 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                           <i className="fa-solid fa-list-check text-orange-500"></i> Tipo Turno:
                         </div>
                         <div className="bg-white px-3 py-2 rounded border border-gray-300 font-medium">
-                          {turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}
+                          {turno.servicio || 'No especificado'}
                         </div>
                       </div>
                       
