@@ -27,7 +27,7 @@ jobs:
       - name: Instalar PM2.
         run: npm install -g pm2
       - name: Detener App.
-        run: npm run pm2-stop
+        run: pm2 stop "Consultorio App"
       - uses: actions/checkout@v4
       - name: Use Node.js
         uses: actions/setup-node@v4
