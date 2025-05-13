@@ -24,22 +24,48 @@ jobs:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} on an self hosted server !"
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      
       - name: Instalar PM2.
         run: npm install -g pm2
-      - name: Detener App.
+      
+      # Primer intento de checkout
+      - name: Primer intento de checkout
+        id: checkout-first
+        uses: actions/checkout@v4
+        continue-on-error: true
+      
+      # Si el primer checkout falló, detener la app y volver a intentar
+      - name: Detener App si checkout falló
+        if: steps.checkout-first.outcome == 'failure'
         run: pm2 stop "Consultorio App"
-      - uses: actions/checkout@v4
+        
+      # Segundo intento de checkout si el primero falló
+      - name: Segundo intento de checkout
+        if: steps.checkout-first.outcome == 'failure'
+        uses: actions/checkout@v4
+      
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-      - name: Instalar Paquetes,
+      
+      - name: Instalar Paquetes
         run: npm ci
+      
       - name: Build de la App.
         run: npm run build --if-present
-      - name: Iniciar App.
+      
+      # Si se detuvo la app (porque el primer checkout falló), la iniciamos
+      - name: Iniciar App (cuando se detuvo)
+        if: steps.checkout-first.outcome == 'failure'
         run: npm run pm2-start
+      
+      # Si no se detuvo la app (el primer checkout fue exitoso), la reiniciamos
+      - name: Reiniciar App (cuando no se detuvo)
+        if: steps.checkout-first.outcome == 'success'
+        run: npm run pm2-restart
+      
       - run: echo "🍏 This job's status is ${{ job.status }}. Ok "
+      
       - name: Enviar Whatsapp de Confirmacion.
         run: npm run okBuild
-
