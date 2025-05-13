@@ -261,43 +261,43 @@ export default function Home() {
       </div>
       {/* Pantallas Pequeñas */}
       <div className="flex flex-col md:hidden gap-2 mb-4">
-        <div className="bg-white rounded-lg shadow-md p-4 flex gap-4 items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-700">
+        <div className="bg-white rounded-lg shadow-md p-4 grid grid-cols-12 items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-700 col-span-7">
             <i className="fa-solid fa-calendar-day mr-2"></i>
             Turnos de Hoy
           </h2>
-          <span className="text-3xl font-bold text-blue-600">{stats.turnosHoy}</span>
+          <span className="text-xl font-bold text-blue-600  col-span-1 p-2">{stats.turnosHoy}</span>
           <Link 
             href={`/turnos?desde=${new Date().toISOString().split('T')[0]}&hasta=${new Date().toISOString().split('T')[0]}`} 
-            className="text-sm text-blue-500 hover:underline inline-block"
+            className="text-xs text-blue-500 hover:underline inline-block col-span-4 text-right"
           >
             Ver todos <i className="fa-solid fa-arrow-right"></i>
           </Link>
         </div>
         
-        <div className="bg-white rounded-lg shadow-md p-4 flex gap-4 items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-700 mb-2">
+         <div className="bg-white rounded-lg shadow-md p-4 grid grid-cols-12 items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-700 mb-2 col-span-7">
             <i className="fa-solid fa-calendar-week mr-2"></i>
             Próximos Turnos
           </h2>
-          <span className="text-3xl font-bold text-green-600">{stats.turnosProximos}</span>
+          <span className="text-xl font-bold text-green-600 col-span-1 p-2">{stats.turnosProximos}</span>
           <Link 
             href="/turnos" 
-            className="text-sm text-blue-500 hover:underline inline-block"
+            className="text-xs text-blue-500 hover:underline inline-block col-span-4 text-right"
           >
             Ver todos <i className="fa-solid fa-arrow-right"></i>
           </Link>
         </div>
         
-        <div className="bg-white rounded-lg shadow-md p-4 flex gap-4 items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-700">
+         <div className="bg-white rounded-lg shadow-md p-4 grid grid-cols-12 items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-700 col-span-7">
             <i className="fa-solid fa-users mr-2"></i>
             Pacientes
           </h2>
-          <span className="text-3xl font-bold text-purple-600">{stats.pacientes}</span>
+          <span className="text-xl font-bold text-purple-600 col-span-1 p-2">{stats.pacientes}</span>
           <Link 
             href="/pacientes" 
-            className="text-sm text-blue-500 hover:underline inline-block"
+            className="text-xs text-blue-500 hover:underline inline-block col-span-4 text-right"
           >
             Ver todos <i className="fa-solid fa-arrow-right"></i>
           </Link>
@@ -313,7 +313,7 @@ export default function Home() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           <button 
             onClick={handleModalTurnoNuevo} 
-            className="bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2"
+            className="bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2 text-xs md:text-md"
           >
             <i className="fa-solid fa-calendar-plus"></i>
             <i className="fa-solid fa-plus"></i>
@@ -321,7 +321,7 @@ export default function Home() {
           </button>
           <button
             onClick={handleModalTurnoDisponibilidad}
-            className="bg-orange-500 hover:bg-orange-600 text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2 "
+            className="bg-orange-500 hover:bg-orange-600 text-white text-center py-2 px-2 rounded-md flex items-center justify-center gap-2 text-xs md:text-md"
           >
             <i className="fa-solid fa-clock"></i>
             <i className="fa-solid fa-plus"></i>
@@ -329,25 +329,19 @@ export default function Home() {
           </button>
           <Link 
             href="/turnos" 
-            className="bg-green-500 hover:bg-green-600 text-white text-center py-3 px-4 rounded-md transition duration-200 flex items-center justify-center "
+            className="bg-green-500 hover:bg-green-600 text-white text-center py-3 px-4 rounded-md transition duration-200 flex items-center justify-center gap-2 text-xs md:text-md"
           >
             <i className="fa-solid fa-calendar-days mr-2"></i>
             Ver Turnos
           </Link>
           <Link 
             href="/pacientes" 
-            className="bg-purple-500 hover:bg-purple-600 text-white text-center py-3 px-4 rounded-md transition duration-200 flex items-center justify-center "
+            className="bg-purple-500 hover:bg-purple-600 text-white text-center py-3 px-4 rounded-md transition duration-200 flex items-center justify-center gap-2 text-xs md:text-md"
 
           >
             <i className="fa-solid fa-user-group mr-2"></i>
             Pacientes
-          </Link>
-          {/* <Link 
-            href="/configuracion" 
-            className="bg-gray-500 hover:bg-gray-600 text-white text-center py-3 px-4 rounded-md transition duration-200 flex items-center justify-center font-bold"          >
-            <i className="fa-solid fa-gear mr-2"></i>
-            Configuración
-          </Link> */}
+          </Link>         
         </div>
       </div>
       

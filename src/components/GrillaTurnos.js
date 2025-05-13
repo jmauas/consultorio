@@ -421,13 +421,13 @@ const cardLibre = (turno, anterior, color, index) => {
                   <p className="mt-1 text-sm font-bold">{turno.doctor.emoji} {turno.doctor.nombre}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Consultorio</p>
+                  <p className="text-sm font-medium text-gray-500 mb-2">Consultorio</p>
                   <p className="mt-1 text-sm font-bold">
                     {turno.consultorio?.nombre || (typeof turno.consultorio === 'string' ? turno.consultorio : 'No especificado')}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Obra Social</p>
+                  <p className="text-sm font-medium text-gray-500 mb-2">Cobertura</p>
                   <span 
                     className="text-xs font-bold p-2 rounded-lg"
                     style={{ 
