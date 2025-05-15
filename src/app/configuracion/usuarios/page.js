@@ -191,7 +191,7 @@ export default function UsersAdmin() {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <i className="fa-solid fa-spinner fa-spin text-orange-400 text-4xl"></i>
+          <i className="fa-solid fa-spinner fa-spin text-[var(--color-primary)] text-4xl"></i>
           <p className="mt-4 text-lg">Cargando...</p>
         </div>
       </div>
@@ -201,7 +201,7 @@ export default function UsersAdmin() {
   // Contenido para mostrar cuando está cargando usuarios
   const loadingContent = (
     <div className="flex justify-center items-center py-8">
-      <i className="fa-solid fa-spinner fa-spin text-orange-400"></i>
+      <i className="fa-solid fa-spinner fa-spin text-[var(--color-primary)]"></i>
       <span className="ml-2">Cargando usuarios...</span>
     </div>
   );
@@ -230,7 +230,7 @@ export default function UsersAdmin() {
                 />
               ) : (
                 <div className="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center">
-                  <i className="fa-solid fa-user text-orange-400"></i>
+                  <i className="fa-solid fa-user text-[var(--color-primary)]"></i>
                 </div>
               )}
             </div>
@@ -313,7 +313,7 @@ export default function UsersAdmin() {
           {loading ? (
             <tr>
               <td colSpan="5" className="px-6 py-4 text-center">
-                <i className="fa-solid fa-spinner fa-spin text-orange-400"></i>
+                <i className="fa-solid fa-spinner fa-spin text-[var(--color-primary)]"></i>
                 <span className="ml-2">Cargando usuarios...</span>
               </td>
             </tr>
@@ -333,7 +333,7 @@ export default function UsersAdmin() {
                         <Image className="h-8 w-8 rounded-full" src={user.image} alt={user.name} width={24} height={24}/>
                       ) : (
                         <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
-                          <i className="fa-solid fa-user text-orange-400"></i>
+                          <i className="fa-solid fa-user text-[var(--color-primary)]"></i>
                         </div>
                       )}
                     </div>
@@ -400,7 +400,7 @@ export default function UsersAdmin() {
       <div className="mx-auto max-w-7xl">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900">
-            <i className="fa-solid fa-users text-orange-400 mr-2"></i>
+            <i className="fa-solid fa-users text-[var(--color-primary)] mr-2"></i>
             Administración de Usuarios
           </h1>
           <button
@@ -413,7 +413,7 @@ export default function UsersAdmin() {
               });
               setShowCreateModal(true);
             }}
-            className="flex items-center rounded-md bg-orange-400 px-4 py-2 text-white hover:bg-orange-500"
+            className="flex items-center rounded-md bg-[var(--color-primary)] px-4 py-2 text-white hover:bg-[var(--color-primary)]"
           >
             <i className="fa-solid fa-user-plus mr-2"></i>
             <span className="hidden sm:inline">Nuevo Usuario</span>
@@ -440,7 +440,7 @@ export default function UsersAdmin() {
               placeholder="Buscar usuarios..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="block w-full rounded-md border-0 py-2 pl-10 pr-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-400"
+              className="block w-full rounded-md border-0 py-2 pl-10 pr-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[var(--color-primary)]"
             />
           </div>
         </div>
@@ -465,7 +465,7 @@ export default function UsersAdmin() {
         <div className="p-6">
           <div className="sm:flex sm:items-start">
             <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 sm:mx-0 sm:h-10 sm:w-10">
-              <i className="fa-solid fa-user-plus text-orange-400"></i>
+              <i className="fa-solid fa-user-plus text-[var(--color-primary)]"></i>
             </div>
             <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
               <div className="mt-2">
@@ -480,7 +480,7 @@ export default function UsersAdmin() {
                       id="name"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 p-2 border"
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)] p-2 border"
                       placeholder="Nombre del usuario"
                     />
                   </div>
@@ -494,7 +494,7 @@ export default function UsersAdmin() {
                       id="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 p-2 border"
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)] p-2 border"
                       placeholder="correo@ejemplo.com"
                       required
                     />
@@ -509,7 +509,7 @@ export default function UsersAdmin() {
                       id="password"
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 p-2 border"
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)] p-2 border"
                       placeholder="Contraseña"
                     />
                     {!formData.password && (
@@ -525,7 +525,7 @@ export default function UsersAdmin() {
                       id="enabled"
                       checked={formData.enabled}
                       onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
-                      className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)] border-gray-300 rounded"
                     />
                     <label htmlFor="enabled" className="ml-2 block text-sm text-gray-900">
                       Usuario habilitado
@@ -540,7 +540,7 @@ export default function UsersAdmin() {
               type="button"
               onClick={handleCreate}
               disabled={loading}
-              className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-orange-600 text-base font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 sm:ml-3 sm:w-auto sm:text-sm"
+              className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-[var(--color-primary)] text-base font-medium text-white hover:bg-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary)] sm:ml-3 sm:w-auto sm:text-sm"
             >
               {loading ? (
                 <>
@@ -645,7 +645,7 @@ export default function UsersAdmin() {
               type="button"
               onClick={handleUpdate}
               disabled={loading}
-              className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-orange-500 text-base font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
+              className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-[var(--color-primary)] text-base font-medium text-white hover:bg-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
             >
               {loading ? (
                 <>

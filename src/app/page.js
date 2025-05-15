@@ -137,10 +137,12 @@ export default function Home() {
     }));
     
     // Últimos turnos (próximos 3 días, ordenados por fecha)
+    const hace1Hora = new Date();
+    hace1Hora.setHours(hace1Hora.getHours() - 1);
     const proximos = turnos
       .filter(turno => {
         const fechaTurno = new Date(turno.desde);
-        return fechaTurno <= limiteTresDias;
+        return (fechaTurno >= hace1Hora && fechaTurno <= limiteTresDias);
       })
       .sort((a, b) => new Date(a.desde) - new Date(b.desde))
       .slice(0, 5);
@@ -196,7 +198,7 @@ export default function Home() {
             
             <Link 
               href="/auth/signin" 
-              className="block w-full bg-orange-500 hover:bg-orange-600 text-white text-center py-3 px-4 rounded-md transition duration-200"
+              className="block w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white text-center py-3 px-4 rounded-md transition duration-200"
             >
               <i className="fa-solid fa-right-to-bracket mr-2"></i>
               Iniciar Sesión
@@ -209,16 +211,16 @@ export default function Home() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-lg md:text-3xl font-bold text-gray-800 mb-2 md:mb-8">
-        <i className="fa-solid fa-user-circle mr-2"></i>
+      <h1 className="text-lg md:text-3xl font-bold mb-2 md:mb-8">
+        <i className="fa-solid fa-user-circle mr-2 "></i>
         Bienvenido, {session.user?.name || 'Usuario'}
       </h1>
       
       {/* Tarjetas de estadísticas */}
       {/* Pantallas Grandes */}
       <div className="hidden md:grid md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-lg font-semibold text-gray-700 mb-2">
+        <div className="rounded-lg shadow-md p-6 border border-slate-500">
+          <h2 className="text-lg font-semibold mb-2">
             <i className="fa-solid fa-calendar-day mr-2"></i>
             Turnos de Hoy
           </h2>
@@ -231,8 +233,8 @@ export default function Home() {
           </Link>
         </div>
         
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-lg font-semibold text-gray-700 mb-2">
+        <div className=" rounded-lg shadow-md p-6 border border-slate-500">
+          <h2 className="text-lg font-semibold mb-2">
             <i className="fa-solid fa-calendar-week mr-2"></i>
             Próximos Turnos
           </h2>
@@ -245,8 +247,8 @@ export default function Home() {
           </Link>
         </div>
         
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-lg font-semibold text-gray-700 mb-2">
+        <div className="rounded-lg shadow-md p-6 border border-slate-500">
+          <h2 className="text-lg font-semibold mb-2">
             <i className="fa-solid fa-users mr-2"></i>
             Pacientes Registrados
           </h2>
@@ -261,8 +263,8 @@ export default function Home() {
       </div>
       {/* Pantallas Pequeñas */}
       <div className="flex flex-col md:hidden gap-2 mb-4">
-        <div className="bg-white rounded-lg shadow-md p-4 grid grid-cols-12 items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-700 col-span-7">
+        <div className="rounded-lg shadow-md p-4 grid grid-cols-12 items-center justify-between border border-slate-500">
+          <h2 className="text-lg font-semibold col-span-7">
             <i className="fa-solid fa-calendar-day mr-2"></i>
             Turnos de Hoy
           </h2>
@@ -275,8 +277,8 @@ export default function Home() {
           </Link>
         </div>
         
-         <div className="bg-white rounded-lg shadow-md p-4 grid grid-cols-12 items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-700 mb-2 col-span-7">
+         <div className="rounded-lg shadow-md p-4 grid grid-cols-12 items-center justify-between border border-slate-500">
+          <h2 className="text-lg font-semibold mb-2 col-span-7">
             <i className="fa-solid fa-calendar-week mr-2"></i>
             Próximos Turnos
           </h2>
@@ -289,8 +291,8 @@ export default function Home() {
           </Link>
         </div>
         
-         <div className="bg-white rounded-lg shadow-md p-4 grid grid-cols-12 items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-700 col-span-7">
+         <div className="rounded-lg shadow-md p-4 grid grid-cols-12 items-center justify-between border border-slate-500">
+          <h2 className="text-lg font-semibold col-span-7">
             <i className="fa-solid fa-users mr-2"></i>
             Pacientes
           </h2>
@@ -305,15 +307,15 @@ export default function Home() {
       </div>
       
       {/* Acciones rápidas */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">
+      <div className="rounded-lg shadow-md p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4">
           <i className="fa-solid fa-bolt mr-2"></i>
           Acciones Rápidas
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           <button 
             onClick={handleModalTurnoNuevo} 
-            className="bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2 text-xs md:text-md"
+            className="bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2 text-xs md:text-base "
           >
             <i className="fa-solid fa-calendar-plus"></i>
             <i className="fa-solid fa-plus"></i>
@@ -321,7 +323,7 @@ export default function Home() {
           </button>
           <button
             onClick={handleModalTurnoDisponibilidad}
-            className="bg-orange-500 hover:bg-orange-600 text-white text-center py-2 px-2 rounded-md flex items-center justify-center gap-2 text-xs md:text-md"
+            className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white text-center py-2 px-2 rounded-md flex items-center justify-center gap-2 text-xs md:text-base"
           >
             <i className="fa-solid fa-clock"></i>
             <i className="fa-solid fa-plus"></i>
@@ -329,14 +331,14 @@ export default function Home() {
           </button>
           <Link 
             href="/turnos" 
-            className="bg-green-500 hover:bg-green-600 text-white text-center py-3 px-4 rounded-md transition duration-200 flex items-center justify-center gap-2 text-xs md:text-md"
+            className="bg-green-500 hover:bg-green-600 text-white text-center py-3 px-4 rounded-md transition duration-200 flex items-center justify-center gap-2 text-xs md:text-base"
           >
             <i className="fa-solid fa-calendar-days mr-2"></i>
             Ver Turnos
           </Link>
           <Link 
             href="/pacientes" 
-            className="bg-purple-500 hover:bg-purple-600 text-white text-center py-3 px-4 rounded-md transition duration-200 flex items-center justify-center gap-2 text-xs md:text-md"
+            className="bg-purple-500 hover:bg-purple-600 text-white text-center py-3 px-4 rounded-md transition duration-200 flex items-center justify-center gap-2 text-xs md:text-base"
 
           >
             <i className="fa-solid fa-user-group mr-2"></i>
@@ -346,15 +348,15 @@ export default function Home() {
       </div>
       
       {/* Próximos turnos */}
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="rounded-lg shadow-md p-6">
         <div className="flex justify-start items-center mb-4 gap-4">
-          <h2 className="text-xl font-semibold text-gray-800">
+          <h2 className="text-xl font-semibold">
             <i className="fa-solid fa-calendar-check mr-2"></i>
             Próximos Turnos
           </h2>
           <button 
             onClick={cargarTodosLosDatos} 
-            className="bg-orange-400 hover:bg-orange-600 text-white rounded-lg transition duration-200 w-8 h-8"
+            className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white rounded-lg transition duration-200 w-8 h-8"
             title="Actualizar turnos"
           >
             <div>
@@ -364,14 +366,14 @@ export default function Home() {
         </div>
         
         {ultimosTurnos.length === 0 ? (
-          <p className="text-gray-500 text-center py-4">
+          <p className="text-center py-4">
             <i className="fa-solid fa-calendar-xmark mr-2"></i>
             No hay turnos programados próximamente
           </p>
         ) : (
           <>
              {/* Listado de turnos */}
-              <div className="bg-white shadow rounded-lg overflow-hidden">
+              <div className="shadow rounded-lg overflow-hidden">
                 <GrillaTurnos
                   turnos={ultimosTurnos}
                   loading={loadingTurnos}

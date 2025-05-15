@@ -5,6 +5,7 @@ import { obtenerConfig, registrarConfig } from '@/lib/services/configService.js'
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import Loader from '@/components/Loader';
+import { useTheme } from 'next-themes';
 
 export default function EmpresaPage() {
   const [datos, setDatos] = useState({
@@ -29,6 +30,7 @@ export default function EmpresaPage() {
   const [loading, setLoading] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const fileInputRef = useRef(null);
+  const { theme } = useTheme();
 
   useEffect(() => {
     async function cargarDatos() {
@@ -154,13 +156,13 @@ export default function EmpresaPage() {
       <h2 className="text-2xl font-bold mb-6">Datos de la Empresa</h2>
       
       <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="p-6 rounded-lg shadow-sm border">
           <h3 className="text-xl font-semibold mb-4">Información Básica</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
-                <label htmlFor="nombreConsultorio" className="block text-gray-700 font-medium mb-2">
+                <label htmlFor="nombreConsultorio" className="block font-medium mb-2">
                   Nombre del Consultorio/Empresa
                 </label>
                 <input
@@ -169,13 +171,13 @@ export default function EmpresaPage() {
                   name="nombreConsultorio"
                   value={datos.nombreConsultorio}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
                   required
                 />
               </div>
               
               <div>
-                <label htmlFor="domicilio" className="block text-gray-700 font-medium mb-2">
+                <label htmlFor="domicilio" className="block font-medium mb-2">
                   Domicilio
                 </label>
                 <input
@@ -184,14 +186,14 @@ export default function EmpresaPage() {
                   name="domicilio"
                   value={datos.domicilio}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
                 />
               </div>
             </div>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-700 font-medium mb-2">
+                <label className="block font-medium mb-2">
                   Logo
                 </label>
                 <div className="flex items-center space-x-4">
@@ -208,7 +210,7 @@ export default function EmpresaPage() {
                         className="max-w-full max-h-full object-contain"
                       />
                     ) : (
-                      <div className="text-gray-400 text-center">
+                      <div className="text-center">
                         <i className="fas fa-image text-2xl"></i>
                         <p className="text-xs mt-1">Subir logo</p>
                       </div>
@@ -226,11 +228,11 @@ export default function EmpresaPage() {
                     <button
                       type="button"
                       onClick={triggerFileInput}
-                      className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm"
+                      className="px-3 py-1 rounded hover:bg-gray-300 text-sm"
                     >
                       Seleccionar archivo
                     </button>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs mt-1">
                       Formatos: JPG, PNG, SVG
                     </p>
                   </div>
@@ -241,7 +243,7 @@ export default function EmpresaPage() {
           
           <div className="mt-6">
             <div>
-              <label htmlFor="horarioAtencion" className="block text-gray-700 font-medium mb-2">
+              <label htmlFor="horarioAtencion" className="block font-medium mb-2">
                 Horario de Atención
               </label>
               <input
@@ -251,18 +253,18 @@ export default function EmpresaPage() {
                 value={datos.horarioAtencion}
                 onChange={handleChange}
                 placeholder="Ej: Lunes a Viernes de 9 a 18hs"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
               />
             </div>
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="p-6 rounded-lg shadow-sm border">
           <h3 className="text-xl font-semibold mb-4">Contacto</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="telefono" className="block text-gray-700 font-medium mb-2">
+              <label htmlFor="telefono" className="block font-medium mb-2">
                 Teléfono Principal
               </label>
               <input
@@ -271,12 +273,12 @@ export default function EmpresaPage() {
                 name="telefono"
                 value={datos.telefono}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
               />
             </div>
             
             <div>
-              <label htmlFor="email" className="block text-gray-700 font-medium mb-2">
+              <label htmlFor="email" className="block font-medium mb-2">
                 Email
               </label>
               <input
@@ -285,12 +287,12 @@ export default function EmpresaPage() {
                 name="email"
                 value={datos.email}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
               />
             </div>
             
             <div>
-              <label htmlFor="web" className="block text-gray-700 font-medium mb-2">
+              <label htmlFor="web" className="block font-medium mb-2">
                 Sitio Web
               </label>
               <input
@@ -300,18 +302,18 @@ export default function EmpresaPage() {
                 value={datos.web}
                 onChange={handleChange}
                 placeholder="https://"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
               />
             </div>
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="p-6 rounded-lg shadow-sm border">
           <h3 className="text-xl font-semibold mb-4">Información Adicional</h3>
           
           <div className="space-y-4">
             <div>
-              <label htmlFor="coberturas" className="block text-gray-700 font-medium mb-2">
+              <label htmlFor="coberturas" className="block font-medium mb-2">
                 Obras Sociales y Coberturas
               </label>
               <textarea
@@ -320,16 +322,16 @@ export default function EmpresaPage() {
                 value={datos.coberturas}
                 onChange={handleChange}
                 rows="4"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
                 placeholder="Lista las obras sociales y coberturas aceptadas..."
               ></textarea>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm mt-1">
                 Separe cada cobertura con una coma o en líneas separadas
               </p>
             </div>
 
             <div>
-              <label htmlFor="limite" className="block text-gray-700 font-medium mb-2">
+              <label htmlFor="limite" className="block font-medium mb-2">
                 Fecha Límite Para Turnos
               </label>
               <input
@@ -338,9 +340,9 @@ export default function EmpresaPage() {
                 name="limite"
                 value={datos.limite}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
               />
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm mt-1">
                 Fecha límite para turnos del consultorio
               </p>
             </div>
@@ -357,9 +359,9 @@ export default function EmpresaPage() {
                   name="envio"
                   checked={datos.envio}
                   onChange={handleChange}
-                  className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)] border-gray-300 rounded"
                 />
-                <label htmlFor="envio" className="ml-2 block text-gray-700">
+                <label htmlFor="envio" className="ml-2 block">
                   Enviar recordatorios por WhatsApp
                 </label>
               </div>
@@ -367,7 +369,7 @@ export default function EmpresaPage() {
               {datos.envio && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-6 mb-4">
                   <div>
-                    <label htmlFor="horaEnvio" className="block text-gray-700 font-medium mb-1">
+                    <label htmlFor="horaEnvio" className="block font-medium mb-1">
                       Hora de envío
                     </label>
                     <input
@@ -376,16 +378,16 @@ export default function EmpresaPage() {
                       name="horaEnvio"
                       value={datos.horaEnvio}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
                       required={datos.envio}
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs mt-1">
                       Hora Díaria de Envío
                     </p>
                   </div>
                   
                   <div>
-                    <label htmlFor="diasEnvio" className="block text-gray-700 font-medium mb-1">
+                    <label htmlFor="diasEnvio" className="block font-medium mb-1">
                       Días a enviar
                     </label>
                     <input
@@ -395,10 +397,10 @@ export default function EmpresaPage() {
                       value={datos.diasEnvio}
                       onChange={handleChange}
                       placeholder="ej: 1,2,3,4,5 (días de la semana: lunes a viernes)"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
                       required={datos.envio}
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs mt-1">
                       1 para turnos del día siguiente, 2 para los 2 días siguientes, etc.
                     </p>
                   </div>
@@ -419,9 +421,9 @@ export default function EmpresaPage() {
                   name="envioMail"
                   checked={datos.envioMail}
                   onChange={handleChange}
-                  className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)] border-gray-300 rounded"
                 />
-                <label htmlFor="envioMail" className="ml-2 block text-gray-700">
+                <label htmlFor="envioMail" className="ml-2 block">
                   Enviar recordatorios por Email
                 </label>
               </div>
@@ -429,7 +431,7 @@ export default function EmpresaPage() {
               {datos.envioMail && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-6">
                   <div>
-                    <label htmlFor="horaEnvioMail" className="block text-gray-700 font-medium mb-1">
+                    <label htmlFor="horaEnvioMail" className="block font-medium mb-1">
                       Hora de envío
                     </label>
                     <input
@@ -438,16 +440,16 @@ export default function EmpresaPage() {
                       name="horaEnvioMail"
                       value={datos.horaEnvioMail}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
                       required={datos.envioMail}
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs mt-1">
                       Hora Díaria de Envío
                     </p>
                   </div>
                   
                   <div>
-                    <label htmlFor="diasEnvioMail" className="block text-gray-700 font-medium mb-1">
+                    <label htmlFor="diasEnvioMail" className="block font-medium mb-1">
                       Días para enviar
                     </label>
                     <input
@@ -457,10 +459,10 @@ export default function EmpresaPage() {
                       value={datos.diasEnvioMail}
                       onChange={handleChange}
                       placeholder="ej: 1,2,3,4,5 (días de la semana: lunes a viernes)"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
                       required={datos.envioMail}
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs mt-1">
                       1 para turnos del día siguiente, 2 para los 2 días siguientes, etc.
                     </p>
                   </div>
@@ -474,7 +476,7 @@ export default function EmpresaPage() {
           <button
             type="submit"
             disabled={guardando}
-            className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors disabled:opacity-50"
+            className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 transition-colors disabled:opacity-50"
           >
             {guardando ? (
               <>

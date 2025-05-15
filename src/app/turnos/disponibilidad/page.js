@@ -21,7 +21,6 @@ const NuevoTurnoPage = () => {
         celularParam && setCelular(celularParam);
         pacienteParam && setPacienteId(pacienteParam);
         
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchParams]);
 
   return (

@@ -141,16 +141,16 @@ const SignIn = () => {
 
   return (
     <div className="flex flex-col items-center justify-center py-2">
-      <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-10 shadow-md">
+      <div className="w-full max-w-md space-y-8 rounded-lg p-10 shadow-md border border-gray-200">
         <div>
-          <h2 className="mt-2 text-center text-3xl font-bold tracking-tight text-gray-900">
+          <h2 className="mt-2 text-center text-3xl font-bold tracking-tight">
             {forgotPassword ? (
               <>
-                <i className="fa-solid fa-unlock-keyhole text-orange-400 mr-2"></i>Restablecer Contraseña
+                <i className="fa-solid fa-unlock-keyhole text-[var(--color-primary)] mr-2"></i>Restablecer Contraseña
               </>
             ) : (
               <>
-                <i className="fa-solid fa-user-lock text-orange-400 mr-2"></i>Iniciar Sesión
+                <i className="fa-solid fa-user-lock text-[var(--color-primary)] mr-2"></i>Iniciar Sesión
               </>
             )}
           </h2>
@@ -164,11 +164,11 @@ const SignIn = () => {
               onClick={() => setAuthMethod("credentials")}
               className={`px-4 py-2 rounded-md flex items-center ${
                 authMethod === "credentials" 
-                  ? "bg-orange-400 text-white" 
+                  ? "bg-[var(--color-primary)] text-white" 
                   : "bg-gray-100 text-gray-700"
               }`}
             >
-              <i className={`fa-solid fa-key mr-2 ${authMethod === "credentials" ? "" : "text-orange-400"}`}></i>
+              <i className={`fa-solid fa-key mr-2 ${authMethod === "credentials" ? "" : "text-[var(--color-primary)]"}`}></i>
               Email y Contraseña
             </button>
             <button
@@ -176,11 +176,11 @@ const SignIn = () => {
               onClick={() => setAuthMethod("email")}
               className={`px-4 py-2 rounded-md flex items-center ${
                 authMethod === "email" 
-                  ? "bg-orange-400 text-white" 
+                  ? "bg-[var(--color-primary)] text-white" 
                   : "bg-gray-100 text-gray-700"
               }`}
             >
-              <i className={`fa-solid fa-envelope mr-2 ${authMethod === "email" ? "" : "text-orange-400"}`}></i>
+              <i className={`fa-solid fa-envelope mr-2 ${authMethod === "email" ? "" : "text-[var(--color-primary)]"}`}></i>
               Enlace por Email
             </button>
           </div>
@@ -189,7 +189,7 @@ const SignIn = () => {
         {/* Área de mensajes de error/éxito con altura fija */}
         <div className="min-h-16">
           {error && (
-            <div className="rounded-md bg-red-50 p-4 flex">
+            <div className="rounded-md p-4 flex">
               <i className="fa-solid fa-circle-exclamation text-red-600 mr-3 mt-0.5"></i>
               <div className="text-sm text-red-700">{error}</div>
             </div>
@@ -205,7 +205,7 @@ const SignIn = () => {
           )}
 
           {resetEmailSent && (
-            <div className="rounded-md bg-green-50 p-4 text-center flex items-center justify-center">
+            <div className="rounded-md  p-4 text-center flex items-center justify-center">
               <i className="fa-solid fa-circle-check text-green-600 mr-2"></i>
               <div className="text-sm text-green-700">
                 ¡Instrucciones enviadas! Revisa tu correo electrónico para recuperar tu contraseña.
@@ -221,7 +221,7 @@ const SignIn = () => {
             <form className="mt-8 space-y-6" onSubmit={handleForgotPassword}>
               <div className="rounded-md shadow-sm min-h-[88px]">
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-orange-400">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--color-primary)]">
                     <i className="fa-solid fa-at"></i>
                   </span>
                   <label htmlFor="reset-email" className="sr-only">
@@ -233,7 +233,7 @@ const SignIn = () => {
                     type="email"
                     autoComplete="email"
                     required
-                    className="relative block w-full rounded-md border-0 p-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-orange-400 sm:text-sm sm:leading-6"
+                    className="relative block w-full rounded-md border-0 p-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-[var(--color-primary)] sm:text-sm sm:leading-6"
                     placeholder="Correo electrónico"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -245,7 +245,7 @@ const SignIn = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="group relative flex w-full justify-center rounded-md bg-orange-400 px-3 py-2 text-sm font-semibold text-white hover:bg-orange-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-orange-400 disabled:bg-orange-300"
+                  className="group relative flex w-full justify-center rounded-md bg-[var(--color-primary)] px-3 py-2 text-sm font-semibold text-white hover:bg-[var(--color-primary)] focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)] disabled:bg-orange-300"
                 >
                   {loading ? (
                     <>
@@ -264,7 +264,7 @@ const SignIn = () => {
               <div className="text-center mt-4">
                 <button
                   type="button"
-                  className="text-sm text-orange-500 hover:text-orange-600"
+                  className="text-sm text-[var(--color-primary)] hover:text-[var(--color-primary)]"
                   onClick={() => setForgotPassword(false)}
                 >
                   <i className="fa-solid fa-arrow-left mr-1"></i>
@@ -282,7 +282,7 @@ const SignIn = () => {
             >
               <div className="rounded-md shadow-sm min-h-[88px]">
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-orange-400">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--color-primary)]">
                     <i className="fa-solid fa-at"></i>
                   </span>
                   <label htmlFor="email" className="sr-only">
@@ -294,7 +294,7 @@ const SignIn = () => {
                     type="email"
                     autoComplete="email"
                     required
-                    className={`relative block w-full border-0 p-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-orange-400 sm:text-sm sm:leading-6 ${
+                    className={`relative block w-full border-0 p-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-[var(--color-primary)] sm:text-sm sm:leading-6 ${
                       authMethod === "credentials" ? "rounded-t-md" : "rounded-md"
                     }`}
                     placeholder="Correo electrónico"
@@ -305,7 +305,7 @@ const SignIn = () => {
                 
                 {authMethod === "credentials" && (
                   <div className="relative">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-orange-400">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--color-primary)]">
                       <i className="fa-solid fa-lock"></i>
                     </span>
                     <label htmlFor="password" className="sr-only">
@@ -317,7 +317,7 @@ const SignIn = () => {
                       type="password"
                       autoComplete="current-password"
                       required
-                      className="relative block w-full rounded-b-md border-0 p-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-orange-400 sm:text-sm sm:leading-6"
+                      className="relative block w-full rounded-b-md border-0 p-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-[var(--color-primary)] sm:text-sm sm:leading-6"
                       placeholder="Contraseña"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -329,7 +329,7 @@ const SignIn = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="group relative flex w-full justify-center rounded-md bg-orange-400 px-3 py-4 text-lg font-semibold text-white hover:bg-orange-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-orange-400 disabled:bg-orange-300"
+                  className="group relative flex w-full justify-center rounded-md bg-[var(--color-primary)] px-3 py-4 text-lg font-semibold text-white hover:bg-[var(--color-primary)] focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)] disabled:bg-orange-300"
                 >
                   {loading ? (
                     <div>
@@ -354,7 +354,7 @@ const SignIn = () => {
                 <div className="flex justify-end">
                   <button
                     type="button"
-                    className="text-sm text-orange-500 hover:text-orange-600 font-bold p-2 border rounded-md shadow-xl"
+                    className="text-sm text-[var(--color-primary)] hover:text-[var(--color-primary)] font-bold p-2 border rounded-md shadow-xl"
                     onClick={() => setForgotPassword(true)}
                   >
                     ¿Olvidaste tu contraseña?
@@ -375,7 +375,7 @@ const SignIn = () => {
                 setForgotPassword(false);
                 setEmail("");
               }}
-              className="text-orange-500 hover:text-orange-600"
+              className="text-[var(--color-primary)] hover:text-[var(--color-primary)]"
             >
               <i className="fa-solid fa-arrow-rotate-left mr-1"></i>
               Volver al inicio de sesión

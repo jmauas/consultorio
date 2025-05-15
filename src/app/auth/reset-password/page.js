@@ -122,7 +122,7 @@ function ResetPasswordForm() {
       <div className="flex min-h-screen flex-col items-center justify-center py-2">
         <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-10 shadow-md">
           <div className="text-center">
-            <i className="fa-solid fa-spinner fa-spin text-orange-400 text-3xl mb-4"></i>
+            <i className="fa-solid fa-spinner fa-spin text-[var(--color-primary)] text-3xl mb-4"></i>
             <h2 className="text-xl font-semibold">Validando enlace de recuperación...</h2>
             <p className="mt-2 text-gray-600">Por favor espera mientras verificamos tu solicitud.</p>
           </div>
@@ -142,7 +142,7 @@ function ResetPasswordForm() {
             <p className="mt-4 text-sm text-gray-500">Serás redirigido al inicio de sesión en unos segundos...</p>
             <button
               onClick={() => router.push('/auth/signin')}
-              className="mt-6 inline-flex items-center rounded-md bg-orange-400 px-4 py-2 text-sm font-medium text-white hover:bg-orange-500"
+              className="mt-6 inline-flex items-center rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-primary)]"
             >
               <i className="fa-solid fa-arrow-right-to-bracket mr-2"></i>
               Ir a iniciar sesión
@@ -158,7 +158,7 @@ function ResetPasswordForm() {
       <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-10 shadow-md">
         <div className="text-center">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-            <i className="fa-solid fa-unlock-keyhole text-orange-400 mr-2"></i>
+            <i className="fa-solid fa-unlock-keyhole text-[var(--color-primary)] mr-2"></i>
             Restablecer contraseña
           </h2>
           {tokenValid ? (
@@ -183,7 +183,7 @@ function ResetPasswordForm() {
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="rounded-md shadow-sm space-y-4">
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-orange-400">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--color-primary)]">
                   <i className="fa-solid fa-lock"></i>
                 </span>
                 <label htmlFor="password" className="sr-only">
@@ -194,14 +194,14 @@ function ResetPasswordForm() {
                   name="password"
                   type="password"
                   required
-                  className="relative block w-full rounded-md border-0 p-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-orange-400 sm:text-sm sm:leading-6"
+                  className="relative block w-full rounded-md border-0 p-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-[var(--color-primary)] sm:text-sm sm:leading-6"
                   placeholder="Nueva contraseña"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-orange-400">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--color-primary)]">
                   <i className="fa-solid fa-lock"></i>
                 </span>
                 <label htmlFor="confirm-password" className="sr-only">
@@ -212,7 +212,7 @@ function ResetPasswordForm() {
                   name="confirm-password"
                   type="password"
                   required
-                  className="relative block w-full rounded-md border-0 p-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-orange-400 sm:text-sm sm:leading-6"
+                  className="relative block w-full rounded-md border-0 p-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-[var(--color-primary)] sm:text-sm sm:leading-6"
                   placeholder="Confirmar contraseña"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
@@ -224,7 +224,7 @@ function ResetPasswordForm() {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative flex w-full justify-center rounded-md bg-orange-400 px-3 py-2 text-sm font-semibold text-white hover:bg-orange-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400 disabled:bg-orange-300"
+                className="group relative flex w-full justify-center rounded-md bg-[var(--color-primary)] px-3 py-2 text-sm font-semibold text-white hover:bg-[var(--color-primary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)] disabled:bg-orange-300"
               >
                 {loading ? (
                   <>
@@ -244,7 +244,7 @@ function ResetPasswordForm() {
           <div className="mt-8 text-center">
             <button
               onClick={() => router.push('/auth/signin')}
-              className="inline-flex items-center rounded-md bg-orange-400 px-4 py-2 text-sm font-medium text-white hover:bg-orange-500"
+              className="inline-flex items-center rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-primary)]"
             >
               <i className="fa-solid fa-arrow-left mr-2"></i>
               Volver al inicio de sesión

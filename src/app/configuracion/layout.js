@@ -2,9 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTheme } from 'next-themes';
 
 export default function ConfiguracionLayout({ children }) {
   const pathname = usePathname();
+  const { theme } = useTheme();
   
   const menuItems = [
     { 
@@ -50,8 +52,8 @@ export default function ConfiguracionLayout({ children }) {
     <div className="flex flex-col md:flex-row gap-6 p-4">
       {/* Barra lateral con navegación */}
       <aside className="w-full md:w-64 flex-shrink-0">
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <div className="px-4 py-3 bg-orange-500 text-white">
+        <div className="rounded-lg shadow-sm overflow-hidden">
+          <div className="px-4 py-3 bg-[var(--color-primary)] text-white">
             <h2 className="text-xl font-semibold">Configuración</h2>
             <p className="text-orange-100 text-sm">Ajustes del sistema</p>
           </div>
@@ -64,11 +66,11 @@ export default function ConfiguracionLayout({ children }) {
                     href={item.href}
                     className={`flex items-center px-3 py-2 rounded-md transition-colors ${
                       isActive(item.href) 
-                        ? 'bg-orange-100 text-orange-700' 
-                        : 'hover:bg-gray-100 text-gray-700'
+                        ? theme==='dark' ? 'bg-slate-500 text-orange-700' : 'bg-orange-100 text-orange-700' 
+                        : theme==='dark' ? 'bg-black text-slate-200' : 'hover:bg-gray-100 text-gray-700'
                     }`}
                   >
-                    <i className={`${item.icon} w-5 text-center mr-2 ${isActive(item.href) ? 'text-orange-600' : 'text-gray-500'}`}></i>
+                    <i className={`${item.icon} w-5 text-center mr-2 ${isActive(item.href) ? 'text-[var(--color-primary)]' : 'text-gray-500'}`}></i>
                     <span>{item.label}</span>
                   </Link>
                 </li>
@@ -76,10 +78,10 @@ export default function ConfiguracionLayout({ children }) {
             </ul>
           </nav>
           
-          <div className="px-4 py-3 bg-gray-50 border-t">
+          <div className="px-4 py-3 border-t">
             <Link
               href="/"
-              className="flex items-center text-gray-600 hover:text-orange-600 transition-colors"
+              className="flex items-center hover:text-[var(--color-primary)] transition-colors"
             >
               <i className="fa-solid fa-arrow-left fa-lg mr-2"></i>
               <span>Volver al inicio</span>
@@ -87,7 +89,7 @@ export default function ConfiguracionLayout({ children }) {
           </div>
         </div>
         
-        <div className="bg-blue-50 rounded-lg mt-4 p-4 text-sm text-blue-800">
+        <div className={`rounded-lg mt-4 p-4 text-sm ${theme==='dark' ? 'bg-slate-700 text-slate-200' : 'bg-blue-100 text-blue-800' }`}>
           <h3 className="font-semibold flex items-center text-blue-700">
             <i className="fas fa-info-circle mr-2"></i>
             Ayuda

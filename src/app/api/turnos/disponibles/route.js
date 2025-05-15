@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
 import { obtenerConfig } from '@/lib/services/configService.js';
+import { agregarFeriados } from '@/lib/utils/variosUtils.js';
 
 // Handle GET request for available appointments
 export async function GET(request) {
@@ -240,6 +241,7 @@ export async function GET(request) {
           const hr = hoy.getHours();
           const min = hoy.getMinutes();
           dia = disp.find(turno => turno.fecha == fecha);
+          const consultorioId = aten.consultorioId;
           const turnoAgregar = {
             hora: hr,
             min: min,
@@ -248,7 +250,7 @@ export async function GET(request) {
               nombre: doctor.nombre,
               emoji: doctor.emoji
             },
-            consultorio: consultorios,
+            consultorioId,
             tipoTurno: tipo,
             tipoDeTurnoId: tipo, // Agregamos el campo tipoDeTurnoId con el mismo valor que tipoTurno
             duracion: minutosTurno
@@ -284,20 +286,3 @@ export async function GET(request) {
   }
 }  
 
-const agregarFeriados = (actual, agregar) => {
-  if (!actual) actual = [];
-  if (!agregar) return actual;
-  agregar.forEach(f => {
-      if (f.indexOf('|') >= 0) {
-          let fecha1 = new Date(f.split('|')[0]);
-          let fecha2 = new Date(f.split('|')[1]);
-          while (fecha1 <= fecha2) {
-              actual.push(new Date(fecha1));
-              fecha1.setDate(fecha1.getDate() + 1);
-          }
-      } else {
-          actual.push(new Date(f));
-      }
-  });
-  return actual;
-}

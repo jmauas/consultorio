@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { obtenerCoberturasDesdeDB } from '@/lib/utils/coberturasUtils';
 import { obtenerConfig, registrarConfig } from '@/lib/services/configService.js';
 import Loader from '@/components/Loader';
+import { useTheme } from 'next-themes';
 
 // Importar los componentes de pestañas
 import CoberturasTab from '@/components/consultorioTabs/CoberturasTab';
@@ -19,6 +20,7 @@ function classNames(...classes) {
 }
 
 export default function ConsultorioPage() {
+  const { theme } = useTheme();
   const [loading, setLoading] = useState(true);
   const [config, setConfig] = useState({
     doctores: [],
@@ -38,7 +40,8 @@ export default function ConsultorioPage() {
   const [nuevoDoctor, setNuevoDoctor] = useState({
     nombre: '',
     emoji: '👨‍⚕️',
-    feriados: []
+    feriados: [],
+    color: '#000000',
   });
   
   const [nuevoFeriadoDoctor, setNuevoFeriadoDoctor] = useState({
@@ -205,6 +208,7 @@ export default function ConsultorioPage() {
           id: doctor.id,
           nombre: doctor.nombre,
           emoji: doctor.emoji || '👨‍⚕️',
+          color: doctor.color || '#000000',
           feriados: doctor.feriados || [],
           especialidad: doctor.especialidad,
           email: doctor.email,
@@ -324,6 +328,7 @@ export default function ConsultorioPage() {
                   id: doctor.id,
                   nombre: doctor.nombre,
                   emoji: doctor.emoji,
+                  color: doctor.color || '#000000',
                   especialidad: doctor.especialidad || '',
                   email: doctor.email || '',
                   telefono: doctor.telefono || '',
@@ -383,15 +388,15 @@ export default function ConsultorioPage() {
       {!loading && (
         <>
           <Tab.Group>
-            <Tab.List className="flex rounded-xl bg-gray-100 p-1 mb-6">
+            <Tab.List className="flex rounded-xl p-1 mb-6">
               <Tab
                 className={({ selected }) =>
                   classNames(
                     'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
-                    'ring-white/60 ring-offset-2 ring-offset-orange-400 focus:outline-none focus:ring-2',
+                    'ring-offset-2 ring-offset-[var(--color-primary)] focus:outline-none focus:ring-2',
                     selected
-                      ? 'bg-white shadow text-orange-600'
-                      : 'text-gray-600 hover:bg-white/[0.12] hover:text-orange-500'
+                      ? 'shadow text-[var(--color-primary)]'
+                      : 'hover:text-[var(--color-primary)]or-primary)]'
                   )
                 }
               >
@@ -401,10 +406,10 @@ export default function ConsultorioPage() {
                 className={({ selected }) =>
                   classNames(
                     'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
-                    'ring-white/60 ring-offset-2 ring-offset-orange-400 focus:outline-none focus:ring-2',
+                    'ring-offset-2 ring-offset-[var(--color-primary)] focus:outline-none focus:ring-2',
                     selected
-                      ? 'bg-white shadow text-orange-600'
-                      : 'text-gray-600 hover:bg-white/[0.12] hover:text-orange-500'
+                      ? 'shadow text-[var(--color-primary)]'
+                      : 'hover:text-[var(--color-primary)]'
                   )
                 }
               >
@@ -414,10 +419,10 @@ export default function ConsultorioPage() {
                 className={({ selected }) =>
                   classNames(
                     'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
-                    'ring-white/60 ring-offset-2 ring-offset-orange-400 focus:outline-none focus:ring-2',
+                    'ring-offset-2 ring-offset-[var(--color-primary)] focus:outline-none focus:ring-2',
                     selected
-                      ? 'bg-white shadow text-orange-600'
-                      : 'text-gray-600 hover:bg-white/[0.12] hover:text-orange-500'
+                      ? 'shadow text-[var(--color-primary)]'
+                      : 'hover:text-[var(--color-primary)]'
                   )
                 }
               >
@@ -427,10 +432,10 @@ export default function ConsultorioPage() {
                 className={({ selected }) =>
                   classNames(
                     'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
-                    'ring-white/60 ring-offset-2 ring-offset-orange-400 focus:outline-none focus:ring-2',
+                    'ring-offset-2 ring-offset-[var(--color-primary)] focus:outline-none focus:ring-2',
                     selected
-                      ? 'bg-white shadow text-orange-600'
-                      : 'text-gray-600 hover:bg-white/[0.12] hover:text-orange-500'
+                      ? 'shadow text-[var(--color-primary)]'
+                      : 'hover:text-[var(--color-primary)]'
                   )
                 }
               >
@@ -440,10 +445,10 @@ export default function ConsultorioPage() {
                 className={({ selected }) =>
                   classNames(
                     'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
-                    'ring-white/60 ring-offset-2 ring-offset-orange-400 focus:outline-none focus:ring-2',
+                    'ring-offset-2 ring-offset-[var(--color-primary)] focus:outline-none focus:ring-2',
                     selected
-                      ? 'bg-white shadow text-orange-600'
-                      : 'text-gray-600 hover:bg-white/[0.12] hover:text-orange-500'
+                      ? 'shadow text-[var(--color-primary)]'
+                      : 'hover:text-[var(--color-primary)]'
                   )
                 }
               >
@@ -518,7 +523,7 @@ export default function ConsultorioPage() {
               type="button"
               onClick={handleGuardarConfiguracion}
               disabled={guardando}
-              className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors disabled:opacity-50"
+              className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 transition-colors disabled:opacity-50"
             >
               {guardando ? (
                 <>

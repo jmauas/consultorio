@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 
 module.exports = {
-  // Otras configuraciones existentes...
+  // Configuramos el modo oscuro basado en la clase
   theme: {
     extend: {
       fontFamily: {
@@ -22,7 +22,7 @@ module.exports = {
             '0%': { opacity: 0 },
             '100%': { opacity: 1 },
         },
-      }
+      },
     },
   },
   plugins: [],

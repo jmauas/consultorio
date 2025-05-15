@@ -2,6 +2,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import TurnoNuevo from '@/components/TurnoNuevo';
+
 import Loader from '@/components/Loader';
 
 const  NuevoTurnoPage = () => {
@@ -40,7 +41,6 @@ const  NuevoTurnoPage = () => {
         setError('Error al cargar configuración');
         setLoading(false);
       }   
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   return (   

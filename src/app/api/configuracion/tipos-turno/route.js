@@ -85,13 +85,13 @@ export async function POST(request) {
         { status: 400 }
       );
     }
-    
-    // Crear el tipo de turno
+      // Crear el tipo de turno
     const nuevoTipoTurno = await prisma.tipoTurnoDoctor.create({
       data: {
         nombre: data.nombre,
         duracion: data.duracion,
         habilitado: data.habilitado !== false,
+        publico: data.publico !== false,
         doctorId: data.doctorId,
         consultorios: {
           connect: consultorioIdsValidos.map(id => ({ id }))
@@ -181,9 +181,7 @@ export async function PUT(request) {
         { ok: false, error: 'El tipo de turno no existe' }, 
         { status: 404 }
       );
-    }
-
-    // Actualizar el tipo de turno
+    }    // Actualizar el tipo de turno
     // En Prisma, para actualizar una relación many-to-many necesitamos desconectar los consultorios existentes
     // y luego conectar los nuevos
     const tipoTurnoActualizado = await prisma.tipoTurnoDoctor.update({
@@ -194,6 +192,7 @@ export async function PUT(request) {
         nombre: data.nombre,
         duracion: data.duracion,
         habilitado: data.habilitado !== false,
+        publico: data.publico !== false,
         consultorios: {
           // Desconectar todos los consultorios actuales
           disconnect: tipoTurnoActual.consultorios.map(c => ({ id: c.id })),

@@ -197,6 +197,7 @@ exports.Prisma.DoctorScalarFieldEnum = {
   nombre: 'nombre',
   emoji: 'emoji',
   feriados: 'feriados',
+  color: 'color',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -222,6 +223,7 @@ exports.Prisma.TipoTurnoDoctorScalarFieldEnum = {
   nombre: 'nombre',
   duracion: 'duracion',
   habilitado: 'habilitado',
+  publico: 'publico',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

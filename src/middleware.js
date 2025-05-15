@@ -12,6 +12,8 @@ const publicRoutes = [
   '/tn-logo.png',
   '/google-calendar-logo.png',
   '/api/debug',
+  '/api/configuracion',
+  '/turnos/disponibilidad'
 ];
 
 // Verificar si una ruta es pública

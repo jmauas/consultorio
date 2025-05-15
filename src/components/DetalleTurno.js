@@ -10,17 +10,20 @@ import Link from 'next/link';
 import Loader from '@/components/Loader';
 
 export default function DetalleTurno({ 
-  turnoId, 
+  turno, 
   onClose, 
   onSuccess, 
   isModal = false 
 }) {
-  const [turno, setTurno] = useState(null);
+  // const [turno, setTurno] = useState(null);
+  const turnoId = turno?.id || null;
   const [loading, setLoading] = useState(true);
   const [loadingAction, setLoadingAction] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [nuevoEstado, setNuevoEstado] = useState('');
+
+  console.log('Turno:', turno);
   
   // Estado para controlar el modo de edición
   const [modoEdicion, setModoEdicion] = useState(false);
@@ -52,7 +55,7 @@ export default function DetalleTurno({
       const data = await response.json();
       
       if (data.ok && data.turno) {
-        setTurno(data.turno);
+        turno = data.turno;
         // Inicializar los datos editables con los valores actuales del turno
         inicializarDatosEditables(data.turno);
       } else {
@@ -153,7 +156,7 @@ export default function DetalleTurno({
   
   // Toggle modo edición
   const toggleModoEdicion = () => {
-    if (modoEdicion) {
+    if (!modoEdicion) {
       // Si estamos saliendo del modo edición, reinicializar los datos
       inicializarDatosEditables(turno);
     }
@@ -325,9 +328,10 @@ export default function DetalleTurno({
   };
 
   useEffect(() => {
-    if (turnoId) {
-      cargarTurno(turnoId);
-    }   
+    setLoading(true);
+    // if (turnoId) {
+    //   cargarTurno(turnoId);
+    // }   
     
     // Cargar los estados disponibles
     const estadosDisponibles = obtenerEstados();
@@ -336,9 +340,10 @@ export default function DetalleTurno({
     const cober = async () => {
       const coberturasDisponibles = await obtenerCoberturasDesdeDB();
       setCoberturas(coberturasDisponibles);
+      setLoading(false);
     };
     cober();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [turnoId]);
 
   // Función para obtener el color del estado
@@ -359,7 +364,7 @@ export default function DetalleTurno({
       <div className={`${isModal ? 'p-6' : 'container mx-auto px-4 py-8'}`}>
         <Loader titulo={'Buscando Datos del Turno ...'}/>
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Detalle de Turno</h1>
+          <h1 className="text-2xl font-bold">Detalle de Turno</h1>
           {!isModal && (
             <Link 
               href="/turnos" 
@@ -377,17 +382,17 @@ export default function DetalleTurno({
     return (
       <div className={`${isModal ? 'p-6' : 'container mx-auto px-4 py-8'}`}>
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Detalle de Turno</h1>
+          <h1 className="text-2xl font-bold">Detalle de Turno</h1>
           {!isModal && (
             <Link 
               href="/turnos" 
-              className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded"
+              className=" py-2 px-4 rounded"
             >
               Volver
             </Link>
           )}
         </div>
-        <div className="bg-white shadow rounded-lg p-6 text-center">
+        <div className="shadow rounded-lg p-6 text-center">
           <div className="text-red-500 mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -410,18 +415,18 @@ export default function DetalleTurno({
     return (
       <div className={`${isModal ? 'p-6' : 'container mx-auto px-4 py-8'}`}>
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Detalle de Turno</h1>
+          <h1 className="text-2xl font-bold ">Detalle de Turno</h1>
           {!isModal && (
             <Link 
               href="/turnos" 
-              className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded"
+              className="py-2 px-4 rounded"
             >
               Volver
             </Link>
           )}
         </div>
-        <div className="bg-white shadow rounded-lg p-6 text-center">
-          <p className="text-gray-700">No se encontró información del turno</p>
+        <div className="shadow rounded-lg p-6 text-center">
+          <p className="">No se encontró información del turno</p>
         </div>
       </div>
     );
@@ -433,11 +438,11 @@ export default function DetalleTurno({
   return (
     <div className={`${isModal ? 'px-6 pb-6' : 'container mx-auto px-4 py-8'}`}>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Detalle de Turno</h1>
+        <h1 className="text-2xl font-bold">Detalle del Turno</h1>
         {!isModal && (
           <Link 
             href="/turnos" 
-            className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded"
+            className=" text-gray-800 py-2 px-4 rounded"
           >
             Volver
           </Link>
@@ -456,15 +461,15 @@ export default function DetalleTurno({
         </div>
       )}
 
-      <div className="bg-white shadow rounded-lg overflow-hidden">
+      <div className="shadow rounded-lg overflow-hidden">
         {/* Cabecera del turno */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div>
-              <h2 className="text-xl font-semibold text-gray-800">
+              <h2 className="text-xl font-semibold">
                 Turno {turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado' || 'Médico'}
               </h2>
-              <p className="text-gray-600 mt-1">
+              <p className=" mt-1">
                 {formatoFecha(turno.desde, true, false, false, true)}
               </p>
             </div>
@@ -481,27 +486,27 @@ export default function DetalleTurno({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Información del paciente */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Información del Paciente</h3>
+              <h3 className="text-lg font-bold mb-3">Información del Paciente</h3>
               <div className="space-y-3">
                 <div>
-                  <p className="text-sm text-gray-500">Nombre</p>
-                  <p className="font-medium">{turno.paciente.nombre} {turno.paciente.apellido || ''}</p>
+                  <p className="text-sm ">Nombre</p>
+                  <p className="font-bold">{turno.paciente.nombre} {turno.paciente.apellido || ''}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">DNI</p>
-                  <p className="font-medium">{turno.paciente.dni}</p>
+                  <p className="text-sm">DNI</p>
+                  <p className="font-bold">{turno.paciente.dni}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Celular</p>
-                  <p className="font-medium">{turno.paciente.celular}</p>
+                  <p className="text-sm">Celular</p>
+                  <p className="font-bold">{turno.paciente.celular}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Email</p>
-                  <p className="font-medium">{turno.paciente.email || 'No especificado'}</p>
+                  <p className="text-sm">Email</p>
+                  <p className="font-bold">{turno.paciente.email || 'No especificado'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Cobertura Médica</p>
-                  <p className="font-medium">{turno.paciente.cobertura || 'No especificada'}</p>
+                  <p className="text-sm">Cobertura Médica</p>
+                  <p className="font-bold">{turno.paciente.cobertura || 'No especificada'}</p>
                   <span 
                     className="text-xs font-bold p-2 rounded-lg"
                     style={{ 
@@ -513,26 +518,24 @@ export default function DetalleTurno({
                   </span>
                 </div>
               </div>
-            </div>
-
-            {/* Información del turno */}
+            </div>            {/* Información del turno */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Información del Turno</h3>
+              <h3 className="text-lg font-bold mb-3">Información del Turno</h3>
               {/* Vista en modo lectura */}
               {!modoEdicion ? (
                 <div className="space-y-3">
                   <div>
-                    <p className="text-sm text-gray-500">Tipo de Turno</p>
-                    <p className="font-medium">{turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}</p>
+                    <p className="text-sm dark:text-gray-400">Tipo de Turno</p>
+                    <p className="font-bold dark:text-gray-200">{turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Doctor</p>
-                    <p className="font-medium">{turno.doctor.emoji} {turno.doctor.nombre}</p>
+                    <p className="text-sm dark:text-gray-400">Doctor</p>
+                    <p className="font-bold dark:text-gray-200">{turno.doctor.emoji} {turno.doctor.nombre}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Consultorio</p>
+                    <p className="text-sm">Consultorio</p>
                     <span 
-                      className={`px-2 py-1 inline-flex text-sm font-medium rounded-lg`}
+                      className={`px-2 py-1 inline-flex text-sm font-bold rounded-lg`}
                         style={{ 
                         backgroundColor: turno.consultorio?.color || '#CCCCCC',
                         color: isColorLight(turno.consultorio?.color || '#CCCCCC') ? '#000000' : '#FFFFFF'
@@ -542,15 +545,15 @@ export default function DetalleTurno({
                     </span>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Duración</p>
-                    <p className="font-medium">{formatoDuracion(turno.duracion || 30)}</p>
+                    <p className="text-sm">Duración</p>
+                    <p className="font-bold">{formatoDuracion(turno.duracion)}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Fecha y Hora</p>
-                    <p className="font-medium">{formatoFecha(turno.desde, true, false, false, true)}</p>
+                    <p className="text-sm">Fecha y Hora</p>
+                    <p className="font-bold">{formatoFecha(turno.desde, true, false, false, true)}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Cobertura Médica</p>
+                    <p className="text-sm">Cobertura Médica</p>
                     <span 
                       className="text-xs font-bold p-2 rounded-lg"
                       style={{ 
@@ -563,8 +566,8 @@ export default function DetalleTurno({
                   </div>
                   {turno.penal && (
                     <div>
-                      <p className="text-sm text-gray-500">Penalidad</p>
-                      <p className="font-medium text-red-600">
+                      <p className="text-sm">Penalidad</p>
+                      <p className="font-bold text-red-600">
                         {turno.penal === 'asa' ? 'Ausencia sin aviso' : 
                          turno.penal === 'ccr' ? 'Cancelación dentro 48 Hs.' : 
                          turno.penal}
@@ -573,36 +576,36 @@ export default function DetalleTurno({
                   )}
                   {turno.observaciones && (
                     <div>
-                      <p className="text-sm text-gray-500">Observaciones</p>
-                      <p className="font-medium">{turno.observaciones}</p>
+                      <p className="text-sm">Observaciones</p>
+                      <p className="font-bold">{turno.observaciones}</p>
                     </div>
                   )}
                   {turno.fhCambioEstado && (
                     <div>
-                      <p className="text-sm text-gray-500">Último cambio de estado</p>
-                      <p className="font-medium">{formatoFecha(turno.fhCambioEstado, true, true)}</p>
+                      <p className="text-sm">Último cambio de estado</p>
+                      <p className="font-bold">{formatoFecha(turno.fhCambioEstado, true, true)}</p>
                     </div>
                   )}
                 </div>
               ) : (
                 /* Vista en modo edición */
                 <div className="space-y-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Turno</label>
-                    <p className="text-sm text-gray-500">
+                  <div>                    
+                    <label className="block text-sm font-bold mb-1">Tipo de Turno</label>
+                    <p className="text-sm">
                       (No editable: {turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'})
                     </p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Doctor</label>
-                    <p className="text-sm text-gray-500">
+                    <label className="block text-sm font-bold mb-1">Doctor</label>
+                    <p className="text-sm">
                       (No editable: {turno.doctor.emoji} {turno.doctor.nombre})
                     </p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Consultorio</label>
+                    <label className="block text-sm font-bold mb-1">Consultorio</label>
                     <span 
-                      className="px-2 py-1 inline-flex text-sm font-medium rounded-lg"
+                      className="px-2 py-1 inline-flex text-sm font-bold rounded-lg"
                       style={{ 
                         backgroundColor: turno.consultorio?.color || '#CCCCCC',
                         color: isColorLight(turno.consultorio?.color || '#CCCCCC') ? '#000000' : '#FFFFFF'
@@ -610,9 +613,8 @@ export default function DetalleTurno({
                     >
                       {turno.consultorio?.nombre || 'No especificado'}
                     </span>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Duración (minutos)</label>
+                  </div>                  <div>
+                    <label className="block text-sm font-bold  mb-1">Duración (minutos)</label>
                     <input
                       type="number"
                       name="duracion"
@@ -620,26 +622,26 @@ export default function DetalleTurno({
                       onChange={handleTurnoChange}
                       min="5"
                       step="5"
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 dark:border-gray-600  rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-100"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Fecha y Hora</label>
+                    <label className="block text-sm font-bold  mb-1">Fecha y Hora</label>
                     <input
                       type="datetime-local"
                       name="desde"
                       value={datosEditados.desde}
                       onChange={handleTurnoChange}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 dark:border-gray-600  rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-100"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Cobertura Médica</label>
+                  <div>                    
+                    <label className="block text-sm font-bold  mb-1">Cobertura Médica</label>
                     <select
                       name="coberturaMedicaId"
                       value={datosEditados.coberturaMedicaId}
                       onChange={handleTurnoChange}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300  rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-100"
                     >
                       <option value="">Seleccionar cobertura</option>
                       {coberturas.map((cobertura) => (
@@ -648,24 +650,22 @@ export default function DetalleTurno({
                         </option>
                       ))}
                     </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Consultorio</label>
-                    <p className="text-sm text-gray-500">
+                  </div>                  <div>
+                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Consultorio</label>
+                    <p className="text-sm dark:text-gray-400">
                       (No editable: {typeof turno.consultorio === 'object' ? turno.consultorio.nombre || 'Consultorio' : turno.consultorio || 'No especificado'})
-                    </p>
-                  </div>
+                    </p>                  </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Observaciones</label>
                     <textarea
                       name="observaciones"
                       value={datosEditados.observaciones}
                       onChange={handleTurnoChange}
                       rows="3"
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-100"
                     ></textarea>
                   </div>
-                </div>
+              </div>
               )}
             </div>
           </div>
@@ -673,37 +673,40 @@ export default function DetalleTurno({
           <div className="mt-6 border-t border-gray-200 pt-4">
             <div className="space-y-3">
               <div className="flex justify-start items-center gap-4 ">
-                <p className="text-sm text-gray-500">Creado:</p>
-                <p className="font-medium">{formatoFecha(turno.createdAt, true, true, false, true, false, false) || 'No especificado'}</p>
-                <p className="text-sm text-gray-500">Por:</p>
-                <p className="font-medium">{turno.createdBy?.name || 'No especificado'}</p>
+                <p className="text-sm">Creado:</p>
+                <p className="font-bold">{formatoFecha(turno.createdAt, true, true, false, true, false, false) || 'No especificado'}</p>
+                <p className="text-sm">Por:</p>
+                <p className="font-bold">{turno.createdBy?.name || 'No especificado'}</p>
               </div>
               <div className="flex justify-start items-center gap-4 ">
-                <p className="text-sm text-gray-500">Modificado:</p>
-                <p className="font-medium">{formatoFecha(turno.updatedAt, true, true, false, true, false, false) || 'No especificado'}</p>
-                <p className="text-sm text-gray-500">Por:</p>
-                <p className="font-medium">{turno.updatedBy?.name || 'No especificado'}</p>
+                <p className="text-sm">Modificado:</p>
+                <p className="font-bold">{formatoFecha(turno.updatedAt, true, true, false, true, false, false) || 'No especificado'}</p>
+                <p className="text-sm">Por:</p>
+                <p className="font-bold">{turno.updatedBy?.name || 'No especificado'}</p>
               </div>
             </div>
           </div>
         </div>
         {/* Acciones */}
-        <div className="p-6 bg-gray-50 border-t border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900 mb-3">Acciones</h3>
+        <div className="p-6 border-t border-gray-200">
+          <div className="p-6 border-t border-gray-200 dark:border-gray-700">
+          <h3 className="text-lg font-bold mb-3">Acciones</h3>
           {loadingAction && <Loader titulo={'Regisrando Cambios ...'}/>}
           <div className="flex flex-wrap gap-2">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 bg-white p-3 rounded-lg border border-gray-200">
-              <div>
-                <label htmlFor="estadoSelect" className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 p-3 rounded-lg border border-gray-200">
+                <label>
+                  Cambiar Estado:
+                </label>
+                <label htmlFor="estadoSelect" className="block text-sm font-bold mb-1">
                   Cambiar Estado:
                 </label>
                 <select
                   id="estadoSelect"
                   value={nuevoEstado}
                   onChange={(e) => setNuevoEstado(e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-100"
                   disabled={loadingAction}
-                >
+                  >
                   <option value="">Seleccionar estado</option>
                   {estados.map((estado) => (
                     <option 
@@ -728,7 +731,7 @@ export default function DetalleTurno({
               </button>
             </div>
           </div>            
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mt-4 bg-white p-3 rounded-lg border border-gray-200">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mt-4 p-3 rounded-lg border border-gray-200">
             <button
               onClick={handleEnviarRecordatorio}
               disabled={loadingAction || estado === 'cancelado'}
@@ -762,7 +765,7 @@ export default function DetalleTurno({
               Eliminar Turno
             </button>
           </div>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mt-4 bg-white p-3 rounded-lg border border-gray-200">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mt-4 p-3 rounded-lg border border-gray-200">
             <button
               onClick={toggleModoEdicion}
               className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded flex items-center"

@@ -1,10 +1,11 @@
 "use server";
 import { formatoFecha } from '@/lib/utils/dateUtils';
-import { obtenerConfig, obtenerCuentasWhatsapp } from '@/lib/services/configService.js';
+import { obtenerConfig, obtenerCuentasWhatsapp, obtenerUrlApp } from '@/lib/services/configService.js';
 import { getTurnoById } from '@/lib/services/turnos/turnosService';
 
 const config = await obtenerConfig();
 const cuentas = await obtenerCuentasWhatsapp();
+const urlApp = await obtenerUrlApp();
    
 /**
  * Servicio para el envío de mensajes por WhatsApp
@@ -108,7 +109,7 @@ export async function enviarRecordatorioTurno(turno, cambioEstado) {
 
 export const textoMensajeConfTurno = async (turno, cambioEstado) => {
   const enlaceCancelacion = turno.token 
-  ? `${config.urlApp}/turnos/cancelar/${turno.token}`
+  ? `${urlApp}/turnos/cancelar/${turno.token}`
   : '';
   let msg = `Hola ${turno.paciente.nombre}. 👋
 Desde *${config.nombreConsultorio}*, te confirmamos tu Turno Agendado. 👍

@@ -1,10 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { obtenerConfig } from '@/lib/services/configService.js';
 import Loader from '@/components/Loader';
+
 
 export default function ConfiguracionPage() {
   const [config, setConfig] = useState(null);
@@ -53,7 +53,7 @@ export default function ConfiguracionPage() {
       href: '/configuracion/usuarios',
       icon: 'fas fa-users',
       description: 'Gestione las cuentas de usuarios y sus permisos de acceso',
-      color: 'bg-orange-500' 
+      color: 'bg-[var(--color-primary)]or-primary)]' 
     },
     { 
       label: 'Opciones Técnicas', 
@@ -73,7 +73,7 @@ export default function ConfiguracionPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold">Panel de Configuración</h1>
-          <p className="text-gray-600">Administre todos los aspectos de su sistema desde aquí</p>
+          <p>Administre todos los aspectos de su sistema desde aquí</p>
         </div>
       </div>
 
@@ -82,14 +82,14 @@ export default function ConfiguracionPage() {
           <Link
             key={index}
             href={item.href}
-            className="block bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 hover:shadow-md transition-shadow"
+            className="block rounded-lg shadow-sm overflow-hidden border hover:shadow-md transition-shadow"
           >
             <div className={`${item.color} p-4 flex items-center text-white`}>
               <i className={`${item.icon} text-2xl mr-3`}></i>
               <h2 className="text-lg font-semibold">{item.label}</h2>
             </div>
             <div className="p-4">
-              <p className="text-gray-600">{item.description}</p>
+              <p>{item.description}</p>
             </div>
           </Link>
         ))}

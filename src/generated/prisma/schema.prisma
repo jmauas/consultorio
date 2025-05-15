@@ -79,7 +79,7 @@ model ConfiguracionConsultorio {
   horaEnvioMail     String?
   diasEnvioMail     String?
   urlApp            String
-  urlAppDev         String? // Nueva columna para entorno de desarrollo
+  urlAppDev         String?
   logoUrl           String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -104,6 +104,7 @@ model Doctor {
   nombre          String
   emoji           String
   feriados        String[]
+  color           String?           @default("#CCCCCC") // Campo de color para el doctor
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   AgendaDoctor    AgendaDoctor[]
@@ -134,6 +135,7 @@ model TipoTurnoDoctor {
   nombre       String
   duracion     String
   habilitado   Boolean       @default(true)
+  publico      Boolean       @default(true)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @default(now()) @updatedAt
   doctor       Doctor        @relation(fields: [doctorId], references: [id], onDelete: Cascade)

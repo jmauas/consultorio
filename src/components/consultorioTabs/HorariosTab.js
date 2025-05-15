@@ -1,5 +1,6 @@
 // src/components/consultorio/HorariosTab.js
-import React, { useEffect } from 'react';
+import React from 'react';
+import { useTheme } from 'next-themes';
 
 const HorariosTab = ({ 
   config, 
@@ -13,13 +14,13 @@ const HorariosTab = ({
   detectarConflictosHorarios,
   setConfig
 }) => {
-
+    const { theme } = useTheme();
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+    <div className=" p-6 rounded-xl shadow-sm border border-gray-200">
       <h3 className="text-xl font-semibold mb-4">Horarios de Atención</h3>
       
       <div className="mt-6">
-        <h4 className="font-medium text-gray-700 mb-3">
+        <h4 className="font-medium mb-3">
           {selectedDoctorForAgenda 
             ? `Agenda de: ${selectedDoctorForAgenda.nombre}`
             : "Seleccione un doctor para ver o editar su agenda"}
@@ -28,20 +29,20 @@ const HorariosTab = ({
         {!selectedDoctorForAgenda ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
             {config.doctores.length === 0 ? (
-              <p className="col-span-full text-center py-4 text-gray-500">
+              <p className="col-span-full text-center py-4 ">
                 No hay doctores registrados. Por favor, cree un doctor primero.
               </p>
             ) : (
               config.doctores.map(doctor => (
                 <div key={doctor.id} 
-                  className="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:bg-orange-50 hover:border-orange-300 cursor-pointer transition-colors"
+                  className={`${theme==='dark' ? 'bg-slate-800' : 'bg-slate-100'} border border-gray-200 rounded-lg p-4 cursor-pointer transition-colorsç`}
                   onClick={() => setSelectedDoctorForAgenda(doctor)}
                 >
                   <div className="flex items-center mb-2">
                     <span className="text-2xl mr-2">{doctor.emoji || '👨‍⚕️'}</span>
                     <h3 className="text-lg font-medium">{doctor.nombre}</h3>
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm">
                     <p>
                       <span className="font-medium">Días de atención: </span>
                       {Object.entries(doctor.diasAtencion || {})
@@ -49,7 +50,7 @@ const HorariosTab = ({
                         .map(([day]) => day.charAt(0).toUpperCase() + day.slice(1))
                         .join(', ') || 'No configurados'}
                     </p>
-                    <button className="mt-3 px-3 py-1 bg-orange-500 text-white text-sm rounded-md hover:bg-orange-600">
+                    <button className="mt-3 px-3 py-1 bg-[var(--color-primary)] text-white text-sm rounded-md hover:bg-[var(--color-primary-dark)]">
                       <i className="fas fa-calendar-alt mr-2"></i>
                       Ver / Editar Agenda
                     </button>
@@ -60,18 +61,18 @@ const HorariosTab = ({
           </div>
         ) : (
           <div className="mt-4">
-            <div className="bg-orange-50 border-l-4 border-orange-500 p-4 mb-4">
+            <div className={`${theme==='dark' ? 'bg-slate-800' : 'bg-slate-100'}  border-l-4 border-[var(--color-primary)] p-4 mb-4`}>
               <div className="flex justify-between items-center">
                 <div>
                   <h4 className="text-lg font-medium flex items-center">
                     <span className="text-xl mr-2">{selectedDoctorForAgenda.emoji || '👨‍⚕️'}</span>
                     {selectedDoctorForAgenda.nombre}
                   </h4>
-                  <p className="text-sm text-gray-600">Configuración de horarios semanales</p>
+                  <p className="text-sm ">Configuración de horarios semanales</p>
                 </div>
                 <button 
                   onClick={() => setSelectedDoctorForAgenda(null)}
-                  className="px-3 py-1 bg-orange-500 text-white rounded-md hover:bg-orange-300 hover:text-black text-sm"
+                  className="px-3 py-1 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary-dark)] text-sm"
                 >
                   <i className="fa fa-chevron-circle-left mr-2"></i>
                   Volver a la lista
@@ -80,15 +81,15 @@ const HorariosTab = ({
             </div>
             
             {/* Selector de Consultorio */}
-            <div className="mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
-              <h4 className="font-medium text-gray-700 mb-3">
+            <div className="mb-6 p-4 rounded-lg border border-gray-200">
+              <h4 className="font-bold mb-3">
                 Seleccione un consultorio para configurar la agenda
               </h4>
               
               {consultorios.length === 0 ? (
-                <div className="bg-white p-4 rounded-lg border border-gray-200 text-center">
-                  <p className="text-gray-500 mb-2">No hay consultorios registrados</p>
-                  <p className="text-sm text-gray-600">
+                <div className={`${theme==='dark' ? 'bg-slate-800' : 'bg-slate-100'} p-4 rounded-lg border border-gray-200 text-center`}>
+                  <p className=" mb-2">No hay consultorios registrados</p>
+                  <p className="text-sm ">
                     Primero debe crear al menos un consultorio en la pestaña Consultorios
                   </p>
                 </div>
@@ -98,9 +99,8 @@ const HorariosTab = ({
                     <div 
                       key={consultorio.id}
                       className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                        selectedConsultorioForAgenda?.id === consultorio.id
-                          ? 'bg-orange-100 border-orange-300'
-                          : 'bg-white border-gray-200 hover:bg-orange-50 hover:border-orange-200'
+                        selectedConsultorioForAgenda?.id === consultorio.id                          ? theme==='dark' ? 'bg-[var(--color-primary-dark)] border-[var(--color-primary)]' : 'bg-[var(--color-secondary)] border-[var(--color-primary)]'
+                          : theme==='dark' ? 'bg-slate-800 border-[var(--color-primary)]' :'bg-white border-gray-200 hover:bg-[var(--color-secondary)] hover:border-[var(--color-primary)]'
                       }`}
                       onClick={() => {
                         setSelectedConsultorioForAgenda(consultorio);
@@ -108,9 +108,9 @@ const HorariosTab = ({
                         setHorarioConflictos(conflictos);
                       }}
                     >
-                      <div className="font-medium text-gray-900">{consultorio.nombre}</div>
+                      <div className="font-medium ">{consultorio.nombre}</div>
                       {consultorio.direccion && (
-                        <div className="text-xs text-gray-600 mt-1">{consultorio.direccion}</div>
+                        <div className="text-xs  mt-1">{consultorio.direccion}</div>
                       )}
                     </div>
                   ))}
@@ -144,26 +144,26 @@ const HorariosTab = ({
               )}
               
               {/* Desktop view - Table format */}
-              <div className="hidden md:block overflow-x-auto">
-                <table className="min-w-full bg-white">
-                  <thead className="bg-gray-50">
+              <div className="hidden md:block overflow-x-auto border border-gray-200 rounded-md">
+                <table className={`min-w-full ${theme==='dark' ? 'bg-slate-800' : 'bg-white'} `}>
+                  <thead className="border">
                     <tr>
-                      <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="py-3 px-4 text-left text-xs font-medium  uppercase tracking-wider">
                         Día
                       </th>
-                      <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="py-3 px-4 text-left text-xs font-medium  uppercase tracking-wider">
                         Atiende
                       </th>
-                      <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="py-3 px-4 text-left text-xs font-medium  uppercase tracking-wider">
                         Hora Inicio
                       </th>
-                      <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="py-3 px-4 text-left text-xs font-medium  uppercase tracking-wider">
                         Hora Fin
                       </th>
-                      <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="py-3 px-4 text-left text-xs font-medium  uppercase tracking-wider">
                         Corte Inicio
                       </th>
-                      <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="py-3 px-4 text-left text-xs font-medium  uppercase tracking-wider">
                         Corte Fin
                       </th>
                     </tr>
@@ -186,7 +186,7 @@ const HorariosTab = ({
                       return (
                         <tr key={dia}>
                           <td className="py-3 px-4 whitespace-nowrap">
-                            <div className="font-medium text-gray-900 capitalize">{dia}</div>
+                            <div className="font-bold capitalize">{dia}</div>
                           </td>
                           <td className="py-3 px-4 whitespace-nowrap">
                             <input
@@ -230,7 +230,7 @@ const HorariosTab = ({
                                   setSelectedDoctorForAgenda(newDoctores[doctorIndex]);
                                 }
                               }}
-                              className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                              className="h-4 w-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)] border-gray-300 rounded"
                             />
                           </td>
                           <td className="py-3 px-4 whitespace-nowrap">
@@ -272,7 +272,7 @@ const HorariosTab = ({
                                 }
                               }}
                               disabled={!diaAgenda.atencion}
-                              className="px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:text-gray-400"
+                              className="px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] disabled:bg-gray-100 disabled:text-gray-400"
                             />
                           </td>
                           <td className="py-3 px-4 whitespace-nowrap">
@@ -314,7 +314,7 @@ const HorariosTab = ({
                                 }
                               }}
                               disabled={!diaAgenda.atencion}
-                              className="px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:text-gray-400"
+                              className="px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] disabled:bg-gray-100 disabled:text-gray-400"
                             />
                           </td>
                           <td className="py-3 px-4 whitespace-nowrap">
@@ -356,7 +356,7 @@ const HorariosTab = ({
                                 }
                               }}
                               disabled={!diaAgenda.atencion}
-                              className="px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:text-gray-400"
+                              className="px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] disabled:bg-gray-100 disabled:text-gray-400"
                             />
                           </td>
                           <td className="py-3 px-4 whitespace-nowrap">
@@ -398,7 +398,7 @@ const HorariosTab = ({
                                 }
                               }}
                               disabled={!diaAgenda.atencion}
-                              className="px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:text-gray-400"
+                              className="px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] disabled:bg-gray-100 disabled:text-gray-400"
                             />
                           </td>
                         </tr>
@@ -436,7 +436,7 @@ const HorariosTab = ({
                       <div className="flex justify-between items-center mb-3">
                         <h4 className="text-base font-medium capitalize text-gray-900">{dia}</h4>
                         <div className="flex items-center">
-                          <span className="text-xs text-gray-500 mr-2">Activo</span>
+                          <span className="text-xs  mr-2">Activo</span>
                           <input
                             type="checkbox"
                             checked={diaAgenda.atencion}
@@ -474,14 +474,14 @@ const HorariosTab = ({
                                 setSelectedDoctorForAgenda(newDoctores[doctorIndex]);
                               }
                             }}
-                            className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                            className="h-4 w-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)] border-gray-300 rounded"
                           />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-xs font-medium text-gray-500 mb-1">
+                          <label className="block text-xs font-medium  mb-1">
                             Hora Inicio
                           </label>
                           <input
@@ -522,11 +522,11 @@ const HorariosTab = ({
                               }
                             }}
                             disabled={!diaAgenda.atencion}
-                            className="w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:text-gray-400"
+                            className="w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] disabled:bg-gray-100 disabled:text-gray-400"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-gray-500 mb-1">
+                          <label className="block text-xs font-medium  mb-1">
                             Hora Fin
                           </label>
                           <input
@@ -567,13 +567,13 @@ const HorariosTab = ({
                               }
                             }}
                             disabled={!diaAgenda.atencion}
-                            className="w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:text-gray-400"
+                            className="w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] disabled:bg-gray-100 disabled:text-gray-400"
                           />
                         </div>
                       </div>
 
                       <div className="mt-3">
-                        <label className="block text-xs font-medium text-gray-500 mb-1">
+                        <label className="block text-xs font-medium  mb-1">
                           Horario de Corte (Pausa/Almuerzo)
                         </label>
                         <div className="grid grid-cols-2 gap-3">
@@ -616,7 +616,7 @@ const HorariosTab = ({
                                 }
                               }}
                               disabled={!diaAgenda.atencion}
-                              className="w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:text-gray-400"
+                              className="w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] disabled:bg-gray-100 disabled:text-gray-400"
                               placeholder="Desde"
                             />
                           </div>
@@ -659,7 +659,7 @@ const HorariosTab = ({
                                 }
                               }}
                               disabled={!diaAgenda.atencion}
-                              className="w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:text-gray-400"
+                              className="w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] disabled:bg-gray-100 disabled:text-gray-400"
                               placeholder="Hasta"
                             />
                           </div>
@@ -673,9 +673,9 @@ const HorariosTab = ({
             )}
             
             {selectedConsultorioForAgenda && (
-            <div className="mt-4 text-sm text-gray-600">
+            <div className="mt-4 text-sm ">
               <p className="flex items-center">
-                <i className="fas fa-info-circle text-orange-500 mr-2"></i>
+                <i className="fas fa-info-circle text-[var(--color-primary)] mr-2"></i>
                 El horario de corte representa un período de pausa (por ejemplo, para almuerzo) donde no se atenderán pacientes.
               </p>
             </div>
@@ -683,8 +683,8 @@ const HorariosTab = ({
             
             {!selectedConsultorioForAgenda && consultorios.length > 0 && (
               <div className="p-8 text-center border border-dashed border-gray-300 rounded-lg">
-                <p className="text-lg text-gray-600 mb-2">Seleccione un consultorio para ver y configurar los horarios</p>
-                <p className="text-sm text-gray-500">La agenda se mostrará después de seleccionar un consultorio</p>
+                <p className="text-lg  mb-2">Seleccione un consultorio para ver y configurar los horarios</p>
+                <p className="text-sm ">La agenda se mostrará después de seleccionar un consultorio</p>
               </div>
             )}
           </div>

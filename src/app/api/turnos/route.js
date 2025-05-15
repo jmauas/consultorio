@@ -18,8 +18,9 @@ export async function POST(request) {
    
     console.log('Datos recibidos para crear turno:', datos);
     // Buscar doctor por nombre
+    const idDr = datos.doctorId || datos.doctor;
     const doctor = await prisma.doctor.findFirst({
-      where: { id: datos.doctorId}
+      where: { id: idDr}
     });
     
     console.log('Doctor encontrado:', doctor);
@@ -355,7 +356,11 @@ export async function GET(request) {
     let turnos = await prisma.turno.findMany({
       where,
       include: {
-        paciente: true,
+        paciente: {
+          include: {
+            coberturaMedica: true
+          }
+        },
         doctor: true,
         consultorio: true,
         coberturaMedica: true,

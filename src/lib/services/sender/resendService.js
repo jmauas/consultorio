@@ -1,11 +1,13 @@
 "use server";
 import { Resend } from 'resend';
-import { obtenerConfig } from '@/lib/services/configService.js';
+import { obtenerConfig, obtenerUrlApp } from '@/lib/services/configService.js';
 import { formatoFecha } from '@/lib/utils/dateUtils';
 import { createEvent } from 'ics';
 import { ValidarEmail } from "@/lib/utils/mailsUtils.js";
 
 const config = await obtenerConfig();
+
+const urlApp = await obtenerUrlApp();
 
 const resendApiKey = process.env.RESEND_API_KEY;
 const resendRte = process.env.RESEND_RTE || 'no-reply@yourdomain.com'; // Fallback default
@@ -116,7 +118,7 @@ export const enviarMail = async (email, asunto, mensaje, ics = null, text = null
 export const htmlMensajeConfTurno = async (turno, cambioEstado) => {
     // Construir enlace de cancelación si existe token
     const enlaceCancelacion = turno.token 
-        ? `${config.urlApp}/turnos/cancelar/${turno.token}`
+        ? `${urlApp}/turnos/cancelar/${turno.token}`
         : '';
 
     const htmlMsg = `
@@ -454,7 +456,7 @@ export const generarArchivoICS = async (turno) => {
 
   export const enviarMailRecuperarPass = async (email, token) => {
     // Crear la URL de autenticación con el token (y asegurar que incluya source=email-link)
-    const signinUrl = `${config.urlApp}/api/auth/callback/email?token=${token}&email=${encodeURIComponent(email)}&source=email-link`;              
+    const signinUrl = `${urlApp}/api/auth/callback/email?token=${token}&email=${encodeURIComponent(email)}&source=email-link`;              
     // Preparar el mensaje HTML con el enlace
     const htmlMessage = `
       <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
@@ -485,7 +487,7 @@ export const generarArchivoICS = async (turno) => {
 
   export const enviarMailResetPass = async (email, token) => {
     // Crear la URL de recuperación de contraseña
-    const resetUrl = `${config.urlApp || 'http://localhost:3000'}/auth/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+    const resetUrl = `${urlApp || 'http://localhost:3000'}/auth/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
     
     // Preparar el correo electrónico
     const htmlMessage = `

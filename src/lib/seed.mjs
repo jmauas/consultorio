@@ -5,6 +5,7 @@ import path from 'node:path';
 
 const prisma = new PrismaClient();
 
+
 async function readJsonFile(filePath) {
   try {
     const data = await fs.readFile(filePath, 'utf8');
@@ -17,6 +18,7 @@ async function readJsonFile(filePath) {
 
 async function main() {
   console.log('Iniciando seed de la base de datos...');
+
 
   // Eliminar datos existentes (opcional)
   await prisma.turno.deleteMany({});
@@ -59,7 +61,7 @@ async function main() {
   console.log(`Usuario de prueba creado con ID: ${testUser.id}`);
 
   // Migrar configuración desde config.json
-  const configFilePath = path.join(process.cwd(), 'locales', 'config.json');
+  const configFilePath = path.join(process.cwd(), '../', 'locales', 'config.json');
   const configData = await readJsonFile(configFilePath);
   
   if (configData) {
@@ -76,9 +78,8 @@ async function main() {
         envio: configData.envio || false,
         horaEnvio: configData.horaEnvio,
         diasEnvio: configData.diasEnvio,
-        calendario: configData.calendario || 'primary',
-        redireccion: configData.redireccion || '/calendar/auth',
         urlApp: configData.urlApp,
+        coberturas: configData.coberturas || '',
       }
     });
     
@@ -94,24 +95,7 @@ async function main() {
             feriados: doctor.feriados || []
           }
         });
-        
-        // Migrar agenda del doctor
-        if (doctor.agenda && Array.isArray(doctor.agenda)) {
-          for (const agendaItem of doctor.agenda) {
-            await prisma.agendaDoctor.create({
-              data: {
-                doctorId: doctorCreado.id,
-                dia: agendaItem.dia,
-                nombre: agendaItem.nombre,
-                atencion: agendaItem.atencion,
-                desde: agendaItem.desde,
-                hasta: agendaItem.hasta,
-                corteDesde: agendaItem.corteDesde,
-                corteHasta: agendaItem.corteHasta
-              }
-            });
-          }
-        }
+      
         
         // Migrar tipos de turno del doctor
         if (doctor.tiposTurno && Array.isArray(doctor.tiposTurno)) {
@@ -132,7 +116,7 @@ async function main() {
   }
   
   // Migrar pacientes y turnos
-  const pacientesFilePath = path.join(process.cwd(), 'locales', 'pacientes.json');
+  const pacientesFilePath = path.join(process.cwd(), '../', 'locales', 'pacientes.json');
   const pacientesData = await readJsonFile(pacientesFilePath);
   
   if (pacientesData && Array.isArray(pacientesData)) {
@@ -166,31 +150,9 @@ async function main() {
         pacienteId = paciente.id;
         pacientesMap.set(pacienteKey, pacienteId);
       }
-      
-      // Crear turno asociado al paciente
-      if (turnoData.desde && turnoData.hasta) {
-        try {
-          await prisma.turno.create({
-            data: {
-              desde: new Date(turnoData.desde),
-              hasta: new Date(turnoData.hasta),
-              doctor: turnoData.doctor || '',
-              emoji: turnoData.emoji || '',
-              servicio: turnoData.servicio || '',
-              duracion: typeof turnoData.duracion === 'string' ? parseInt(turnoData.duracion) : (turnoData.duracion || 0),
-              pacienteId: pacienteId,
-              confirmado: turnoData.confirmado || false,
-              estado: turnoData.estado || null
-            }
-          });
-        } catch (error) {
-          console.error(`Error creando turno para paciente ${turnoData.nombre} ${turnoData.apellido || ''}:`, error);
-        }
-      }
     }
     
     console.log(`${pacientesMap.size} pacientes migrados correctamente`);
-    console.log(`Turnos migrados correctamente`);
   }
   
   console.log('Seed completado exitosamente!');

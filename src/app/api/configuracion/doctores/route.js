@@ -61,7 +61,8 @@ export async function POST(request) {
       data: {
         nombre: data.nombre,
         emoji: data.emoji || '👨‍⚕️',
-        feriados: data.feriados || []
+        feriados: data.feriados || [],
+        color: data.color || '#000000',
       }
     });
     
@@ -92,7 +93,8 @@ export async function POST(request) {
             doctorId: nuevoDoctor.id,
             nombre: tipo.nombre,
             duracion: tipo.duracion,
-            habilitado: tipo.habilitado !== false
+            habilitado: tipo.habilitado !== false,
+            publico: tipo.publico !== false
           }
         });
         
@@ -168,7 +170,8 @@ export async function PUT(request) {
       data: {
         nombre: data.nombre,
         emoji: data.emoji || '👨‍⚕️',
-        feriados: data.feriados || []
+        feriados: data.feriados || [],
+        color: data.color || '#000000',
       }
     });
     
@@ -209,6 +212,7 @@ export async function PUT(request) {
             nombre: tipo.nombre,
             duracion: tipo.duracion,
             habilitado: tipo.habilitado !== false,
+            publico: tipo.publico !== false,
           }
         });
         

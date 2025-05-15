@@ -9173,6 +9173,7 @@ export namespace Prisma {
     id: string | null
     nombre: string | null
     emoji: string | null
+    color: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -9181,6 +9182,7 @@ export namespace Prisma {
     id: string | null
     nombre: string | null
     emoji: string | null
+    color: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -9190,6 +9192,7 @@ export namespace Prisma {
     nombre: number
     emoji: number
     feriados: number
+    color: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -9200,6 +9203,7 @@ export namespace Prisma {
     id?: true
     nombre?: true
     emoji?: true
+    color?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -9208,6 +9212,7 @@ export namespace Prisma {
     id?: true
     nombre?: true
     emoji?: true
+    color?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -9217,6 +9222,7 @@ export namespace Prisma {
     nombre?: true
     emoji?: true
     feriados?: true
+    color?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -9299,6 +9305,7 @@ export namespace Prisma {
     nombre: string
     emoji: string
     feriados: string[]
+    color: string | null
     createdAt: Date
     updatedAt: Date
     _count: DoctorCountAggregateOutputType | null
@@ -9325,6 +9332,7 @@ export namespace Prisma {
     nombre?: boolean
     emoji?: boolean
     feriados?: boolean
+    color?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     AgendaDoctor?: boolean | Doctor$AgendaDoctorArgs<ExtArgs>
@@ -9338,6 +9346,7 @@ export namespace Prisma {
     nombre?: boolean
     emoji?: boolean
     feriados?: boolean
+    color?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["doctor"]>
@@ -9347,6 +9356,7 @@ export namespace Prisma {
     nombre?: boolean
     emoji?: boolean
     feriados?: boolean
+    color?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["doctor"]>
@@ -9356,11 +9366,12 @@ export namespace Prisma {
     nombre?: boolean
     emoji?: boolean
     feriados?: boolean
+    color?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type DoctorOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nombre" | "emoji" | "feriados" | "createdAt" | "updatedAt", ExtArgs["result"]["doctor"]>
+  export type DoctorOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nombre" | "emoji" | "feriados" | "color" | "createdAt" | "updatedAt", ExtArgs["result"]["doctor"]>
   export type DoctorInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     AgendaDoctor?: boolean | Doctor$AgendaDoctorArgs<ExtArgs>
     TipoTurnoDoctor?: boolean | Doctor$TipoTurnoDoctorArgs<ExtArgs>
@@ -9382,6 +9393,7 @@ export namespace Prisma {
       nombre: string
       emoji: string
       feriados: string[]
+      color: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["doctor"]>
@@ -9814,6 +9826,7 @@ export namespace Prisma {
     readonly nombre: FieldRef<"Doctor", 'String'>
     readonly emoji: FieldRef<"Doctor", 'String'>
     readonly feriados: FieldRef<"Doctor", 'String[]'>
+    readonly color: FieldRef<"Doctor", 'String'>
     readonly createdAt: FieldRef<"Doctor", 'DateTime'>
     readonly updatedAt: FieldRef<"Doctor", 'DateTime'>
   }
@@ -11520,6 +11533,7 @@ export namespace Prisma {
     nombre: string | null
     duracion: string | null
     habilitado: boolean | null
+    publico: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -11530,6 +11544,7 @@ export namespace Prisma {
     nombre: string | null
     duracion: string | null
     habilitado: boolean | null
+    publico: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -11540,6 +11555,7 @@ export namespace Prisma {
     nombre: number
     duracion: number
     habilitado: number
+    publico: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -11552,6 +11568,7 @@ export namespace Prisma {
     nombre?: true
     duracion?: true
     habilitado?: true
+    publico?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -11562,6 +11579,7 @@ export namespace Prisma {
     nombre?: true
     duracion?: true
     habilitado?: true
+    publico?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -11572,6 +11590,7 @@ export namespace Prisma {
     nombre?: true
     duracion?: true
     habilitado?: true
+    publico?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -11655,6 +11674,7 @@ export namespace Prisma {
     nombre: string
     duracion: string
     habilitado: boolean
+    publico: boolean
     createdAt: Date
     updatedAt: Date
     _count: TipoTurnoDoctorCountAggregateOutputType | null
@@ -11682,6 +11702,7 @@ export namespace Prisma {
     nombre?: boolean
     duracion?: boolean
     habilitado?: boolean
+    publico?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     doctor?: boolean | DoctorDefaultArgs<ExtArgs>
@@ -11696,6 +11717,7 @@ export namespace Prisma {
     nombre?: boolean
     duracion?: boolean
     habilitado?: boolean
+    publico?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     doctor?: boolean | DoctorDefaultArgs<ExtArgs>
@@ -11707,6 +11729,7 @@ export namespace Prisma {
     nombre?: boolean
     duracion?: boolean
     habilitado?: boolean
+    publico?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     doctor?: boolean | DoctorDefaultArgs<ExtArgs>
@@ -11718,11 +11741,12 @@ export namespace Prisma {
     nombre?: boolean
     duracion?: boolean
     habilitado?: boolean
+    publico?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type TipoTurnoDoctorOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "doctorId" | "nombre" | "duracion" | "habilitado" | "createdAt" | "updatedAt", ExtArgs["result"]["tipoTurnoDoctor"]>
+  export type TipoTurnoDoctorOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "doctorId" | "nombre" | "duracion" | "habilitado" | "publico" | "createdAt" | "updatedAt", ExtArgs["result"]["tipoTurnoDoctor"]>
   export type TipoTurnoDoctorInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     doctor?: boolean | DoctorDefaultArgs<ExtArgs>
     consultorios?: boolean | TipoTurnoDoctor$consultoriosArgs<ExtArgs>
@@ -11749,6 +11773,7 @@ export namespace Prisma {
       nombre: string
       duracion: string
       habilitado: boolean
+      publico: boolean
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["tipoTurnoDoctor"]>
@@ -12182,6 +12207,7 @@ export namespace Prisma {
     readonly nombre: FieldRef<"TipoTurnoDoctor", 'String'>
     readonly duracion: FieldRef<"TipoTurnoDoctor", 'String'>
     readonly habilitado: FieldRef<"TipoTurnoDoctor", 'Boolean'>
+    readonly publico: FieldRef<"TipoTurnoDoctor", 'Boolean'>
     readonly createdAt: FieldRef<"TipoTurnoDoctor", 'DateTime'>
     readonly updatedAt: FieldRef<"TipoTurnoDoctor", 'DateTime'>
   }
@@ -18574,6 +18600,7 @@ export namespace Prisma {
     nombre: 'nombre',
     emoji: 'emoji',
     feriados: 'feriados',
+    color: 'color',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -18605,6 +18632,7 @@ export namespace Prisma {
     nombre: 'nombre',
     duracion: 'duracion',
     habilitado: 'habilitado',
+    publico: 'publico',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -19281,6 +19309,7 @@ export namespace Prisma {
     nombre?: StringFilter<"Doctor"> | string
     emoji?: StringFilter<"Doctor"> | string
     feriados?: StringNullableListFilter<"Doctor">
+    color?: StringNullableFilter<"Doctor"> | string | null
     createdAt?: DateTimeFilter<"Doctor"> | Date | string
     updatedAt?: DateTimeFilter<"Doctor"> | Date | string
     AgendaDoctor?: AgendaDoctorListRelationFilter
@@ -19293,6 +19322,7 @@ export namespace Prisma {
     nombre?: SortOrder
     emoji?: SortOrder
     feriados?: SortOrder
+    color?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     AgendaDoctor?: AgendaDoctorOrderByRelationAggregateInput
@@ -19308,6 +19338,7 @@ export namespace Prisma {
     nombre?: StringFilter<"Doctor"> | string
     emoji?: StringFilter<"Doctor"> | string
     feriados?: StringNullableListFilter<"Doctor">
+    color?: StringNullableFilter<"Doctor"> | string | null
     createdAt?: DateTimeFilter<"Doctor"> | Date | string
     updatedAt?: DateTimeFilter<"Doctor"> | Date | string
     AgendaDoctor?: AgendaDoctorListRelationFilter
@@ -19320,6 +19351,7 @@ export namespace Prisma {
     nombre?: SortOrder
     emoji?: SortOrder
     feriados?: SortOrder
+    color?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: DoctorCountOrderByAggregateInput
@@ -19335,6 +19367,7 @@ export namespace Prisma {
     nombre?: StringWithAggregatesFilter<"Doctor"> | string
     emoji?: StringWithAggregatesFilter<"Doctor"> | string
     feriados?: StringNullableListFilter<"Doctor">
+    color?: StringNullableWithAggregatesFilter<"Doctor"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Doctor"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Doctor"> | Date | string
   }
@@ -19443,6 +19476,7 @@ export namespace Prisma {
     nombre?: StringFilter<"TipoTurnoDoctor"> | string
     duracion?: StringFilter<"TipoTurnoDoctor"> | string
     habilitado?: BoolFilter<"TipoTurnoDoctor"> | boolean
+    publico?: BoolFilter<"TipoTurnoDoctor"> | boolean
     createdAt?: DateTimeFilter<"TipoTurnoDoctor"> | Date | string
     updatedAt?: DateTimeFilter<"TipoTurnoDoctor"> | Date | string
     doctor?: XOR<DoctorScalarRelationFilter, DoctorWhereInput>
@@ -19456,6 +19490,7 @@ export namespace Prisma {
     nombre?: SortOrder
     duracion?: SortOrder
     habilitado?: SortOrder
+    publico?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     doctor?: DoctorOrderByWithRelationInput
@@ -19472,6 +19507,7 @@ export namespace Prisma {
     nombre?: StringFilter<"TipoTurnoDoctor"> | string
     duracion?: StringFilter<"TipoTurnoDoctor"> | string
     habilitado?: BoolFilter<"TipoTurnoDoctor"> | boolean
+    publico?: BoolFilter<"TipoTurnoDoctor"> | boolean
     createdAt?: DateTimeFilter<"TipoTurnoDoctor"> | Date | string
     updatedAt?: DateTimeFilter<"TipoTurnoDoctor"> | Date | string
     doctor?: XOR<DoctorScalarRelationFilter, DoctorWhereInput>
@@ -19485,6 +19521,7 @@ export namespace Prisma {
     nombre?: SortOrder
     duracion?: SortOrder
     habilitado?: SortOrder
+    publico?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: TipoTurnoDoctorCountOrderByAggregateInput
@@ -19501,6 +19538,7 @@ export namespace Prisma {
     nombre?: StringWithAggregatesFilter<"TipoTurnoDoctor"> | string
     duracion?: StringWithAggregatesFilter<"TipoTurnoDoctor"> | string
     habilitado?: BoolWithAggregatesFilter<"TipoTurnoDoctor"> | boolean
+    publico?: BoolWithAggregatesFilter<"TipoTurnoDoctor"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"TipoTurnoDoctor"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"TipoTurnoDoctor"> | Date | string
   }
@@ -20506,6 +20544,7 @@ export namespace Prisma {
     nombre: string
     emoji: string
     feriados?: DoctorCreateferiadosInput | string[]
+    color?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     AgendaDoctor?: AgendaDoctorCreateNestedManyWithoutDoctorInput
@@ -20518,6 +20557,7 @@ export namespace Prisma {
     nombre: string
     emoji: string
     feriados?: DoctorCreateferiadosInput | string[]
+    color?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     AgendaDoctor?: AgendaDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -20530,6 +20570,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     emoji?: StringFieldUpdateOperationsInput | string
     feriados?: DoctorUpdateferiadosInput | string[]
+    color?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     AgendaDoctor?: AgendaDoctorUpdateManyWithoutDoctorNestedInput
@@ -20542,6 +20583,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     emoji?: StringFieldUpdateOperationsInput | string
     feriados?: DoctorUpdateferiadosInput | string[]
+    color?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     AgendaDoctor?: AgendaDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -20554,6 +20596,7 @@ export namespace Prisma {
     nombre: string
     emoji: string
     feriados?: DoctorCreateferiadosInput | string[]
+    color?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -20563,6 +20606,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     emoji?: StringFieldUpdateOperationsInput | string
     feriados?: DoctorUpdateferiadosInput | string[]
+    color?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -20572,6 +20616,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     emoji?: StringFieldUpdateOperationsInput | string
     feriados?: DoctorUpdateferiadosInput | string[]
+    color?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -20684,6 +20729,7 @@ export namespace Prisma {
     nombre: string
     duracion: string
     habilitado?: boolean
+    publico?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     doctor: DoctorCreateNestedOneWithoutTipoTurnoDoctorInput
@@ -20697,6 +20743,7 @@ export namespace Prisma {
     nombre: string
     duracion: string
     habilitado?: boolean
+    publico?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     consultorios?: ConsultorioUncheckedCreateNestedManyWithoutTiposTurnoInput
@@ -20708,6 +20755,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     duracion?: StringFieldUpdateOperationsInput | string
     habilitado?: BoolFieldUpdateOperationsInput | boolean
+    publico?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     doctor?: DoctorUpdateOneRequiredWithoutTipoTurnoDoctorNestedInput
@@ -20721,6 +20769,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     duracion?: StringFieldUpdateOperationsInput | string
     habilitado?: BoolFieldUpdateOperationsInput | boolean
+    publico?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     consultorios?: ConsultorioUncheckedUpdateManyWithoutTiposTurnoNestedInput
@@ -20733,6 +20782,7 @@ export namespace Prisma {
     nombre: string
     duracion: string
     habilitado?: boolean
+    publico?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -20742,6 +20792,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     duracion?: StringFieldUpdateOperationsInput | string
     habilitado?: BoolFieldUpdateOperationsInput | boolean
+    publico?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -20752,6 +20803,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     duracion?: StringFieldUpdateOperationsInput | string
     habilitado?: BoolFieldUpdateOperationsInput | boolean
+    publico?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -21707,6 +21759,7 @@ export namespace Prisma {
     nombre?: SortOrder
     emoji?: SortOrder
     feriados?: SortOrder
+    color?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -21715,6 +21768,7 @@ export namespace Prisma {
     id?: SortOrder
     nombre?: SortOrder
     emoji?: SortOrder
+    color?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -21723,6 +21777,7 @@ export namespace Prisma {
     id?: SortOrder
     nombre?: SortOrder
     emoji?: SortOrder
+    color?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -21833,6 +21888,7 @@ export namespace Prisma {
     nombre?: SortOrder
     duracion?: SortOrder
     habilitado?: SortOrder
+    publico?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -21843,6 +21899,7 @@ export namespace Prisma {
     nombre?: SortOrder
     duracion?: SortOrder
     habilitado?: SortOrder
+    publico?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -21853,6 +21910,7 @@ export namespace Prisma {
     nombre?: SortOrder
     duracion?: SortOrder
     habilitado?: SortOrder
+    publico?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -23976,6 +24034,7 @@ export namespace Prisma {
     nombre: string
     duracion: string
     habilitado?: boolean
+    publico?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     doctor: DoctorCreateNestedOneWithoutTipoTurnoDoctorInput
@@ -23988,6 +24047,7 @@ export namespace Prisma {
     nombre: string
     duracion: string
     habilitado?: boolean
+    publico?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     turnos?: TurnoUncheckedCreateNestedManyWithoutTipoDeTurnoInput
@@ -24073,6 +24133,7 @@ export namespace Prisma {
     nombre?: StringFilter<"TipoTurnoDoctor"> | string
     duracion?: StringFilter<"TipoTurnoDoctor"> | string
     habilitado?: BoolFilter<"TipoTurnoDoctor"> | boolean
+    publico?: BoolFilter<"TipoTurnoDoctor"> | boolean
     createdAt?: DateTimeFilter<"TipoTurnoDoctor"> | Date | string
     updatedAt?: DateTimeFilter<"TipoTurnoDoctor"> | Date | string
   }
@@ -24120,6 +24181,7 @@ export namespace Prisma {
     nombre: string
     duracion: string
     habilitado?: boolean
+    publico?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     consultorios?: ConsultorioCreateNestedManyWithoutTiposTurnoInput
@@ -24131,6 +24193,7 @@ export namespace Prisma {
     nombre: string
     duracion: string
     habilitado?: boolean
+    publico?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     consultorios?: ConsultorioUncheckedCreateNestedManyWithoutTiposTurnoInput
@@ -24256,6 +24319,7 @@ export namespace Prisma {
     nombre: string
     emoji: string
     feriados?: DoctorCreateferiadosInput | string[]
+    color?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     TipoTurnoDoctor?: TipoTurnoDoctorCreateNestedManyWithoutDoctorInput
@@ -24267,6 +24331,7 @@ export namespace Prisma {
     nombre: string
     emoji: string
     feriados?: DoctorCreateferiadosInput | string[]
+    color?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     TipoTurnoDoctor?: TipoTurnoDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -24325,6 +24390,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     emoji?: StringFieldUpdateOperationsInput | string
     feriados?: DoctorUpdateferiadosInput | string[]
+    color?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     TipoTurnoDoctor?: TipoTurnoDoctorUpdateManyWithoutDoctorNestedInput
@@ -24336,6 +24402,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     emoji?: StringFieldUpdateOperationsInput | string
     feriados?: DoctorUpdateferiadosInput | string[]
+    color?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     TipoTurnoDoctor?: TipoTurnoDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -24384,6 +24451,7 @@ export namespace Prisma {
     nombre: string
     emoji: string
     feriados?: DoctorCreateferiadosInput | string[]
+    color?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     AgendaDoctor?: AgendaDoctorCreateNestedManyWithoutDoctorInput
@@ -24395,6 +24463,7 @@ export namespace Prisma {
     nombre: string
     emoji: string
     feriados?: DoctorCreateferiadosInput | string[]
+    color?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     AgendaDoctor?: AgendaDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -24509,6 +24578,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     emoji?: StringFieldUpdateOperationsInput | string
     feriados?: DoctorUpdateferiadosInput | string[]
+    color?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     AgendaDoctor?: AgendaDoctorUpdateManyWithoutDoctorNestedInput
@@ -24520,6 +24590,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     emoji?: StringFieldUpdateOperationsInput | string
     feriados?: DoctorUpdateferiadosInput | string[]
+    color?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     AgendaDoctor?: AgendaDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -24908,6 +24979,7 @@ export namespace Prisma {
     nombre: string
     emoji: string
     feriados?: DoctorCreateferiadosInput | string[]
+    color?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     AgendaDoctor?: AgendaDoctorCreateNestedManyWithoutDoctorInput
@@ -24919,6 +24991,7 @@ export namespace Prisma {
     nombre: string
     emoji: string
     feriados?: DoctorCreateferiadosInput | string[]
+    color?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     AgendaDoctor?: AgendaDoctorUncheckedCreateNestedManyWithoutDoctorInput
@@ -24999,6 +25072,7 @@ export namespace Prisma {
     nombre: string
     duracion: string
     habilitado?: boolean
+    publico?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     doctor: DoctorCreateNestedOneWithoutTipoTurnoDoctorInput
@@ -25011,6 +25085,7 @@ export namespace Prisma {
     nombre: string
     duracion: string
     habilitado?: boolean
+    publico?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     consultorios?: ConsultorioUncheckedCreateNestedManyWithoutTiposTurnoInput
@@ -25152,6 +25227,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     emoji?: StringFieldUpdateOperationsInput | string
     feriados?: DoctorUpdateferiadosInput | string[]
+    color?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     AgendaDoctor?: AgendaDoctorUpdateManyWithoutDoctorNestedInput
@@ -25163,6 +25239,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     emoji?: StringFieldUpdateOperationsInput | string
     feriados?: DoctorUpdateferiadosInput | string[]
+    color?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     AgendaDoctor?: AgendaDoctorUncheckedUpdateManyWithoutDoctorNestedInput
@@ -25261,6 +25338,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     duracion?: StringFieldUpdateOperationsInput | string
     habilitado?: BoolFieldUpdateOperationsInput | boolean
+    publico?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     doctor?: DoctorUpdateOneRequiredWithoutTipoTurnoDoctorNestedInput
@@ -25273,6 +25351,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     duracion?: StringFieldUpdateOperationsInput | string
     habilitado?: BoolFieldUpdateOperationsInput | boolean
+    publico?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     consultorios?: ConsultorioUncheckedUpdateManyWithoutTiposTurnoNestedInput
@@ -26039,6 +26118,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     duracion?: StringFieldUpdateOperationsInput | string
     habilitado?: BoolFieldUpdateOperationsInput | boolean
+    publico?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     doctor?: DoctorUpdateOneRequiredWithoutTipoTurnoDoctorNestedInput
@@ -26051,6 +26131,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     duracion?: StringFieldUpdateOperationsInput | string
     habilitado?: BoolFieldUpdateOperationsInput | boolean
+    publico?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     turnos?: TurnoUncheckedUpdateManyWithoutTipoDeTurnoNestedInput
@@ -26062,6 +26143,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     duracion?: StringFieldUpdateOperationsInput | string
     habilitado?: BoolFieldUpdateOperationsInput | boolean
+    publico?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -26085,6 +26167,7 @@ export namespace Prisma {
     nombre: string
     duracion: string
     habilitado?: boolean
+    publico?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -26159,6 +26242,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     duracion?: StringFieldUpdateOperationsInput | string
     habilitado?: BoolFieldUpdateOperationsInput | boolean
+    publico?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     consultorios?: ConsultorioUpdateManyWithoutTiposTurnoNestedInput
@@ -26170,6 +26254,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     duracion?: StringFieldUpdateOperationsInput | string
     habilitado?: BoolFieldUpdateOperationsInput | boolean
+    publico?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     consultorios?: ConsultorioUncheckedUpdateManyWithoutTiposTurnoNestedInput
@@ -26181,6 +26266,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     duracion?: StringFieldUpdateOperationsInput | string
     habilitado?: BoolFieldUpdateOperationsInput | boolean
+    publico?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

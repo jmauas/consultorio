@@ -9,11 +9,13 @@ import DetalleTurno from '@/components/DetalleTurno';
 import { obtenerCoberturasDesdeDB } from '@/lib/utils/coberturasUtils';
 import Loader from '@/components/Loader';
 import { formatoFecha } from '@/lib/utils/dateUtils';
+import { useTheme } from 'next-themes';
 
 export default function PacienteDetallePage() {
   const router = useRouter();
   const params = useParams();
   const { id } = params;
+  const { theme, setTheme } = useTheme();
   
   const [paciente, setPaciente] = useState(null);
   const [asa, setAsa] = useState(false);
@@ -33,7 +35,6 @@ export default function PacienteDetallePage() {
     cobertura: '',
     observaciones: ''
   });
-  // Estados para manejar la transición fade
   const [viewOpacity, setViewOpacity] = useState(1);
   const [editOpacity, setEditOpacity] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -132,11 +133,9 @@ export default function PacienteDetallePage() {
   };
 
   const handleCancelarEdicion = () => {
-    // Iniciamos la transición para salir del modo edición
     setIsTransitioning(true);
     setEditOpacity(0);
     
-    // Esperamos que termine la transición antes de cambiar el estado
     setTimeout(() => {
       setEditing(false);
       setViewOpacity(1);
@@ -154,20 +153,18 @@ export default function PacienteDetallePage() {
           observaciones: paciente.observaciones || ''
         });
       }
-    }, 600); // Mismo tiempo que la duración de la transición
+    }, 600);
   };
 
   const handleEditClick = () => {
-    // Iniciamos la transición para entrar en modo edición
     setIsTransitioning(true);
     setViewOpacity(0);
     
-    // Esperamos que termine la transición antes de cambiar el estado
     setTimeout(() => {
       setEditing(true);
       setEditOpacity(1);
       setIsTransitioning(false);
-    }, 600); // Mismo tiempo que la duración de la transición
+    }, 600);
   };
 
   const handleSubmit = async (e) => {
@@ -285,7 +282,7 @@ export default function PacienteDetallePage() {
           <Link href="/pacientes" className="text-blue-500 hover:text-blue-700">
             &larr; Volver a la lista de pacientes
           </Link>
-          <h1 className="text-2xl font-bold text-gray-800 mt-1">
+          <h1 className="text-2xl font-bold mt-1">
             {paciente.nombre} {paciente.apellido}
           </h1>
         </div>
@@ -302,8 +299,7 @@ export default function PacienteDetallePage() {
         ) : null}
       </div>
 
-      <div className="bg-white shadow rounded-lg overflow-hidden mb-6 relative">
-        {/* Vista de información del paciente */}
+      <div className="shadow rounded-lg overflow-hidden mb-6 relative">
         <div 
           className={`transition-opacity duration-600 ${editing ? 'opacity-0 pointer-events-none' : ''}`} 
           style={{ 
@@ -315,36 +311,36 @@ export default function PacienteDetallePage() {
           }}
         >
           <div className="p-6">
-            <h2 className="text-lg font-semibold text-gray-700 mb-4">Información del Paciente</h2>
+            <h2 className="text-lg font-semibold mb-4">Información del Paciente</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
               <div>
-                <h3 className="text-sm font-medium text-gray-500">Nombre Completo</h3>
-                <p className="mt-1 text-base text-gray-900 font-bold">{paciente.nombre} {paciente.apellido || ''}</p>
+                <h3 className="text-sm font-medium">Nombre Completo</h3>
+                <p className="mt-1 text-base font-bold">{paciente.nombre} {paciente.apellido || ''}</p>
               </div>
               
               <div>
-                <h3 className="text-sm font-medium text-gray-500">DNI</h3>
-                <p className="mt-1 text-base text-gray-900 font-bold">{paciente.dni || '-'}</p>
+                <h3 className="text-sm font-medium">DNI</h3>
+                <p className="mt-1 text-base font-bold">{paciente.dni || '-'}</p>
               </div>
               
               <div>
-                <h3 className="text-sm font-medium text-gray-500">Celular</h3>
-                <p className="mt-1 text-base text-gray-900 font-bold">{paciente.celular}</p>
+                <h3 className="text-sm font-medium">Celular</h3>
+                <p className="mt-1 text-base font-bold">{paciente.celular}</p>
               </div>
               
               <div>
-                <h3 className="text-sm font-medium text-gray-500">Email</h3>
-                <p className="mt-1 text-base text-gray-900 font-bold">{paciente.email || '-'}</p>
+                <h3 className="text-sm font-medium">Email</h3>
+                <p className="mt-1 text-base font-bold">{paciente.email || '-'}</p>
               </div>
               
               <div>
-                <h3 className="text-sm font-medium text-gray-500">Cobertura Médica</h3>
-                <p className="mt-1 text-base text-gray-900 font-bold">{paciente.cobertura || '-'}</p>
+                <h3 className="text-sm font-medium">Cobertura Médica</h3>
+                <p className="mt-1 text-base font-bold">{paciente.cobertura || '-'}</p>
               </div>
               
               <div className="md:col-span-2">
-                <h3 className="text-sm font-medium text-gray-500">Observaciones</h3>
-                <p className="mt-1 text-base text-gray-900 font-bold">
+                <h3 className="text-sm font-medium">Observaciones</h3>
+                <p className="mt-1 text-base font-bold">
                   {paciente.observaciones || 'No hay observaciones registradas.'}
                 </p>
               </div>
@@ -352,15 +348,15 @@ export default function PacienteDetallePage() {
             <div className="mt-6 border-t border-gray-200 pt-4">
               <div className="space-y-3">
                 <div className="flex justify-start items-center gap-4 ">
-                  <p className="text-sm text-gray-500">Creado:</p>
+                  <p className="text-sm">Creado:</p>
                   <p className="font-medium">{formatoFecha(paciente.createdAt, true, true, false, true, false, false) || 'No especificado'}</p>
-                  <p className="text-sm text-gray-500">Por:</p>
+                  <p className="text-sm">Por:</p>
                   <p className="font-medium">{paciente.createdBy?.name || 'No especificado'}</p>
                 </div>
                 <div className="flex justify-start items-center gap-4 ">
-                  <p className="text-sm text-gray-500">Modificado:</p>
+                  <p className="text-sm">Modificado:</p>
                   <p className="font-medium">{formatoFecha(paciente.updatedAt, true, true, false, true, false, false) || 'No especificado'}</p>
-                  <p className="text-sm text-gray-500">Por:</p>
+                  <p className="text-sm">Por:</p>
                   <p className="font-medium">{paciente.updatedBy?.name || 'No especificado'}</p>
                 </div>
               </div>
@@ -368,7 +364,6 @@ export default function PacienteDetallePage() {
           </div>
         </div>
 
-        {/* Formulario de edición */}
         <div 
           className={`transition-opacity duration-600 ${!editing ? 'opacity-0 pointer-events-none' : ''}`} 
           style={{ 
@@ -380,10 +375,10 @@ export default function PacienteDetallePage() {
           }}
         >
           <form onSubmit={handleSubmit} className="p-6">
-            <h2 className="text-lg font-semibold text-gray-700 mb-4">Editar Información del Paciente</h2>
+            <h2 className="text-lg font-semibold mb-4">Editar Información del Paciente</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
-                <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="nombre" className="block text-sm font-medium mb-1">
                   Nombre*
                 </label>
                 <input
@@ -397,7 +392,7 @@ export default function PacienteDetallePage() {
                 />
               </div>
               <div>
-                <label htmlFor="apellido" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="apellido" className="block text-sm font-medium mb-1">
                   Apellido
                 </label>
                 <input
@@ -413,7 +408,7 @@ export default function PacienteDetallePage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
-                <label htmlFor="dni" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="dni" className="block text-sm font-medium mb-1">
                   DNI
                 </label>
                 <input
@@ -426,7 +421,7 @@ export default function PacienteDetallePage() {
                 />
               </div>
               <div>
-                <label htmlFor="celular" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="celular" className="block text-sm font-medium mb-1">
                   Celular*
                 </label>
                 <input
@@ -443,7 +438,7 @@ export default function PacienteDetallePage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="email" className="block text-sm font-medium mb-1">
                   Email
                 </label>
                 <input
@@ -456,7 +451,7 @@ export default function PacienteDetallePage() {
                 />
               </div>
               <div>
-                <label htmlFor="cobertura" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="cobertura" className="block text-sm font-medium mb-1">
                   Cobertura Médica
                 </label>
                 <select
@@ -464,7 +459,7 @@ export default function PacienteDetallePage() {
                   name="coberturaMedicaId"
                   value={formData.coberturaMedicaId}
                   onChange={handleCoberturaChange}
-                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`px-3 py-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='light' ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-200'}`}
                 >
                   <option value="" disabled>Seleccionar Cobertura</option>
                   {coberturasDisponibles.map((cobertura) => (
@@ -477,7 +472,7 @@ export default function PacienteDetallePage() {
             </div>
             
             <div className="mb-4">
-              <label htmlFor="observaciones" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="observaciones" className="block text-sm font-medium mb-1">
                 Observaciones
               </label>
               <textarea
@@ -520,16 +515,16 @@ export default function PacienteDetallePage() {
         </div>
       </div>
 
-      <div className="bg-white shadow rounded-lg overflow-hidden mb-6">
+      <div className="shadow rounded-lg overflow-hidden mb-6">
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-gray-700">Historial de Turnos</h2>
+            <h2 className="text-lg font-semibold">Historial de Turnos</h2>
             <Link 
               href={`/turnos/nuevo?pacienteId=${id}`}
               className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded text-sm flex items-center"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+                <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a 1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
               </svg>
               Nuevo Turno
             </Link>
@@ -555,10 +550,10 @@ export default function PacienteDetallePage() {
         <div className="p-6">
             {turnos.cancelados && turnos.cancelados.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-md font-medium text-gray-700 mb-2">Turnos Cancelados</h3>
+              <h3 className="text-md font-medium mb-2">Turnos Cancelados</h3>
               <div className="border rounded-md divide-y divide-gray-200">
                 {turnos.cancelados.map((turno) => (
-                  <div key={turno.id} className="p-3 hover:bg-gray-50 bg-red-50">
+                  <div key={turno.id} className={`p-3 hover:bg-slate-300 ${theme==='light' ? 'bg-red-50' : 'bg-slate-900 text-white'}`}>
                     <div className="flex justify-between">
                       <div>
                         <p className="font-medium">{new Date(turno.desde).toLocaleDateString('es-ES', { 
@@ -567,7 +562,7 @@ export default function PacienteDetallePage() {
                           month: 'long', 
                           year: 'numeric' 
                         })}</p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm">
                           {new Date(turno.desde).toLocaleTimeString('es-ES', { 
                             hour: '2-digit', 
                             minute: '2-digit' 
@@ -595,11 +590,11 @@ export default function PacienteDetallePage() {
             </div>
           )}
           <div className="mb-6">
-            <h3 className="text-md font-medium text-gray-700 mb-2">Próximos Turnos</h3>
+            <h3 className="text-md font-medium mb-2">Próximos Turnos</h3>
             {turnos.proximos && turnos.proximos.length > 0 ? (
               <div className="border rounded-md divide-y divide-gray-200">
                 {turnos.proximos.map((turno) => (
-                  <div key={turno.id} className="p-3 hover:bg-gray-50">
+                  <div key={turno.id} className="p-3 hover:bg-slate-300">
                     <div className="flex justify-between">
                       <div>
                         <p className="font-medium">{new Date(turno.desde).toLocaleDateString('es-ES', { 
@@ -608,7 +603,7 @@ export default function PacienteDetallePage() {
                           month: 'long', 
                           year: 'numeric' 
                         })}</p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm">
                           {new Date(turno.desde).toLocaleTimeString('es-ES', { 
                             hour: '2-digit', 
                             minute: '2-digit' 
@@ -639,16 +634,16 @@ export default function PacienteDetallePage() {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-sm italic">No hay turnos próximos programados.</p>
+              <p className="text-sm italic">No hay turnos próximos programados.</p>
             )}
           </div>
 
           <div className="mb-6">
-            <h3 className="text-md font-medium text-gray-700 mb-2">Historial de Turnos</h3>
+            <h3 className="text-md font-medium mb-2">Historial de Turnos</h3>
             {turnos.pasados && turnos.pasados.length > 0 ? (
               <div className="border rounded-md divide-y divide-gray-200">
                 {turnos.pasados.map((turno) => (
-                  <div key={turno.id} className="p-3 hover:bg-gray-50">
+                  <div key={turno.id} className="p-3 hover:bg-slate-300">
                     <div className="flex justify-between">
                       <div>
                         <p className="font-medium">{new Date(turno.desde).toLocaleDateString('es-ES', { 
@@ -657,7 +652,7 @@ export default function PacienteDetallePage() {
                           month: 'long', 
                           year: 'numeric' 
                         })}</p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm">
                           {new Date(turno.desde).toLocaleTimeString('es-ES', { 
                             hour: '2-digit', 
                             minute: '2-digit' 
@@ -683,7 +678,7 @@ export default function PacienteDetallePage() {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-sm italic">No hay historial de turnos anteriores.</p>
+              <p className="text-sm italic">No hay historial de turnos anteriores.</p>
             )}
           </div>          
         </div>

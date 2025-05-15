@@ -8,6 +8,7 @@ import path from 'path';
 export async function GET(request, { params }) {
   try {
     // Obtener el slug para construir la ruta del archivo
+    params = await params;
     const { slug } = params;
     const fileName = Array.isArray(slug) ? slug.join('/') : slug;
     

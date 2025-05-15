@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { Montserrat } from 'next/font/google';
 import { AuthProvider } from "./providers/AuthProvider";
+import { ThemeProvider } from "next-themes";
 import { Toaster } from "react-hot-toast";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -36,7 +37,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es">
+    <html lang="es" className="scroll-smooth" suppressHydrationWarning>
       <head>
         {/* Font Awesome */}
         <link
@@ -48,33 +49,35 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body
-        className={`${monse.className} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
+        className={`${monse.className} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100`}
       >
+        <ThemeProvider attribute={"class"} enableSystem={true} defaultTheme="system">
         <AuthProvider>
-          <Header />
-          <div className="flex-grow">{children}</div>
-          <Footer />
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: '#333',
-                color: '#fff',
-              },
-              success: {
+            <Header />
+            <div className="flex-grow">{children}</div>
+            <Footer />
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 4000,
                 style: {
-                  background: '#22c55e',
+                  background: 'var(--toast-background, #333)',
+                  color: 'var(--toast-color, #fff)',
                 },
-              },
-              error: {
-                style: {
-                  background: '#ef4444',
+                success: {
+                  style: {
+                    background: 'var(--toast-success-background, #22c55e)',
+                  },
                 },
-              },
-            }}
-          />
+                error: {
+                  style: {
+                    background: 'var(--toast-error-background, #ef4444)',
+                  },
+                },
+              }}
+            />
         </AuthProvider>
+          </ThemeProvider>
       </body>
     </html>
   );

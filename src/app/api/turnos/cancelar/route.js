@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { obtenerConfig } from '@/lib/services/configService.js';
+import { obtenerConfig, obtenerUrlApp } from '@/lib/services/configService.js';
 
 const config = await obtenerConfig();
     
@@ -42,8 +42,9 @@ export async function POST(request) {
       }, { status: 400 });
     }
     
+    const url = await obtenerUrlApp();
     // Hacer una llamada a la API de turnos para actualizar el estado
-    const actualizacionResponse = await fetch(`${config.urlApp || 'http://localhost:3000'}/api/turnos/${turno.id}`, {
+    const actualizacionResponse = await fetch(`${url || 'http://localhost:3000'}/api/turnos/${turno.id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

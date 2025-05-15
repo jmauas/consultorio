@@ -4,8 +4,10 @@ import toast from 'react-hot-toast';
 import Loader from '@/components/Loader';
 import { obtenerCoberturasDesdeDB } from '@/lib/utils/coberturasUtils';
 import { isColorLight } from '@/lib/utils/variosUtils';
+import { useTheme } from 'next-themes';
 
 const CoberturasTab = () => {
+  const { theme } = useTheme();
   // Estado para manejar coberturas y formulario
   const [coberturas, setCoberturas] = useState([]);
   const [nuevaCobertura, setNuevaCobertura] = useState({ 
@@ -124,9 +126,9 @@ const CoberturasTab = () => {
 
   // Componente de Card para mostrar en pantallas pequeñas
   const CoberturaCard = ({ cobertura }) => (
-    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-4">
+    <div className="p-4 rounded-lg shadow-sm border border-gray-200 mb-4">
       <div className="flex justify-between items-center mb-3">
-        <h4 className="text-lg font-medium text-gray-900">{cobertura.nombre}</h4>
+        <h4 className="text-lg font-medium">{cobertura.nombre}</h4>
         <span className={`text-xs font-bold p-2 rounded-2xl ${cobertura.fondo} ${cobertura.color}`}>
           {cobertura.codigo ? cobertura.codigo.toUpperCase() : '--'}
         </span>
@@ -134,11 +136,11 @@ const CoberturasTab = () => {
       
       <div className="grid grid-cols-3 gap-2 mb-3">
         <div>
-          <p className="text-xs text-gray-500">Código</p>
-          <p className="text-sm text-gray-700">{cobertura.codigo || '--'}</p>
+          <p className="text-xs ">Código</p>
+          <p className="text-sm font-bold">{cobertura.codigo || '--'}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-500">Estado</p>
+          <p className="text-xs ">Estado</p>
           {cobertura.habilitado ? (
             <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
               Activa
@@ -150,7 +152,7 @@ const CoberturasTab = () => {
           )}
         </div>
         <div>
-          <p className="text-xs text-gray-500">Color</p>
+          <p className="text-xs ">Color</p>
           <div className="flex items-center space-x-2 mt-1">
             <div 
               className="w-4 h-4 rounded-full border border-gray-300" 
@@ -176,13 +178,13 @@ const CoberturasTab = () => {
   );
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+    <div className="p-6 rounded-xl shadow-sm border border-gray-200">
       <h3 className="text-xl font-semibold mb-4">Coberturas Médicas</h3>
       
       <div className="mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div>
-            <label htmlFor="nombreCobertura" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="nombreCobertura" className="block text-sm font-bold mb-1">
               Nombre de la Cobertura*
             </label>
             <input
@@ -190,13 +192,13 @@ const CoberturasTab = () => {
               id="nombreCobertura"
               value={nuevaCobertura.nombre}
               onChange={(e) => setNuevaCobertura({...nuevaCobertura, nombre: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
               placeholder="Ej: OSDE"
             />
           </div>
           
           <div>
-            <label htmlFor="codigoCobertura" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="codigoCobertura" className="block text-sm font-bold mb-1">
               Código
             </label>
             <input
@@ -204,14 +206,14 @@ const CoberturasTab = () => {
               id="codigoCobertura"
               value={nuevaCobertura.codigo || ''}
               onChange={(e) => setNuevaCobertura({...nuevaCobertura, codigo: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
               placeholder="Ej: osde"
             />
           </div>
 
           {/* Nuevo campo para el color */}
           <div>
-            <label htmlFor="colorCobertura" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="colorCobertura" className="block text-sm font-bold mb-1">
               Color
             </label>
             <div className="flex items-center space-x-2">
@@ -227,7 +229,7 @@ const CoberturasTab = () => {
                 id="colorCoberturaText"
                 value={nuevaCobertura.color || '#CCCCCC'}
                 onChange={(e) => setNuevaCobertura({...nuevaCobertura, color: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
                 placeholder="#CCCCCC"
               />
             </div>
@@ -240,9 +242,9 @@ const CoberturasTab = () => {
             id="habilitadoCobertura"
             checked={nuevaCobertura.habilitado !== false}
             onChange={(e) => setNuevaCobertura({...nuevaCobertura, habilitado: e.target.checked})}
-            className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+            className="h-4 w-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)] border-gray-300 rounded"
           />
-          <label htmlFor="habilitadoCobertura" className="ml-2 text-sm text-gray-700">
+          <label htmlFor="habilitadoCobertura" className="ml-2 text-sm font-bold">
             Habilitado
           </label>
         </div>
@@ -282,7 +284,7 @@ const CoberturasTab = () => {
             type="button"
             onClick={handleAgregarCobertura}
             disabled={guardando}
-            className={`mt-2 px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors ${guardando ? 'opacity-70 cursor-not-allowed' : ''}`}
+            className={`mt-2 px-4 py-2 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 transition-colors ${guardando ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
             {guardando ? (
               <>
@@ -303,31 +305,31 @@ const CoberturasTab = () => {
         <Loader titulo={'Cargando Coberturas ...'}/>
       ) : coberturas.length === 0 ? (
         <div className="text-center py-4 bg-gray-50 rounded-lg border border-gray-200">
-          <p className="text-gray-500">No hay coberturas médicas registradas</p>
+          <p className="">No hay coberturas médicas registradas</p>
         </div>
       ) : (
         <>
           {/* Vista de tabla para pantallas medianas y grandes */}
           <div className="hidden md:block overflow-x-auto">
-            <table className="min-w-full bg-white">
-              <thead className="bg-gray-50">
+            <table className="min-w-full">
+              <thead className="">
                 <tr>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="py-3 px-4 text-left text-xs font-medium  uppercase tracking-wider">
                     Nombre
                   </th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="py-3 px-4 text-left text-xs font-medium  uppercase tracking-wider">
                     Código
                   </th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="py-3 px-4 text-left text-xs font-medium  uppercase tracking-wider">
                     Estado
                   </th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="py-3 px-4 text-left text-xs font-medium  uppercase tracking-wider">
                     Color
                   </th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="py-3 px-4 text-left text-xs font-medium  uppercase tracking-wider">
                     Vista Previa
                   </th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="py-3 px-4 text-left text-xs font-medium  uppercase tracking-wider">
                     Acciones
                   </th>
                 </tr>
@@ -336,10 +338,10 @@ const CoberturasTab = () => {
                 {coberturas.map((cobertura) => (
                   <tr key={cobertura.id}>
                     <td className="py-3 px-4 whitespace-nowrap">
-                      <div className="font-medium text-gray-900">{cobertura.nombre}</div>
+                      <div className="font-medium">{cobertura.nombre}</div>
                     </td>
                     <td className="py-3 px-4 whitespace-nowrap">
-                      <div className="text-gray-700">{cobertura.codigo || '--'}</div>
+                      <div className="font-bold">{cobertura.codigo || '--'}</div>
                     </td>
                     <td className="py-3 px-4 whitespace-nowrap">
                       {cobertura.habilitado ? (

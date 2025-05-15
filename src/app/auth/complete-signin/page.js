@@ -71,7 +71,7 @@ function CompleteSignInForm() {
                       <div className="mt-2 text-sm text-red-700">
                         <p>{error}</p>
                         <button
-                          className="mt-4 inline-flex w-full justify-center rounded-md border border-transparent bg-orange-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                          className="mt-4 inline-flex w-full justify-center rounded-md border border-transparent bg-[var(--color-primary)] py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
                           onClick={() => router.push('/auth/signin')}
                         >
                           Volver a iniciar sesión

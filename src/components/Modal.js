@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTheme } from 'next-themes';
 
 export default function Modal({ isOpen, onClose, children, size = 'medium', title = '' }) {
   // Estado local para manejar la animación y visibilidad
   const [isVisible, setIsVisible] = useState(false);
+  const { theme, setTheme } = useTheme();
   
   // Ajustar el tamaño del modal según la propiedad size
   const modalSizeClasses = {
@@ -74,16 +76,15 @@ export default function Modal({ isOpen, onClose, children, size = 'medium', titl
       className={`fixed inset-0 z-50 flex items-center justify-center backdrop-blur-xs transition-opacity duration-300 ease-out ${isVisible ? 'opacity-100' : 'opacity-0'}`}
       style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
       onClick={handleOverlayClick}
-    >
-      <div 
-        className={`relative bg-white rounded-lg shadow-xl overflow-hidden w-full ${sizeClass} max-h-[90vh] flex flex-col transition-all duration-300 ease-out transform ${isVisible ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 translate-y-4'}`}
+    >      <div 
+        className={`relative ${theme==='light' ? 'bg-white' : 'bg-slate-800'} rounded-lg shadow-xl overflow-hidden w-full ${sizeClass} max-h-[90vh] flex flex-col transition-all duration-300 ease-out transform ${isVisible ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 translate-y-4'}`}
       >
         {/* Cabecera del modal con título y botón de cierre */}
-        <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
+        <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg font-semibold">{title}</h2>
           <button
             onClick={onClose}
-            className="text-red-400 hover:text-gray-500 focus:outline-none"
+            className="text-red-400 hover:text-gray-500 dark:hover:text-gray-400 focus:outline-none"
             aria-label="Cerrar"
           >
             <i className="fa-solid fa-square-xmark fa-2xl"></i>

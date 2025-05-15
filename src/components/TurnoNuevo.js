@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { obtenerCoberturasDesdeDB } from '@/lib/utils/coberturasUtils';
 import Loader from '@/components/Loader';
+import { useTheme } from 'next-themes';
 
 const TurnoNuevo = ({
     desdeParam,
@@ -12,7 +13,8 @@ const TurnoNuevo = ({
     tipoTurnoIdParam,
     dniParam,
     celularParam,
-    pacienteIdParam
+    pacienteIdParam,
+    consultorioIdParam
 }) => {
    const router = useRouter();
    const [loading, setLoading] = useState(false);
@@ -40,7 +42,9 @@ const TurnoNuevo = ({
      duracion: 30,
      observaciones: '',
      consultorioId: '',
-   });   
+   });
+
+  const { theme, setTheme } = useTheme();
  
    // Búsqueda de paciente por celular desde parámetros de URL
    const buscarPacientePorParam = async (param) => {    
@@ -313,7 +317,6 @@ const TurnoNuevo = ({
            throw new Error(`Error: ${response.status}`);
          }        
          const config = await response.json();
-         console.log(config)
          // Verificar que doctores sea un array y tenga elementos
          if (Array.isArray(config.doctores) && config.doctores.length > 0) {
            setDoctores(config.doctores);
@@ -384,6 +387,14 @@ const TurnoNuevo = ({
              }
            }
          }
+
+         // Procesar consultorio
+          if (consultorioIdParam) {
+            const consultorioSeleccionado = config.consultorios.find(consultorio => consultorio.id === consultorioIdParam);
+            if (consultorioSeleccionado) {
+              turnoUpdates.consultorioId = consultorioIdParam;
+            }
+          }
          
          // Aplicar todas las actualizaciones al estado del turno
          if (Object.keys(turnoUpdates).length > 0) {
@@ -431,7 +442,7 @@ const TurnoNuevo = ({
   return (
    <div className="container mx-auto px-4 py-8">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">Nuevo Turno</h1>
+        <h1 className="text-2xl font-bold mb-6">Nuevo Turno</h1>
 
         {/* Mensaje de éxito */}
         {success && (
@@ -455,14 +466,14 @@ const TurnoNuevo = ({
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-6">
+        <form onSubmit={handleSubmit} className="shadow-md rounded-lg p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <h2 className="text-lg font-medium md:col-span-2">Datos del Paciente</h2>
             
             {/* DNI con búsqueda */}
             <div className="md:col-span-2 flex items-end space-x-2">
               <div className="flex-grow">
-                <label className="block text-sm font-medium text-gray-700 mb-1">DNI *</label>
+                <label className="block text-sm font-medium mb-1">DNI *</label>
                 <input
                   type="text"
                   name="dni"
@@ -485,7 +496,7 @@ const TurnoNuevo = ({
             
             {/* Nombre */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+              <label className="block text-sm font-medium  mb-1">Nombre *</label>
               <input
                 type="text"
                 name="nombre"
@@ -498,7 +509,7 @@ const TurnoNuevo = ({
             
             {/* Apellido */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
+              <label className="block text-sm font-medium  mb-1">Apellido</label>
               <input
                 type="text"
                 name="apellido"
@@ -512,7 +523,7 @@ const TurnoNuevo = ({
             {/* Celular con búsqueda */}
             <div className="md:col-span-2 flex items-end space-x-2">
               <div className="flex-grow">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Celular *</label>
+                <label className="block text-sm font-medium  mb-1">Celular *</label>
                 <input
                   type="text"
                   name="celular"
@@ -535,7 +546,7 @@ const TurnoNuevo = ({
             
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label className="block text-sm font-medium  mb-1">Email</label>
               <input
                 type="email"
                 name="email"
@@ -548,12 +559,12 @@ const TurnoNuevo = ({
             
             {/* Cobertura Médica (Select) utilizando la nueva tabla */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Cobertura Médica *</label>
+              <label className="block text-sm font-medium  dark:text-gray-300 mb-1">Cobertura Médica *</label>
               <select
                 name="coberturaMedicaId"
                 value={turno.coberturaMedicaId}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded px-3 py-2"
+                className={`px-3 py-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='light' ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-200'}`}
               >
                 <option value="">Seleccione cobertura</option>
                 {coberturas.map((cob) => (
@@ -567,16 +578,16 @@ const TurnoNuevo = ({
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <h2 className="text-lg font-medium md:col-span-2">Datos del Turno</h2>
+            <h2 className="text-lg font-medium md:col-span-2 dark:text-gray-200">Datos del Turno</h2>
             
             {/* Doctor - Primero */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Doctor *</label>
+              <label className="block text-sm font-medium  dark:text-gray-300 mb-1">Doctor *</label>
               <select
                 name="doctor"
                 value={turno.doctor}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded px-3 py-2"
+                className={`px-3 py-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='light' ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-200'}`}
               >
                 <option value="">Seleccione doctor</option>
                 {doctores.map((doctor) => (
@@ -586,15 +597,14 @@ const TurnoNuevo = ({
                 ))}
               </select>
             </div>
-            
-            {/* Tipo de turno - Segundo */}
+              {/* Tipo de turno - Segundo */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de turno *</label>
+              <label className="block text-sm font-medium  dark:text-gray-300 mb-1">Tipo de turno *</label>
               <select
                 name="servicio"
                 value={turno.tipoDeTurnoId}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded px-3 py-2"
+                className={`px-3 py-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='light' ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-200'}`}
                 disabled={!turno.doctor}
               >
                 <option value="">Seleccione tipo de turno</option>
@@ -608,7 +618,7 @@ const TurnoNuevo = ({
             
             {/* Fecha y hora */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha y hora *</label>
+              <label className="block text-sm font-medium  mb-1">Fecha y hora *</label>
               <input
                 type="datetime-local"
                 name="desde"
@@ -620,7 +630,7 @@ const TurnoNuevo = ({
             
             {/* Duración */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Duración (minutos)</label>
+              <label className="block text-sm font-medium  mb-1">Duración (minutos)</label>
               <input
                 type="number"
                 name="duracion"
@@ -632,12 +642,12 @@ const TurnoNuevo = ({
 
             {/* Consultorios */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Consultorio *</label>
+              <label className="block text-sm font-medium  mb-1">Consultorio *</label>
               <select
                 name="consultorioId"
                 value={turno.consultorioId}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded px-3 py-2 font-bold"
+                className={`px-3 py-2 w-full border font-bold rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='light' ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-200'}`}
                 disabled={!turno.doctor}
               >
                 <option value="">Seleccioná Consultorio</option>
@@ -651,7 +661,7 @@ const TurnoNuevo = ({
             
             {/* Observaciones */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+              <label className="block text-sm font-medium  mb-1">Observaciones</label>
               <textarea
                 name="observaciones"
                 value={turno.observaciones}
@@ -707,7 +717,9 @@ export default function Page({
     tipoTurnoIdParam,
     dniParam,
     celularParam,
-    pacienteIdParam}) {
+    pacienteIdParam,
+    consultorioIdParam
+  }) {
   return (
     <Suspense fallback={<Loader titulo={'Cargando nuevo turno'}/>}>
       <TurnoNuevo 
@@ -718,6 +730,7 @@ export default function Page({
         dniParam={dniParam}
         celularParam={celularParam}
         pacienteIdParam={pacienteIdParam}
+        consultorioIdParam={consultorioIdParam}
       />
     </Suspense>
   );

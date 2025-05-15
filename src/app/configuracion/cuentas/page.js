@@ -286,7 +286,7 @@ export default function CuentasPage() {
           <button
             type="button"
             onClick={abrirModalNuevaCuenta}
-            className="px-3 py-1 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors flex items-center gap-1"
+            className="px-3 py-1 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary)] transition-colors flex items-center gap-1"
           >
             <i className="fas fa-plus"></i> Agregar Cuenta
           </button>
@@ -328,7 +328,7 @@ export default function CuentasPage() {
                 type="text"
                 value={nuevaCuenta.nombre}
                 onChange={manejarCambioCampo}
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                 placeholder="Nombre de la cuenta"
                 required
               />
@@ -344,7 +344,7 @@ export default function CuentasPage() {
                 type="text"
                 value={nuevaCuenta.url}
                 onChange={manejarCambioCampo}
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                 placeholder="URL de conexión"
                 required
               />
@@ -360,7 +360,7 @@ export default function CuentasPage() {
                 type="text"
                 value={nuevaCuenta.token}
                 onChange={manejarCambioCampo}
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                 placeholder="Token de autenticación"
                 required
               />
@@ -378,7 +378,7 @@ export default function CuentasPage() {
             <button
               type="submit"
               disabled={guardando}
-              className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors disabled:opacity-50"
+              className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary)] transition-colors disabled:opacity-50"
             >
               {guardando ? (
                 <>

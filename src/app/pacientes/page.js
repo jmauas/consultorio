@@ -10,6 +10,7 @@ import { obtenerCoberturasDesdeDB } from '@/lib/utils/coberturasUtils';
 import Loader from '@/components/Loader';
 import TurnoNuevo from '@/components/TurnoNuevo';
 import TurnoDisponibilidad from '@/components/TurnoDisponibilidad';
+import { useTheme } from 'next-themes';
 
 export default function PacientesPage() {
   const router = useRouter();
@@ -31,12 +32,11 @@ export default function PacientesPage() {
   const [modalTurnoNuevo, setModalTurnoNuevo] = useState(false);
   const [modalTurnoDisponibilidad, setModalTurnoDisponibilidad] = useState(false);
   
-  // Estado para coberturas médicas
   const [coberturas, setCoberturas] = useState([]);
-  
-  // Estado para el modal de nuevo turno
   const [modalNuevoTurnoAbierto, setModalNuevoTurnoAbierto] = useState(false);
   const [pacienteSeleccionado, setPacienteSeleccionado] = useState(null);
+
+  const { theme, setTheme } = useTheme();
 
   const cargarPacientes = async (usarFiltros = false) => {
     try {
@@ -45,7 +45,6 @@ export default function PacientesPage() {
       
       let url = '/api/pacientes?todos=true&sinTurnos=true';
       
-      // Si se están aplicando filtros, usar los criterios de búsqueda
       if (usarFiltros && (filtros.nombre || filtros.dni || filtros.celular || filtros.cobertura)) {
         url = '/api/pacientes?sinTurnos=true&';
         if (filtros.nombre) url += `nombre=${encodeURIComponent(filtros.nombre)}&`;
@@ -62,12 +61,10 @@ export default function PacientesPage() {
       
       const data = await response.json();
       
-      // Si la respuesta contiene pacientes en un array
       if (data.pacientes || data.paciente) {
         const listaPacientes = data.pacientes || data.paciente;
         setPacientes(listaPacientes);
         
-        // Actualizar paginación
         setPaginacion(prev => ({
           ...prev,
           total: listaPacientes.length
@@ -95,7 +92,6 @@ export default function PacientesPage() {
       
       let url = '/api/pacientes?todos=true';
       
-      // Si se están aplicando filtros, usar los criterios de búsqueda
       if (filtros.nombre) url += `nombre=${encodeURIComponent(filtros.nombre)}&`;
       if (filtros.dni) url += `dni=${encodeURIComponent(filtros.dni)}&`;
       if (filtros.celular) url += `celular=${encodeURIComponent(filtros.celular)}&`;
@@ -109,7 +105,6 @@ export default function PacientesPage() {
       
       const data = await response.json();
       
-      // Si la respuesta contiene pacientes en un array
       if (data.pacientes || data.paciente) {
         const listaPacientes = data.pacientes || data.paciente;
         handleExcel(listaPacientes, 'Pacientes');
@@ -134,7 +129,7 @@ export default function PacientesPage() {
     e.preventDefault();
     setPaginacion(prev => ({
       ...prev,
-      pagina: 1 // Volver a la primera página al filtrar
+      pagina: 1
     }));
     cargarPacientes(true);
   };
@@ -175,13 +170,12 @@ export default function PacientesPage() {
     setModalNuevoTurnoAbierto(false);
     setPacienteSeleccionado(null);
   };
-    // Cerrar modal
+
   const cerrarModal = () => {
     setModalTurnoNuevo(false);
     setModalTurnoDisponibilidad(false);
   };
   
-  // Funciones de navegación para nuevo turno
   const irANuevoTurno = () => {
     setModalTurnoNuevo(true);
     setModalNuevoTurnoAbierto(false);
@@ -194,7 +188,6 @@ export default function PacientesPage() {
     setModalTurnoDisponibilidad(true);
   };
 
-  // Calcular índices para paginación
   const indiceInicial = (paginacion.pagina - 1) * paginacion.porPagina;
   const indiceFinal = Math.min(indiceInicial + paginacion.porPagina, paginacion.total);
   const pacientesPaginados = pacientes.slice(indiceInicial, indiceFinal);
@@ -202,7 +195,6 @@ export default function PacientesPage() {
 
    useEffect(() => {
     cargarPacientes();
-    // Cargar las coberturas médicas al inicializar
     const cargarCoberturas = async () => {
       try {
         const coberturasData = await obtenerCoberturasDesdeDB();
@@ -215,11 +207,10 @@ export default function PacientesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paginacion.pagina]);
 
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Pacientes</h1>
+        <h1 className="text-2xl font-bold">Pacientes</h1>
         <Link 
           href="/pacientes/nuevo" 
           className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded flex items-center gap-2"
@@ -228,12 +219,11 @@ export default function PacientesPage() {
         </Link>
       </div>
 
-      {/* Filtros */}
-      <div className="bg-white shadow rounded-lg p-4 mb-6">
+      <div className="shadow rounded-lg p-4 mb-6 border border-gray-400">
         <h2 className="text-lg font-medium mb-4">Buscar Pacientes</h2>
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+            <label className="block text-sm font-medium mb-1">Nombre</label>
             <input
               type="text"
               name="nombre"
@@ -244,7 +234,7 @@ export default function PacientesPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">DNI</label>
+            <label className="block text-sm font-medium mb-1">DNI</label>
             <input
               type="text"
               name="dni"
@@ -255,7 +245,7 @@ export default function PacientesPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Celular</label>
+            <label className="block text-sm font-medium mb-1">Celular</label>
             <input
               type="text"
               name="celular"
@@ -266,12 +256,12 @@ export default function PacientesPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Cobertura</label>
+            <label className="block text-sm font-medium mb-1">Cobertura</label>
             <select
               name="cobertura"
               value={filtros.cobertura}
               onChange={handleFiltroChange}
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              className={`px-3 py-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='light' ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-200'}`}
             >
               <option value="todos">Todas las coberturas</option>
               {coberturas.map((cobertura) => (
@@ -310,8 +300,7 @@ export default function PacientesPage() {
         </form>
       </div>
 
-      {/* Lista de pacientes */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
+      <div className="shadow rounded-lg overflow-hidden">
         {loading ? (
           <Loader titulo={'Cargando Pacientes...'}/>
         ) : error ? (
@@ -325,7 +314,7 @@ export default function PacientesPage() {
             </button>
           </div>
         ) : pacientesPaginados.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">
+          <div className="p-6 text-center">
             <p>No se encontraron pacientes.</p>
             {!filtros.nombre && !filtros.dni && !filtros.celular && !filtros.cobertura ? (
               <Link 
@@ -345,47 +334,46 @@ export default function PacientesPage() {
           </div>
         ) : (
           <>
-            {/* Vista de tabla para pantallas medianas y grandes */}
             <div className="hidden md:block overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-400 border border-gray-400">
+                <thead>
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                       Nombre
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                       DNI
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                       Contacto
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                       Cobertura
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                       Acciones
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-400">
                   {pacientesPaginados.map((paciente, i) => (
-                    <tr key={`${paciente.id}-${i}`} className="hover:bg-gray-50">
+                    <tr key={`${paciente.id}-${i}`} className="hover:bg-slate-100 hover:text-slate-700">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium">
                           {paciente.nombre} {paciente.apellido || ''}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{paciente.dni}</div>
+                        <div className="text-sm">{paciente.dni}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm">
                           <div>{paciente.celular}</div>
                           {paciente.email && <div className="text-xs">{paciente.email}</div>}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm">
                           {paciente.coberturaMedica ? (
                             <span className={`px-2 py-1 rounded ${paciente.coberturaMedica.fondo} ${paciente.coberturaMedica.color}`}>
                               {paciente.coberturaMedica.nombre}
@@ -409,7 +397,6 @@ export default function PacientesPage() {
                           >
                             <i className="fa-solid fa-calendar-plus"></i>
                           </button>
-                          {/* Botón para enviar email */}
                           {paciente.email && (
                             <a
                               href={`mailto:${paciente.email}`}
@@ -421,7 +408,6 @@ export default function PacientesPage() {
                               <i className="fa-solid fa-envelope"></i>
                             </a>
                           )}
-                          {/* Botón para enviar WhatsApp */}
                           {paciente.celular && (
                             <a 
                               href={`https://wa.me/${paciente.celular}`}
@@ -441,16 +427,15 @@ export default function PacientesPage() {
               </table>
             </div>
             
-            {/* Vista de cards para pantallas pequeñas */}
             <div className="md:hidden space-y-4 p-4">
               {pacientesPaginados.map((paciente, i) => (
                 <div 
                   key={`card-${paciente.id}-${i}`} 
-                  className="bg-white border rounded-lg shadow-sm overflow-hidden"
+                  className="border rounded-lg shadow-sm overflow-hidden"
                 >
                   <div className="p-4 border-b">
                     <div className="flex justify-between items-center">
-                      <h3 className="text-lg font-bold text-gray-900">
+                      <h3 className="text-lg font-bold">
                         {paciente.nombre} {paciente.apellido || ''}
                       </h3>
                       <div className="bg-blue-100 rounded-full p-2">
@@ -462,24 +447,24 @@ export default function PacientesPage() {
                   <div className="p-4">
                     <div className="grid grid-cols-1 gap-3">
                       <div>
-                        <p className="text-sm font-medium text-gray-500">DNI</p>
+                        <p className="text-sm font-medium">DNI</p>
                         <p className="mt-1 text-sm font-bold">{paciente.dni || '-'}</p>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-500">Contacto</p>
+                        <p className="text-sm font-medium">Contacto</p>
                         <p className="mt-1 text-sm font-bold">{paciente.celular || '-'}</p>
                         {paciente.email && (
-                          <p className="text-xs text-gray-500">{paciente.email}</p>
+                          <p className="text-xs">{paciente.email}</p>
                         )}
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-500">Cobertura Médica</p>
+                        <p className="text-sm font-medium">Cobertura Médica</p>
                         <p className="mt-1 text-sm font-bold">{paciente.cobertura || '-'}</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-gray-50 px-4 py-3 flex justify-between">
+                  <div className="px-4 py-3 flex justify-between border-t">
                     <div className="space-x-2">
                       <button
                         onClick={() => handleVerDetalle(paciente.id)}
@@ -525,24 +510,21 @@ export default function PacientesPage() {
               ))}
             </div>
             
-            {/* Paginación */}
             {totalPaginas > 1 && (
-              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center">
-                <div className="text-sm text-gray-700 mb-2 sm:mb-0">
+              <div className="px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center">
+                <div className="text-sm mb-2 sm:mb-0">
                   Mostrando <span className="font-medium">{indiceInicial + 1}</span> a <span className="font-medium">{indiceFinal}</span> de <span className="font-medium">{paginacion.total}</span> pacientes
                 </div>
                 <div className="flex flex-wrap justify-center space-x-1">
                   <button
                     onClick={() => handleCambiarPagina(paginacion.pagina - 1)}
                     disabled={paginacion.pagina === 1}
-                    className="px-3 py-1 rounded border border-gray-300 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center gap-1"
+                    className="px-3 py-1 rounded border border-gray-300 text-sm font-medium disabled:cursor-not-allowed flex items-center gap-1"
                   >
                     <i className="fa-solid fa-chevron-left"></i> Anterior
                   </button>
                   
-                  {/* Mostrar páginas */}
                   {Array.from({ length: Math.min(5, totalPaginas) }, (_, i) => {
-                    // Si hay más de 5 páginas, mostrar contexto alrededor de la página actual
                     let pageNum;
                     if (totalPaginas <= 5) {
                       pageNum = i + 1;
@@ -561,7 +543,7 @@ export default function PacientesPage() {
                         className={`px-3 py-1 rounded border text-sm font-medium ${
                           pageNum === paginacion.pagina 
                             ? 'bg-blue-500 text-white border-blue-500' 
-                            : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+                            : 'border-gray-300 hover:bg-gray-50'
                         }`}
                       >
                         {pageNum}
@@ -572,7 +554,7 @@ export default function PacientesPage() {
                   <button
                     onClick={() => handleCambiarPagina(paginacion.pagina + 1)}
                     disabled={paginacion.pagina === totalPaginas}
-                    className="px-3 py-1 rounded border border-gray-300 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center gap-1"
+                    className="px-3 py-1 rounded border border-gray-300 text-sm font-medium disabled:cursor-not-allowed flex items-center gap-1"
                   >
                     Siguiente <i className="fa-solid fa-chevron-right"></i>
                   </button>
@@ -583,7 +565,6 @@ export default function PacientesPage() {
         )}
       </div>
 
-      {/* Modal para nuevo turno */}
       <Modal
         isOpen={modalNuevoTurnoAbierto}
         onClose={cerrarModalNuevoTurno}
@@ -591,7 +572,7 @@ export default function PacientesPage() {
         title="Crear Nuevo Turno"
       >
         <div className="p-4">
-          <p className="text-gray-600 mb-4">
+          <p className="mb-4">
             Seleccione el tipo de turno que desea crear para 
             <span className="font-bold"> {pacienteSeleccionado?.nombre} {pacienteSeleccionado?.apellido}</span>
           </p>
@@ -614,7 +595,6 @@ export default function PacientesPage() {
           </div>
         </div>
       </Modal>
-      {/* Modal para nuevo Turno */}
       <Modal
         isOpen={modalTurnoNuevo || modalTurnoDisponibilidad}
         onClose={cerrarModal}

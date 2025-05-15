@@ -12,18 +12,30 @@ export const obtenerConfig = async () => {
     const config = await prisma.configuracionConsultorio.findFirst({
       orderBy: { createdAt: 'desc' }
     });
-    
-    // Si estamos en modo desarrollo y hay una URL de desarrollo configurada, la usamos
-    if (process.env.DEV === 'true' && config?.urlAppDev) {
-      return { ...config, urlApp: config.urlAppDev };
-    }
-    
+
     return config || {};
   } catch (error) {
     console.error('Error al obtener configuración:', error);
     return {};
   }
 };
+
+export const obtenerUrlApp = async () => {
+  try {
+    const config = await obtenerConfig();
+
+    // Si estamos en modo desarrollo y hay una URL de desarrollo configurada, la usamos
+    if (process.env.DEV === 'true' && config?.urlAppDev) {
+      return config.urlAppDev;
+    } else {
+      // En producción, usamos la URL de la app normal
+      return config.urlApp || '';
+    }
+  } catch (error) {
+    console.error('Error al obtener URL de la app:', error);
+    return '';
+  }
+}
 
 /**
  * Guarda la configuración global del sistema en la base de datos
@@ -184,7 +196,8 @@ export const registrarConfig = async (datos, seccion = 'completo') => {
             data: {
               nombre: doctor.nombre,
               emoji: doctor.emoji || '👨‍⚕️',
-              feriados: doctor.feriados || []
+              feriados: doctor.feriados || [],
+              color: doctor.color || '#000000',
             }
           });
           
@@ -246,7 +259,8 @@ export const registrarConfig = async (datos, seccion = 'completo') => {
                   where: { id: tipoExistente.id },
                   data: {
                     duracion: tipoTurno.duracion,
-                    habilitado: tipoTurno.habilitado
+                    habilitado: tipoTurno.habilitado,
+                    publico: tipoTurno.publico || true,
                   }
                 });
               } else {
@@ -256,7 +270,8 @@ export const registrarConfig = async (datos, seccion = 'completo') => {
                     doctorId: doctor.id,
                     nombre: tipoTurno.nombre,
                     duracion: tipoTurno.duracion,
-                    habilitado: tipoTurno.habilitado
+                    habilitado: tipoTurno.habilitado,
+                    publico: tipoTurno.publico || true,
                   }
                 });
               }
@@ -299,7 +314,8 @@ export const registrarConfig = async (datos, seccion = 'completo') => {
                   doctorId: doctorCreado.id,
                   nombre: tipoTurno.nombre,
                   duracion: tipoTurno.duracion,
-                  habilitado: tipoTurno.habilitado
+                  habilitado: tipoTurno.habilitado,
+                  publico: tipoTurno.publico || true,
                 }
               });
             }
@@ -333,7 +349,8 @@ export const obtenerDoctores = async () => {
             nombre: true,
             duracion: true,
             habilitado: true,
-            consultorios: true
+            consultorios: true,
+            publico: true
           }
         }
       },
@@ -341,7 +358,6 @@ export const obtenerDoctores = async () => {
         nombre: 'asc'
       }
     });
-    
     // Transform the data to match the expected structure in the frontend
     return doctores.map(doctor => ({
       ...doctor,
@@ -371,12 +387,6 @@ export const obtenerConsultorios = async () => {
   }
 };
 
-/**
- * Obtiene la configuración del sistema
- */
-export async function getConfig() {
-  // Implementación actual o futura
-}
 
 /**
  * Obtiene todas las cuentas de WhatsApp

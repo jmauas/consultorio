@@ -2,6 +2,7 @@
 import React from 'react';
 import toast from 'react-hot-toast';
 import { isColorLight } from '@/lib/utils/variosUtils';
+import { useTheme } from 'next-themes';
 
 const ConsultoriosTab = ({ 
   consultorios, 
@@ -9,11 +10,13 @@ const ConsultoriosTab = ({
   nuevoConsultorio, 
   setNuevoConsultorio 
 }) => {
+  const { theme } = useTheme();
+  
   // Componente Card para pantallas pequeñas
   const ConsultorioCard = ({ consultorio }) => (
-    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-4">
+    <div className="p-4 rounded-lg shadow-sm border mb-4">
       <div className="flex justify-between items-center mb-3">
-        <h4 className="text-lg font-medium text-gray-900">{consultorio.nombre}</h4>
+        <h4 className="text-lg ">{consultorio.nombre}</h4>
         <div 
           className="w-6 h-6 rounded-full border border-gray-300" 
           style={{ backgroundColor: consultorio.color || '#CCCCCC' }}
@@ -23,20 +26,20 @@ const ConsultoriosTab = ({
       
       <div className="space-y-2 mb-3">
         <div>
-          <p className="text-xs text-gray-500">Dirección</p>
-          <p className="text-sm text-gray-700">{consultorio.direccion || '-'}</p>
+          <p className="text-xs">Dirección</p>
+          <p className="text-sm">{consultorio.direccion || '-'}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-500">Teléfono</p>
-          <p className="text-sm text-gray-700">{consultorio.telefono || '-'}</p>
+          <p className="text-xs">Teléfono</p>
+          <p className="text-sm">{consultorio.telefono || '-'}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-500">Email</p>
-          <p className="text-sm text-gray-700">{consultorio.email || '-'}</p>
+          <p className="text-xs">Email</p>
+          <p className="text-sm">{consultorio.email || '-'}</p>
         </div>
       </div>
       <span 
-        className="px-2 py-1 inline-flex text-sm font-medium rounded-lg"
+        className="px-2 py-1 inline-flex text-sm  rounded-lg"
         style={{ 
           backgroundColor: consultorio.color || '#CCCCCC',
           color: isColorLight(consultorio.color || '#CCCCCC') ? '#000000' : '#FFFFFF'
@@ -45,7 +48,7 @@ const ConsultoriosTab = ({
         {consultorio.nombre ? consultorio.nombre : '--'}
       </span>
       
-      <div className="flex justify-end border-t border-gray-100 pt-3 space-x-2">
+      <div className="flex justify-end border-t pt-3 space-x-2">
         <button
           type="button"
           onClick={() => {
@@ -98,13 +101,13 @@ const ConsultoriosTab = ({
   );
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+    <div className="p-6 rounded-xl shadow-sm border border-gray-200">
       <h3 className="text-xl font-semibold mb-4">Consultorios/Sucursales</h3>
       
       <div className="mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <label htmlFor="nombreConsultorio" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="nombreConsultorio" className="block text-sm  text-gray-700 mb-1">
               Nombre del Consultorio*
             </label>
             <input
@@ -112,13 +115,13 @@ const ConsultoriosTab = ({
               id="nombreConsultorio"
               value={nuevoConsultorio?.nombre || ''}
               onChange={(e) => setNuevoConsultorio({...nuevoConsultorio || {}, nombre: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
               placeholder="Ej: Consultorio 1"
             />
           </div>
           
           <div>
-            <label htmlFor="direccionConsultorio" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="direccionConsultorio" className="block text-sm  text-gray-700 mb-1">
               Dirección
             </label>
             <input
@@ -126,7 +129,7 @@ const ConsultoriosTab = ({
               id="direccionConsultorio"
               value={nuevoConsultorio?.direccion || ''}
               onChange={(e) => setNuevoConsultorio({...nuevoConsultorio || {}, direccion: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
               placeholder="Ej: Av. Rivadavia 1234"
             />
           </div>
@@ -134,7 +137,7 @@ const ConsultoriosTab = ({
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <label htmlFor="telefonoConsultorio" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="telefonoConsultorio" className="block text-sm  text-gray-700 mb-1">
               Teléfono
             </label>
             <input
@@ -142,13 +145,13 @@ const ConsultoriosTab = ({
               id="telefonoConsultorio"
               value={nuevoConsultorio?.telefono || ''}
               onChange={(e) => setNuevoConsultorio({...nuevoConsultorio || {}, telefono: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
               placeholder="Ej: 11 1234-5678"
             />
           </div>
           
           <div>
-            <label htmlFor="emailConsultorio" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="emailConsultorio" className="block text-sm  text-gray-700 mb-1">
               Email
             </label>
             <input
@@ -156,14 +159,14 @@ const ConsultoriosTab = ({
               id="emailConsultorio"
               value={nuevoConsultorio?.email || ''}
               onChange={(e) => setNuevoConsultorio({...nuevoConsultorio || {}, email: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
               placeholder="Ej: consultorio@ejemplo.com"
             />
           </div>
         </div>
 
         <div className="mb-4">
-          <label htmlFor="colorConsultorio" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="colorConsultorio" className="block text-sm  text-gray-700 mb-1">
             Color
           </label>
           <div className="flex items-center space-x-4">
@@ -179,7 +182,7 @@ const ConsultoriosTab = ({
                 className="w-10 h-10 rounded-full border border-gray-300" 
                 style={{ backgroundColor: nuevoConsultorio?.color || '#CCCCCC' }}
               ></div>
-              <span className="text-sm text-gray-500">{nuevoConsultorio?.color || '#CCCCCC'}</span>
+              <span className="text-sm font-bold">{nuevoConsultorio?.color || '#CCCCCC'}</span>
             </div>
           </div>
         </div>
@@ -294,7 +297,7 @@ const ConsultoriosTab = ({
                 toast.error(`Error: ${error.message}`);
               }
             }}
-            className="mt-4 px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors"
+            className="mt-4 px-4 py-2 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 transition-colors"
           >
             <i className="fas fa-plus mr-2"></i>
             Agregar Consultorio
@@ -304,34 +307,34 @@ const ConsultoriosTab = ({
       
       {consultorios.length === 0 ? (
         <div className="text-center py-4 bg-gray-50 rounded-lg border border-gray-200">
-          <p className="text-gray-500">No hay consultorios registrados</p>
+          <p className="">No hay consultorios registrados</p>
         </div>
       ) : (
         <>
           {/* Vista de tabla para pantallas medianas y grandes */}
           <div className="hidden md:block overflow-x-auto">
-            <table className="min-w-full bg-white">
-              <thead className="bg-gray-50">
+            <table className="min-w-full">
+              <thead className="">
                 <tr>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="py-3 px-4 text-left text-xs  font-bold uppercase tracking-wider">
                     Nombre
                   </th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="py-3 px-4 text-left text-xs  font-bold uppercase tracking-wider">
                     Color
                   </th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="py-3 px-4 text-left text-xs  font-bold uppercase tracking-wider">
                     Dirección
                   </th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="py-3 px-4 text-left text-xs  font-bold uppercase tracking-wider">
                     Teléfono
                   </th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="py-3 px-4 text-left text-xs  font-bold uppercase tracking-wider">
                     Email
                   </th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="py-3 px-4 text-left text-xs  font-bold uppercase tracking-wider">
                     Vista Previa
                   </th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="py-3 px-4 text-left text-xs  font-bold uppercase tracking-wider">
                     Acciones
                   </th>
                 </tr>
@@ -340,7 +343,7 @@ const ConsultoriosTab = ({
                 {consultorios.map((consultorio) => (
                   <tr key={consultorio.id}>
                     <td className="py-3 px-4 whitespace-nowrap">
-                      <div className="font-medium text-gray-900">{consultorio.nombre}</div>
+                      <div className="">{consultorio.nombre}</div>
                     </td>
                     <td className="py-3 px-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -362,7 +365,7 @@ const ConsultoriosTab = ({
                     </td>
                     <td className="py-3 px-4 whitespace-nowrap">
                         <span 
-                          className="px-2 py-1 inline-flex text-sm font-medium rounded-lg"
+                          className="px-2 py-1 inline-flex text-sm  rounded-lg"
                           style={{ 
                             backgroundColor: consultorio.color || '#CCCCCC',
                             color: isColorLight(consultorio.color || '#CCCCCC') ? '#000000' : '#FFFFFF'

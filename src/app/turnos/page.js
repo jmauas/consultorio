@@ -11,6 +11,7 @@ import Loader from '@/components/Loader';
 import TurnoNuevo from '@/components/TurnoNuevo';
 import TurnoDisponibilidad from '@/components/TurnoDisponibilidad';
 import Modal from '@/components/Modal';
+import CalendarioTurnos from '@/components/CalendarioTurno';
 
 // Memoizar los estados para evitar recálculos en cada renderizado
 const estados = obtenerEstados();
@@ -19,17 +20,22 @@ export default function TurnosPage() {
   // Ref para rastrear si es la primera renderización
   const isFirstRender = useRef(true);
   const filterTimeoutRef = useRef(null);
-  
+
+
   const [turnos, setTurnos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date());
   const [diasCalendario, setDiasCalendario] = useState([]);
   const [filtroDoctor, setFiltroDoctor] = useState('todos');
-  const [doctores, setDoctores] = useState([]);
   const [tituloModal, setTituloModal] = useState('');
   const [modalTurnoNuevo, setModalTurnoNuevo] = useState(false);
   const [modalTurnoDisponibilidad, setModalTurnoDisponibilidad] = useState(false);
+  const [doctores, setDoctores] = useState([]);
+  const [consultorios, setConsultorios] = useState([]);
+  const [tiposTurno, setTiposTurno] = useState([]);
+  const [coberturas, setCoberturas] = useState([]);
+  const [configuracion, setConfiguracion] = useState(null);
 
   // Estados para filtros de fecha avanzados
   const fechaHoy = new Date();
@@ -48,8 +54,7 @@ export default function TurnosPage() {
   const [turnosPorDia, setTurnosPorDia] = useState({});
   
   // Nuevos estados para filtros adicionales
-  const [consultorios, setConsultorios] = useState([]);
-  const [tiposTurno, setTiposTurno] = useState([]);
+
   const [filtroConsultorio, setFiltroConsultorio] = useState('todos');
   const [filtroTipoTurno, setFiltroTipoTurno] = useState('todos');
   const [filtroPacienteNombre, setFiltroPacienteNombre] = useState('');
@@ -58,7 +63,6 @@ export default function TurnosPage() {
   const [filtroEstado, setFiltroEstado] = useState('todos');
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
   const [filtroCobertura, setFiltroCobertura] = useState('todos');
-  const [coberturas, setCoberturas] = useState([]);
 
   const handleModalTurnoNuevo = () => {
     setTituloModal('Nuevo Turno');
@@ -182,6 +186,41 @@ export default function TurnosPage() {
       // En caso de error, no actualizamos los contadores
     }
   }, []);
+
+  // Cancelar turno
+  const cancelarTurno = useCallback(async (turnoId) => {
+    if (!confirm('¿Está seguro de cancelar este turno?')) return;
+    
+    try {
+      const response = await fetch(`/api/turnos/${turnoId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al cancelar turno');
+      }
+      
+      // Actualizar lista de turnos
+      await cargarTurnos(fechaSeleccionada, mostrarFiltros);
+      // Actualizar contadores para reflejar la cancelación
+      cargarContadoresTurnos(diasCalendario);
+      toast.success('Turno cancelado correctamente');
+      
+    } catch (err) {
+      console.error('Error al cancelar turno:', err);
+      toast.error(`Error: ${err.message}`);
+    }
+  }, [cargarTurnos, fechaSeleccionada, mostrarFiltros, cargarContadoresTurnos, diasCalendario]);
+
+  // Manejar actualizaciones de turnos desde la grilla
+  const handleTurnoActualizado = useCallback((tipo, datos) => {
+    if (tipo === 'delete' || tipo === 'update') {
+      // Recargar turnos y contadores
+      cargarTurnos(fechaSeleccionada, mostrarFiltros);
+      cargarContadoresTurnos(diasCalendario);
+    }
+  }, [cargarTurnos, fechaSeleccionada, mostrarFiltros, cargarContadoresTurnos, diasCalendario]);
   
   useEffect(() => {
     const cargarDatos = async () => {
@@ -200,6 +239,7 @@ export default function TurnosPage() {
         if (configData) {
           setDoctores(configData.doctores || []);
           setConsultorios(configData.consultorios || []);
+          setConfiguracion(configData);
           
           // Obtener los tipos de turno disponibles (unificados de todos los doctores)
           const tiposUnificados = [];
@@ -252,7 +292,8 @@ export default function TurnosPage() {
   const cambiarFecha = useCallback((fecha) => {
     setFechaSeleccionada(fecha);
     cargarTurnos(fecha, false);
-  }, [cargarTurnos]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   // Navegar a días anteriores/siguientes
   const navegarDias = useCallback((direccion) => {
@@ -318,42 +359,8 @@ export default function TurnosPage() {
     }, 300); // Esperar a que termine la animación
   }, [mostrarFiltros, cargarTurnos, fechaSeleccionada]);
  
-  // Cancelar turno
-  const cancelarTurno = useCallback(async (turnoId) => {
-    if (!confirm('¿Está seguro de cancelar este turno?')) return;
-    
-    try {
-      const response = await fetch(`/api/turnos/${turnoId}`, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al cancelar turno');
-      }
-      
-      // Actualizar lista de turnos
-      await cargarTurnos(fechaSeleccionada, mostrarFiltros);
-      // Actualizar contadores para reflejar la cancelación
-      cargarContadoresTurnos(diasCalendario);
-      toast.success('Turno cancelado correctamente');
-      
-    } catch (err) {
-      console.error('Error al cancelar turno:', err);
-      toast.error(`Error: ${err.message}`);
-    }
-  }, [cargarTurnos, fechaSeleccionada, mostrarFiltros, cargarContadoresTurnos, diasCalendario]);
-  
-  // Manejar actualizaciones de turnos desde la grilla
-  const handleTurnoActualizado = useCallback((tipo, datos) => {
-    if (tipo === 'delete' || tipo === 'update') {
-      // Recargar turnos y contadores
-      cargarTurnos(fechaSeleccionada, mostrarFiltros);
-      cargarContadoresTurnos(diasCalendario);
-    }
-  }, [cargarTurnos, fechaSeleccionada, mostrarFiltros, cargarContadoresTurnos, diasCalendario]);
 
-  // Manejadores de filtros optimizados
+ // Manejadores de filtros optimizados
   const handleFiltroDoctor = useCallback((value) => {
     setFiltroDoctor(value);
   }, []);
@@ -409,7 +416,7 @@ export default function TurnosPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row justify-between items-center md:items-start mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Gestión de Turnos</h1>
+        <h1 className="text-2xl font-bold ">Gestión de Turnos</h1>
         
         <div className="mt-4 md:mt-0 flex flex-wrap gap-2">
           <button 
@@ -422,7 +429,7 @@ export default function TurnosPage() {
           </button>
           <button
             onClick={handleModalTurnoDisponibilidad}
-            className="bg-orange-500 hover:bg-orange-600 text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2 "
+            className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2 "
           >
             <i className="fa-solid fa-clock"></i>
             <i className="fa-solid fa-plus"></i>
@@ -438,7 +445,7 @@ export default function TurnosPage() {
       )}
       
       {/* Filtros */}
-      <div className="bg-white shadow rounded-lg p-4 mb-6">
+      <div className="shadow rounded-lg p-4 mb-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Navegación por días - se oculta cuando se muestran filtros avanzados */}
           <div 
@@ -470,7 +477,7 @@ export default function TurnosPage() {
                       className={`flex-shrink-0 px-4 py-2 pb-0 border relative min-h-20 ${
                         dia.fecha.toDateString() === fechaSeleccionada.toDateString()
                           ? 'bg-slate-500 text-white border-slate-500 border-x-white'
-                          : 'bg-white text-gray-700 border-gray-700 hover:bg-gray-50'}
+                          : 'border-gray-700 hover:bg-gray-50'}
                         
                       `}
                     >
@@ -515,23 +522,23 @@ export default function TurnosPage() {
                 mostrarFiltros ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100'
             }`}>
               <div className="inline-flex items-center justify-center">
-                <div className="calendar-icon bg-white border border-red-500 rounded-lg shadow-sm overflow-hidden w-14 h-14 flex flex-col">
-                  <div className="bg-red-600 text-white text-xs font-bold text-center py-1">
+                <div className="calendar-icon border border-red-500 rounded-lg shadow-sm overflow-hidden w-14 h-14 flex flex-col">
+                  <div className="bg-red-600 text-xs font-bold text-center py-1">
                     {fechaSeleccionada.toLocaleDateString('es-AR', { month: 'short' }).toUpperCase()}
                   </div>
                   <div className="flex-grow flex items-center justify-center">
-                    <span className="text-gray-900 font-bold text-xl">
+                    <span className="font-bold text-xl">
                       {fechaSeleccionada.getDate()}
                     </span>
                   </div>
                 </div>
                 <div className="ml-2 flex flex-col items-start">
-                  <span className="text-lg font-bold text-gray-800">
+                  <span className="text-lg font-bold ">
                     {fechaSeleccionada.toLocaleDateString('es-AR', {
                       weekday: 'long',
                     })}
                   </span>
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm">
                     {fechaSeleccionada.toLocaleDateString('es-AR', {
                       month: 'long',
                       year: 'numeric'
@@ -544,7 +551,7 @@ export default function TurnosPage() {
           
           {/* Filtros simples siempre visibles (Doctor y Consultorio) */}
           <div className="col-span-3 md:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Doctor</label>
+            <label className="block text-sm font-medium mb-1">Doctor</label>
             <select
               value={filtroDoctor}
               onChange={(e) => handleFiltroDoctor(e.target.value)}
@@ -560,7 +567,7 @@ export default function TurnosPage() {
           </div>
 
           <div className="col-span-3 md:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Consultorio</label>
+            <label className="block text-sm font-medium mb-1">Consultorio</label>
             <select
               value={filtroConsultorio}
               onChange={(e) => handleFiltroConsultorio(e.target.value)}
@@ -581,7 +588,7 @@ export default function TurnosPage() {
                 cargarTurnos(fechaSeleccionada, mostrarFiltros);
                 cargarContadoresTurnos(diasCalendario);
               }}
-              className="ml-2 px-3 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 flex items-center gap-2"
+              className="ml-2 px-3 py-2 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary-dark)] flex items-center gap-2"
               title="Actualizar datos de turnos"
             >
               <i className="fas fa-sync-alt"></i>
@@ -612,7 +619,7 @@ export default function TurnosPage() {
           >
             {/* Selectors de fecha desde/hasta */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha Desde</label>
+              <label className="block text-sm font-medium mb-1">Fecha Desde</label>
               <input
                 type="date"
                 value={fechaDesde}
@@ -622,7 +629,7 @@ export default function TurnosPage() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha Hasta</label>
+              <label className="block text-sm font-medium mb-1">Fecha Hasta</label>
               <input
                 type="date"
                 value={fechaHasta}
@@ -632,7 +639,7 @@ export default function TurnosPage() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Turno</label>
+              <label className="block text-sm font-medium mb-1">Tipo de Turno</label>
               <select
                 value={filtroTipoTurno}
                 onChange={(e) => handleFiltroTipoTurno(e.target.value)}
@@ -648,7 +655,7 @@ export default function TurnosPage() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nombre o Apellido del Paciente</label>
+              <label className="block text-sm font-medium mb-1">Nombre o Apellido del Paciente</label>
               <input
                 type="text"
                 value={filtroPacienteNombre}
@@ -659,7 +666,7 @@ export default function TurnosPage() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">DNI del Paciente</label>
+              <label className="block text-sm font-medium mb-1">DNI del Paciente</label>
               <input
                 type="text"
                 value={filtroPacienteDni}
@@ -670,7 +677,7 @@ export default function TurnosPage() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Celular del Paciente</label>
+              <label className="block text-sm font-medium mb-1">Celular del Paciente</label>
               <input
                 type="text"
                 value={filtroPacienteCelular}
@@ -681,7 +688,7 @@ export default function TurnosPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Estado del Turno</label>
+              <label className="block text-sm font-medium mb-1">Estado del Turno</label>
               <select
                 value={filtroEstado}
                 onChange={(e) => handleFiltroEstado(e.target.value)}
@@ -697,7 +704,7 @@ export default function TurnosPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Cobertura Médica</label>
+              <label className="block text-sm font-medium mb-1">Cobertura Médica</label>
               <select
                 value={filtroCobertura}
                 onChange={(e) => handleFiltroCobertura(e.target.value)}
@@ -715,7 +722,7 @@ export default function TurnosPage() {
             <div className="col-span-3 flex justify-end space-x-2 mt-4">
               <button
                 onClick={limpiarFiltros}
-                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
+                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
               >
                 <i className="fa-solid fa-eraser"></i> Limpiar Filtros
               </button>
@@ -731,7 +738,7 @@ export default function TurnosPage() {
       </div>
            
       {/* Listado de turnos */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
+      <div className="shadow rounded-lg overflow-hidden">
         <GrillaTurnos
           turnos={turnos}
           loading={loading}
@@ -739,6 +746,15 @@ export default function TurnosPage() {
           onTurnoActualizado={handleTurnoActualizado}
         />
       </div>
+        <CalendarioTurnos 
+          fecha={fechaSeleccionada}
+          turnos={turnos}
+          loading={loading}
+          setLoading={setLoading}
+          configuracion={configuracion}
+          doctores={doctores}
+          consultorios={consultorios}
+        />
        {/* Modal para nuevo Turno */}
         <Modal
           isOpen={modalTurnoNuevo || modalTurnoDisponibilidad}

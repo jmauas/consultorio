@@ -23,3 +23,25 @@ export const isColorLight = (color) => {
   // Si la luminosidad es mayor que 0.5, el color es claro
   return luminance > 0.5;
 }
+
+export const agregarFeriados = (actual, agregar) => {
+  if (!actual) actual = [];
+  if (!agregar || agregar.lenght === 0) return actual;
+  agregar.forEach(f => {
+      if (f.indexOf('|') >= 0) {
+          let fecha1 = new Date(f.split('|')[0]);
+          let fecha2 = new Date(f.split('|')[1]);
+          fecha1.setHours(fecha1.getHours() + 3);
+          fecha2.setHours(fecha2.getHours() + 3);
+          while (fecha1 <= fecha2) {
+              actual.push(new Date(fecha1));
+              fecha1.setDate(fecha1.getDate() + 1);
+          }
+      } else {
+        let fecha1 = new Date(f);
+        fecha1.setHours(fecha1.getHours() + 3);
+        actual.push(fecha1);
+      }
+  });
+  return actual;
+}

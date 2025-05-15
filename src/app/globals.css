@@ -3,6 +3,27 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* --color-primary: #f97316; orange-500 */
+  --color-primary: #4823ad; /* orange-500 */
+  --color-primary-dark: #ea580c; /* orange-600 */
+  --color-secondary: #f3f4f6; /* gray-100 */
+  --card-bg: #d3e4ef; /* gris claro */
+  --card-border: #e5e7eb; /* gray-200 */
+  --button-hover: #f3f4f6; /* gray-100 */
+  --text-color: #000000;
+}
+
+.dark {
+  --background: #121212;
+  --foreground: #e0e0e0;
+  /* --color-primary: #fb923c; orange-400 - más brillante en modo oscuro */
+  --color-primary: #cb13a3; /* orange-400 - más brillante en modo oscuro */
+  --color-primary-dark: #f97316; /* orange-500 */
+  --color-secondary: #2d2d2d;
+  --card-bg: #33383a; /* gris oscuro */
+  --card-border: #333333;
+  --button-hover: #333333;
+  --text-color: #ffffff;
 }
 
 :root {
@@ -12,15 +33,28 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #ffffff;
-    --foreground: #171717;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Estilos específicos para el modo oscuro */
+.dark button, 
+.dark a {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Personalizaciones para notificaciones toast en modo oscuro */
+.dark .react-hot-toast {
+  --toast-background: #333333;
+  --toast-color: #ffffff;
+}
+
+/* Transiciones suaves para cambios de modo */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
 }

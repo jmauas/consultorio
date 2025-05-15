@@ -108,7 +108,7 @@ export default function CancelarTurnoPage({ }) {
           <div className="text-center">
             <Link 
               href="/"
-              className="px-4 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 inline-flex items-center"
+              className="px-4 py-2 bg-[var(--color-primary)] text-white font-medium rounded-lg hover:bg-[var(--color-primary-dark)] inline-flex items-center"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -160,7 +160,7 @@ export default function CancelarTurnoPage({ }) {
             
             <Link 
               href="/"
-              className="px-4 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 inline-flex items-center justify-center"
+              className="px-4 py-2 bg-[var(--color-primary)] text-white font-medium rounded-lg hover:bg-[var(--color-primary-dark)] inline-flex items-center justify-center"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -253,7 +253,7 @@ export default function CancelarTurnoPage({ }) {
         <div className="mt-6 text-center">
           <Link 
             href="/"
-            className="text-orange-500 hover:text-orange-700 font-medium inline-flex items-center"
+            className="text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] font-medium inline-flex items-center"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />

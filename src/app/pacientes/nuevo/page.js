@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { obtenerCoberturasDesdeDB } from '@/lib/utils/coberturasUtils';
 import Loader from '@/components/Loader';
+import { useTheme } from 'next-themes';
 
 export default function NuevoPacientePage() {
   const router = useRouter();
@@ -21,6 +22,8 @@ export default function NuevoPacientePage() {
     cobertura: '',
     observaciones: ''
   });
+
+  const { theme, setTheme } = useTheme();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -169,7 +172,7 @@ export default function NuevoPacientePage() {
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-3xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Nuevo Paciente</h1>
+          <h1 className="text-2xl font-bold">Nuevo Paciente</h1>
           <Link
             href="/pacientes"
             className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
@@ -205,7 +208,7 @@ export default function NuevoPacientePage() {
               </button>
             </div>
             
-            <div className="bg-white p-3 rounded-lg shadow-sm mb-4">
+            <div className="p-3 rounded-lg shadow-sm mb-4">
               <h3 className="font-bold mb-2 text-red-800">Datos del paciente existente:</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                 <div>
@@ -249,13 +252,13 @@ export default function NuevoPacientePage() {
           </div>
         )}
 
-        <div className="bg-white shadow rounded-lg overflow-hidden">
+        <div className="shadow rounded-lg overflow-hidden">
           <form onSubmit={handleSubmit}>
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Nombre */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium mb-1">
                     Nombre <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -271,7 +274,7 @@ export default function NuevoPacientePage() {
 
                 {/* Apellido */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium mb-1">
                     Apellido
                   </label>
                   <input
@@ -286,7 +289,7 @@ export default function NuevoPacientePage() {
 
                 {/* DNI */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium mb-1">
                     DNI <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -302,7 +305,7 @@ export default function NuevoPacientePage() {
 
                 {/* Celular */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium mb-1">
                     Celular <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -314,14 +317,14 @@ export default function NuevoPacientePage() {
                     placeholder="Número de celular sin 0 ni 15"
                     required
                   />
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs">
                     Formato: código de área + número, sin 0 ni 15. Ej: 1123456789
                   </p>
                 </div>
 
                 {/* Email */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium mb-1">
                     Email
                   </label>
                   <input
@@ -336,14 +339,14 @@ export default function NuevoPacientePage() {
 
                 {/* Cobertura Médica */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium mb-1">
                     Cobertura Médica
                   </label>
                   <select
                     name="coberturaMedicaId"
                     value={formData.coberturaMedicaId}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded px-3 py-2"
+                    className={`px-3 py-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='light' ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-200'}`}
                   >
                     <option value="">Seleccione una cobertura</option>
                     {coberturas.map((cobertura) => (
@@ -357,7 +360,7 @@ export default function NuevoPacientePage() {
 
               {/* Observaciones */}
               <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1">
                   Observaciones
                 </label>
                 <textarea
@@ -371,7 +374,7 @@ export default function NuevoPacientePage() {
               </div>
             </div>
 
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+            <div className="px-6 py-4 border-t border-gray-200 flex justify-end">
               <div className="flex space-x-2">
                 <Link
                   href="/pacientes"

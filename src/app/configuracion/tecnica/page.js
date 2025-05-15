@@ -85,7 +85,7 @@ export default function TecnicaPage() {
                 name="urlApp"
                 value={datos.urlApp}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
               />
             </div>
             <div>
@@ -97,7 +97,7 @@ export default function TecnicaPage() {
                 name="urlAppDev"
                 value={datos.urlAppDev}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
               />
             </div>
           </div>
@@ -107,7 +107,7 @@ export default function TecnicaPage() {
           <button
             type="submit"
             disabled={guardando}
-            className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors disabled:opacity-50"
+            className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 transition-colors disabled:opacity-50"
           >
             {guardando ? (
               <>
