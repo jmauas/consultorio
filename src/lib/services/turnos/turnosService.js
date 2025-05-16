@@ -1,5 +1,7 @@
 "use server";
 import { prisma } from '@/lib/prisma';
+import { obtenerConfig } from '@/lib/services/configService.js';
+import { agregarFeriados } from '@/lib/utils/variosUtils.js';
 
 export const getTurnoById = async (id) => {
     try {
@@ -18,6 +20,258 @@ export const getTurnoById = async (id) => {
         return null;
     }
 }
+
+export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, asa, ccr) => {
+  try {
+   // Obtener la configuración
+      const config = await obtenerConfig();
+      let limite = new Date(config.limite);
+      limite = limite.setDate(limite.getDate() + 1);
+      let feriados = agregarFeriados([], config.feriados);
+      // Obtengo los consultorios relacionados con el tipo de turno especificado
+      const consultorios = await prisma.consultorio.findMany({
+        where: {
+          tiposTurno: {
+            some: {
+              id: tipoDeTurno
+            }
+          }
+        },
+      });
+      
+      // Obtener todos los doctores o el doctor específico
+      let doctores = [];
+      if (doctor && doctor !== 'Indistinto') {
+        const dr = await prisma.doctor.findFirst({
+          where: { id: doctor },
+        });
+        if (dr) {
+          const consultoriosIds = consultorios.map(c => c.id);
+          const agenda = await prisma.agendaDoctor.findMany({
+            where: { 
+              doctorId: dr.id,
+              consultorioId: {
+                in: consultoriosIds
+              }
+            },
+            orderBy: { dia: 'asc' }
+          });
+          dr.agenda = agenda;
+          doctores.push(dr);
+        }
+      } else {
+        doctores = await prisma.doctor.findMany({
+          include: { 
+            AgendaDoctor: {
+              where: {
+                consultorioId: {
+                  in: consultorios.map(c => c.id)
+                }
+              }
+            }
+          }
+        });
+        
+        // Rename AgendaDoctor to agenda for consistency
+        doctores = doctores.map(doc => ({
+          ...doc,
+          agenda: doc.AgendaDoctor || [],
+          AgendaDoctor: undefined
+        }));
+      }
+  
+      if (doctores.length === 0) {
+        return { 
+          ok: false, 
+          message: 'No se encontraron doctores' 
+        }
+      }
+  
+      // Calcular fechas para buscar disponibilidad
+      const ahora = new Date();
+      const finPeriodo = new Date(config.limite);
+  
+      // Ajustar para penalidades
+      let fechaInicioBusqueda = new Date(ahora);
+      
+      // Si tiene penalidades, aplicar restricciones
+      if (asa && config.diasAsa > 0) {
+        fechaInicioBusqueda.setDate(fechaInicioBusqueda.getDate() + Number(config.diasAsa || 0));
+      } else if (ccr && config.diasCcr > 0) {
+        fechaInicioBusqueda.setDate(fechaInicioBusqueda.getDate() + Number(config.diasCcr || 0));
+      }
+  
+      // Obtener turnos existentes para el periodo
+      const turnos = await prisma.turno.findMany({
+        where: {
+          desde: { gte: fechaInicioBusqueda },
+          hasta: { lte: finPeriodo },
+          estado: { not: 'cancelado' }
+        }
+      });
+      const disp = [];
+      doctores.forEach(doctor => {
+        // Verificar si el doctor tiene agenda
+        if (!doctor.agenda || doctor.agenda.length === 0) {
+          console.log(`Doctor ${doctor.nombre} no tiene agenda definida.`);
+          return;
+        }
+        const agenda = doctor.agenda;
+        let hoy = new Date();
+        hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+        hoy.setDate(hoy.getDate() + 1);
+        //ANALIZO PENALIZACIÓN
+        if (asa && asa === 'si') {
+          hoy.setDate(hoy.getDate() + 30)
+        } else if (ccr && ccr === 'si') {
+          hoy.setDate(hoy.getDate() + 7)
+        }
+        hoy.setMinutes(hoy.getMinutes() - minutosTurno);
+        const atenEnFeriado = { ...agenda.find(d => d.dia === 9) };
+        try {
+          while (hoy <= limite) {
+            hoy.setMinutes(hoy.getMinutes() + minutosTurno);
+            let fecha = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+            const fechaFer = new Date(fecha);
+            fechaFer.setHours(fechaFer.getHours() - 3);
+            let dia = hoy.getUTCDay();
+            const aten = { ...agenda.find(d => d.dia === dia) };
+            const esFeriado = feriados.some(f =>
+              f.getDate() === fechaFer.getDate() &&
+              f.getMonth() === fechaFer.getMonth() &&
+              f.getFullYear() === fechaFer.getFullYear()
+            );
+            const diasNoAitende = agregarFeriados([], doctor.feriados);
+            const noAtiende = diasNoAitende.some(f =>
+              f.getDate() === fechaFer.getDate() &&
+              f.getMonth() === fechaFer.getMonth() &&
+              f.getFullYear() === fechaFer.getFullYear()
+            );
+            if (noAtiende) {
+              aten.atencion = false;
+            } else if (atenEnFeriado && esFeriado) {
+              aten.atencion = atenEnFeriado.atencion;
+              aten.desde = atenEnFeriado.desde;
+              aten.hasta = atenEnFeriado.hasta;
+              aten.corteDesde = atenEnFeriado.corteDesde;
+              aten.corteHasta = atenEnFeriado.corteHasta;
+            }
+            if (!aten.atencion) {
+              hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+              hoy.setDate(hoy.getDate() + 1);
+              hoy.setMinutes(hoy.getMinutes() - minutosTurno);
+              continue;
+            }
+            const hora = hoy.getHours();
+            const minutos = hoy.getMinutes();
+            const hrInicio = Number(aten.desde.split(':')[0]);
+            const minInicio = Number(aten.desde.split(':')[1]);
+            const hrFin = Number(aten.hasta.split(':')[0]);
+            const minFin = Number(aten.hasta.split(':')[1]);
+            const hrCorteDesde = Number(aten.corteDesde.split(':')[0]);
+            const hrCorteHasta = Number(aten.corteHasta.split(':')[0]);
+            const minCorteDesde = aten.corteDesde.split(':')[1] ? Number(aten.corteDesde.split(':')[1]): 0;
+            const minCorteHasta = aten.corteHasta.split(':')[1] ? Number(aten.corteHasta.split(':')[1]) : 0;
+  
+            //console.log(new Date().toLocaleString()+'  -  '+'diaSemana', dia, 'hoy', hoy, 'Fecha para feriado', fechaFer, 'fecha', fecha, 'hora', hora, 'minutos', minutos, 'hrInicio', hrInicio, 'minInicio', minInicio, 'hrFin', hrFin, 'minFin', minFin)
+            //console.log(new Date().toLocaleString()+'  -  '+'hora', hora, 'minutos', minutos, 'hrCorte', hrCorteDesde, minCorteDesde, 'hrCorteHasta', hrCorteHasta, minCorteHasta)
+            if (hora < hrInicio) {
+              hoy.setHours(hrInicio);
+              hoy.setMinutes(hoy.getMinutes() - minutosTurno);
+              continue;
+            }
+            if (hora === hrInicio && minutos < minInicio) {
+              hoy.setMinutes(minInicio);
+              hoy.setMinutes(hoy.getMinutes() - minutosTurno);
+              continue;
+            }
+            if (hora > hrFin) {
+              hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+              hoy.setDate(hoy.getDate() + 1);
+              hoy.setMinutes(hoy.getMinutes() - minutosTurno);
+              continue;
+            }
+            if (hora === hrFin && minutos >= minFin) {
+              hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+              hoy.setDate(hoy.getDate() + 1);
+              hoy.setMinutes(hoy.getMinutes() - minutosTurno);
+              continue;
+            }
+            if (hora > hrCorteDesde && hora < hrCorteHasta) {
+              hoy.setHours(hrCorteHasta);
+              hoy.setMinutes(minCorteHasta - minutosTurno);
+              continue;
+            }
+            if ((hora === hrCorteDesde && minutos > minCorteDesde) || (hora === hrCorteHasta && minutos < minCorteHasta)) {
+              hoy.setHours(hrCorteHasta);
+              //hoy.setMinutes(minCorteHasta - minutosTurno);
+              //continue;
+            }
+            const turno = turnos.filter(t => {
+              const inicioTurno = new Date(t.desde);
+              const finTurno = new Date(t.hasta);
+              const finHoy = new Date(hoy).setMinutes(hoy.getMinutes() + minutosTurno);
+              if ((inicioTurno < hoy && finTurno > hoy) || (inicioTurno >= hoy && inicioTurno < finHoy) || (finTurno > hoy && finTurno <= finHoy)) {
+                return true;
+              } else {
+                return false
+              }
+            });
+            if (turno && turno.length > 0) {
+              const fin = new Date(turno[turno.length - 1].hasta);
+              hoy = new Date(fin);
+              hoy.setMinutes(hoy.getMinutes() - minutosTurno);
+              continue;
+            }
+            //const fh = hoy.getFullYear() + '-' + (hoy.getMonth() + 1) + '-' + hoy.getDate() + ' ' + hoy.getHours() + ':' + hoy.getMinutes() + ':00';
+            fecha = hoy.getFullYear() + '-' + (hoy.getMonth() + 1) + '-' + hoy.getDate();
+            const hr = hoy.getHours();
+            const min = hoy.getMinutes();
+            dia = disp.find(turno => turno.fecha == fecha);
+            const consultorioId = aten.consultorioId;
+            const turnoAgregar = {
+              hora: hr,
+              min: min,
+              doctor: {
+                id: doctor.id,
+                nombre: doctor.nombre,
+                emoji: doctor.emoji
+              },
+              consultorioId,
+              tipoTurno: tipoDeTurno,
+              tipoDeTurnoId: tipoDeTurno, // Agregamos el campo tipoDeTurnoId con el mismo valor que tipoTurno
+              duracion: minutosTurno
+            }
+            if (!dia) {
+              disp.push({
+                fecha: fecha,
+                diaSemana: new Date(hoy).toLocaleDateString('es-ES', { weekday: 'long' }),
+                turnos: [turnoAgregar],
+              });
+            } else {
+              const index = disp.indexOf(dia);
+              dia.turnos.push(turnoAgregar);
+              disp[index] = dia;
+            }
+          }
+        } catch (error) {
+          console.log(new Date().toLocaleString()+'  -  '+'Error en disponibilidad', error);
+        }
+      });
+      return { 
+        ok: true, 
+        turnos: disp,
+        mensaje: 'Turnos disponibles obtenidos correctamente'
+      }
+    } catch (error) {
+      console.error('Error al obtener turnos disponibles:', error);
+      return { 
+        ok: false, 
+        message: 'Error al obtener los turnos disponibles', 
+        error: error.message
+      }
+    }
+  }
 
 export const analizarTurnosDisponibles = async (turnos) => {
     // Obtener la agenda del doctor para ese día
@@ -218,4 +472,257 @@ export const analizarTurnosDisponibles = async (turnos) => {
     };
     return turno;
   }
+
+
+  export const disponibilidadTurnosEnFecha = async (fechaDesde, fechaHasta, doctorId, consultorioId) => {
+    try {
+      // Obtener la configuración
+      const config = await obtenerConfig();
+      let feriados = agregarFeriados([], config.feriados);
+
+      // Asegurar que las fechas están en formato Date
+      const fechaDesdeObj = new Date(fechaDesde.getFullYear(), fechaDesde.getMonth(), fechaDesde.getDate(), fechaDesde.getHours(), fechaDesde.getMinutes());
+      const fechaHastaObj = new Date(fechaHasta.getFullYear(), fechaHasta.getMonth(), fechaHasta.getDate(), fechaHasta.getHours(), fechaHasta.getMinutes());  
+      // Asegurarse que solo estamos analizando un día (el de fechaDesde)
+      const fechaInicioDia = new Date(fechaDesdeObj.getFullYear(), fechaDesdeObj.getMonth(), fechaDesdeObj.getDate());
+      // fechaInicioDia.setHours(0, 0, 0, 0);
+      
+      const fechaFinDia = new Date(fechaInicioDia.getFullYear(), fechaInicioDia.getMonth(), fechaInicioDia.getDate());
+      fechaFinDia.setHours(23, 59, 59, 999);
+
+      // Obtener el doctor específico
+      const doctor = await prisma.doctor.findFirst({
+        where: { id: doctorId },
+      });
+
+      if (!doctor) {
+        return { 
+          ok: false, 
+          message: 'No se encontró el doctor especificado' 
+        };
+      }
+
+      // Obtener el consultorio específico
+      const consultorio = await prisma.consultorio.findFirst({
+        where: { id: consultorioId },
+      });
+
+      if (!consultorio) {
+        return { 
+          ok: false, 
+          message: 'No se encontró el consultorio especificado' 
+        };
+      }
+
+      // Buscar la agenda del doctor para ese consultorio
+      const agenda = await prisma.agendaDoctor.findMany({
+        where: { 
+          doctorId: doctor.id,
+          consultorioId: consultorio.id
+        },
+        orderBy: { dia: 'asc' }
+      });
+
+      if (!agenda || agenda.length === 0) {
+        return { 
+          ok: false, 
+          message: 'El doctor no tiene agenda definida para este consultorio' 
+        };
+      }
+
+      // Calculo duracion por diferencia de minutos de fechas desde y hasta
+      const minutosTurno = Math.abs((fechaHastaObj - fechaDesdeObj) / 60000);
+
+      // Obtener turnos existentes para el día
+      const turnos = await prisma.turno.findMany({
+        where: {
+          desde: { gte: fechaInicioDia },
+          hasta: { lte: fechaFinDia },
+          estado: { not: 'cancelado' },
+          doctorId: doctorId,
+          consultorioId: consultorioId
+        }
+      });
+
+      // Crear lista de disponibilidades
+      const disp = [];
+      
+      // Determinar el día de la semana (0 = domingo, 1 = lunes, etc.)
+      const dia = fechaInicioDia.getUTCDay();
+      
+      // Buscar la agenda para ese día de la semana
+      const aten = agenda.find(d => d.dia === dia);
+      const atenEnFeriado = agenda.find(d => d.dia === 9); // Día 9 parece ser el indicador para feriados
+      
+      // Si no hay atención para ese día, retornar vacío
+      if (!aten) {
+        return {
+          ok: true,
+          turnos: disp,
+          mensaje: 'No hay atención para el día seleccionado'
+        };
+      }
+
+      // Verificar si es feriado
+      const fechaFer = new Date(fechaInicioDia);
+      fechaFer.setHours(fechaFer.getHours() - 3);
+      
+      const esFeriado = feriados.some(f =>
+        f.getDate() === fechaFer.getDate() &&
+        f.getMonth() === fechaFer.getMonth() &&
+        f.getFullYear() === fechaFer.getFullYear()
+      );
+      
+      // Verificar días que no atiende el doctor
+      const diasNoAtiende = agregarFeriados([], doctor.feriados);
+      const noAtiende = diasNoAtiende.some(f =>
+        f.getDate() === fechaFer.getDate() &&
+        f.getMonth() === fechaFer.getMonth() &&
+        f.getFullYear() === fechaFer.getFullYear()
+      );
+      
+      // Ajustar la atención según si es feriado o día que no atiende
+      let atencion = { ...aten };
+      
+      if (noAtiende) {
+        atencion.atencion = false;
+      } else if (atenEnFeriado && esFeriado) {
+        atencion.atencion = atenEnFeriado.atencion;
+        atencion.desde = atenEnFeriado.desde;
+        atencion.hasta = atenEnFeriado.hasta;
+        atencion.corteDesde = atenEnFeriado.corteDesde;
+        atencion.corteHasta = atenEnFeriado.corteHasta;
+      }
+      
+      // Si no hay atención, retornar vacío
+      if (!atencion.atencion) {
+        return {
+          ok: true,
+          turnos: disp,
+          mensaje: 'No hay atención para el día seleccionado'
+        };
+      }
+
+      // Calcular los horarios de inicio y fin
+      const hrInicio = Number(atencion.desde.split(':')[0]);
+      const minInicio = Number(atencion.desde.split(':')[1]);
+      const hrFin = Number(atencion.hasta.split(':')[0]);
+      const minFin = Number(atencion.hasta.split(':')[1]);
+      const hrCorteDesde = atencion.corteDesde ? Number(atencion.corteDesde.split(':')[0]) : null;
+      const minCorteDesde = atencion.corteDesde ? Number(atencion.corteDesde.split(':')[1]) : 0;
+      const hrCorteHasta = atencion.corteHasta ? Number(atencion.corteHasta.split(':')[0]) : null;
+      const minCorteHasta = atencion.corteHasta ? Number(atencion.corteHasta.split(':')[1]) : 0;
+
+      // Iniciar desde la hora de inicio de atención o la fechaDesde, la que sea posterior
+      let hoy = new Date(fechaInicioDia);
+      hoy.setHours(hrInicio, minInicio, 0, 0);
+
+      // Limitar al fin del día o fechaHasta, lo que sea anterior
+      const limiteHora = new Date(fechaInicioDia);
+      limiteHora.setHours(hrFin, minFin, 0, 0);
+
+      // Restar la duración del turno para que el primer cálculo la agregue
+      hoy.setMinutes(hoy.getMinutes() - minutosTurno);
+      try {
+        // Iterar a través de los posibles horarios
+        while (hoy <= limiteHora) {
+          hoy.setMinutes(hoy.getMinutes() + minutosTurno);
+          
+          // Si ya pasamos el límite, salimos
+          if (hoy > limiteHora) break;
+          
+          const hora = hoy.getHours();
+          const minutos = hoy.getMinutes();
+
+          // Verificar si estamos en horario de corte
+          if (hrCorteDesde !== null && hrCorteHasta !== null) {
+            if (hora > hrCorteDesde && hora < hrCorteHasta) {
+              hoy.setHours(hrCorteHasta);
+              hoy.setMinutes(minCorteHasta);
+              continue;
+            }
+            
+            if ((hora === hrCorteDesde && minutos >= minCorteDesde) || 
+                (hora === hrCorteHasta && minutos < minCorteHasta)) {
+              hoy.setHours(hrCorteHasta);
+              hoy.setMinutes(minCorteHasta);
+              continue;
+            }
+          }
+
+          // Verificar superposición con turnos existentes
+          const turnoSuperpuesto = turnos.find(t => {
+            const inicioTurno = new Date(t.desde);
+            const finTurno = new Date(t.hasta);
+            const inicioNuevo = new Date(hoy);
+            const finNuevo = new Date(hoy);
+            finNuevo.setMinutes(finNuevo.getMinutes() + minutosTurno);
+            
+            // Verificar superposición
+            return (
+              (inicioTurno <= inicioNuevo && finTurno > inicioNuevo) || 
+              (inicioTurno >= inicioNuevo && inicioTurno < finNuevo)
+            );
+          });
+          
+          if (turnoSuperpuesto) {
+            // Saltar al final de este turno
+            const fin = new Date(turnoSuperpuesto.hasta);
+            hoy = new Date(fin);
+            continue;
+          }
+          
+          // Formato de fecha
+          const fecha = `${hoy.getFullYear()}-${(hoy.getMonth() + 1)}-${hoy.getDate()}`;
+          
+          // Buscar el día en la lista de disponibilidades o crear uno nuevo
+          let dia = disp.find(turno => turno.fecha === fecha);
+          
+          const turnoAgregar = {
+            hora: hora,
+            min: minutos,
+            doctor: {
+              id: doctor.id,
+              nombre: doctor.nombre,
+              emoji: doctor.emoji
+            },
+            consultorioId,
+            duracion: minutosTurno
+          };
+          
+          if (!dia) {
+            disp.push({
+              fecha: fecha,
+              diaSemana: new Date(hoy).toLocaleDateString('es-ES', { weekday: 'long' }),
+              turnos: [turnoAgregar],
+            });
+          } else {
+            const index = disp.indexOf(dia);
+            dia.turnos.push(turnoAgregar);
+            disp[index] = dia;
+          }
+        }
+        
+        return { 
+          ok: true, 
+          turnos: disp,
+          mensaje: 'Turnos disponibles obtenidos correctamente'
+        };
+      } catch (error) {
+        console.log('Error al calcular disponibilidad:', error);
+        return {
+          ok: false,
+          message: 'Error al calcular la disponibilidad',
+          error: error.message
+        };
+      }
+    } catch (error) {
+      console.error('Error al obtener turnos disponibles:', error);
+      return { 
+        ok: false, 
+        message: 'Error al obtener los turnos disponibles', 
+        error: error.message
+      };
+    }
+};
 

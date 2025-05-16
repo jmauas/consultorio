@@ -55,7 +55,6 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
     };
 
     const abrirModalNuevoTurnoDispo = (turno) => {
-        console.log(turno);
       setTurnoParaNuevoTurno(turno);
       setModalTurnoNuevo(true);
     }
@@ -165,6 +164,7 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
             });
 
             const nueva = procesarAgendaConsultorios(agendas, turnos)
+            console.log('nueva', nueva);
             setAgendaConsul(nueva);
             } catch (error) {
                 console.error('Error al obtener datos:', error);
@@ -188,7 +188,7 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                 </div>
             )}
             {consultorios && consultorios.length > 0 && agendaConsul && agendaConsul.length > 0 && (
-                <div className="m-5 p-4 flex flex-col items-start justify-center rounded-xl">
+                <div className="p-2 flex flex-col items-start justify-center rounded-xl">
                     <div className="flex items-center justify-between w-full">
                         <h1 className="m-5 font-bold text-3xl">Calendario de Turnos</h1>
                         <div className="inline-flex items-center justify-center">
@@ -220,7 +220,7 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                     <div 
                         className={`hidden md:grid items-center justify-start w-full bg-[var(--card-bg)] p-3 font-bold text-xl rounded-md sticky top-18 z-50`}
                         style={{ 
-                            gridTemplateColumns: `repeat(${(consultorios.length*4)+2}, minmax(0, 1fr))`
+                            gridTemplateColumns: `repeat(${(consultorios.length*4)+1}, minmax(0, 1fr))`
                         }}
                     >
                         <div
@@ -243,322 +243,484 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                     </div>
                     {/* Vista de escritorio - se oculta en pantallas pequeñas */}
                     <div className="hidden md:block w-full">
-                    {
-                        agendaConsul.map((hora, index) => (
-                            <React.Fragment key={`hora-fragment-${index}-${hora.hora}`}>
+                        {/* Pre-process the agenda to consolidate turnos from hidden slots */}
+                        {(() => {
+                            // Deep clone to avoid modifying the original data
+                            const processedAgenda = JSON.parse(JSON.stringify(agendaConsul));
+                            
+                            // For each consultorio column, check for spanning cells
+                            for (let consultorioIndex = 0; consultorioIndex < consultorios.length; consultorioIndex++) {
+                                for (let horaIndex = 0; horaIndex < processedAgenda.length; horaIndex++) {
+                                    const hora = processedAgenda[horaIndex];
+                                    const consultorio = hora.consultorios[consultorioIndex];
+                                    
+                                    if (consultorio && consultorio.slotsOcupados > 1) {
+                                        // This consultorio spans multiple slots
+                                        for (let spanIndex = 1; spanIndex < consultorio.slotsOcupados; spanIndex++) {
+                                            // Make sure we don't go out of bounds
+                                            if (horaIndex + spanIndex < processedAgenda.length) {
+                                                const spanHora = processedAgenda[horaIndex + spanIndex];
+                                                const spanConsultorio = spanHora.consultorios[consultorioIndex];
+                                                
+                                                // Check if the span slot has turnos to consolidate
+                                                if (spanConsultorio && spanConsultorio.turnos && spanConsultorio.turnos.length > 0) {
+                                                    // Initialize turnos array if needed
+                                                    if (!consultorio.turnos) consultorio.turnos = [];
+                                                    
+                                                    // Consolidate turnos from the span slot to the main slot
+                                                    consultorio.turnos = [
+                                                        ...consultorio.turnos,
+                                                        ...spanConsultorio.turnos
+                                                    ];
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            return (
                                 <div 
-                                    key={`${index}-encabezado-fila-${hora.hora}`}                           
-                                    className={`grid items-center justify-start w-full border border-slate-200 rounded-md`}
+                                    className="grid w-full border border-slate-200 rounded-md"
                                     style={{ 
-                                        gridTemplateColumns: `repeat(${(consultorios.length*4)+2}, minmax(0, 1fr))`
+                                        gridTemplateColumns: `repeat(${(consultorios.length*4)+1}, minmax(0, 1fr))`,
+                                        gridAutoRows: 'minmax(60px, auto)',
                                     }}
                                 >
-                                    <div 
-                                        key={`${index}-fila-${hora.hora}`}
-                                        className="m-1 font-bold text-xl col-span-1"    
-                                        >                           
-                                        <div className="px-2 py-2 border rounded-md text-center">
-                                            {hora.hora}
-                                        </div>
-                                    </div>                         
-                                    {hora.consultorios.map((consultorio) => {
-                                        return (
+                                    {processedAgenda.flatMap((hora, index) => {
+                                        // Calculate row start position 
+                                        const rowPosition = index + 1;                            
+                                        return [
+                                            // Hour cell for this row
                                             <div 
-                                                key={`${consultorio.consultorioId}-${hora.hora}`}
-                                                className="m-1 p-2 col-span-4 rounded-lg flex flex-row items-center justify-start gap-2"
-                                                style={{ 
-                                                    backgroundColor: consultorio.doctores.filter(d => d.atencion).length > 0 ? consultorio.color : 'oklch(86.9% 0.022 252.894)',
-                                                    color: consultorio.doctores.filter(d => d.atencion).length > 0 ? isColorLight(consultorio.color) ? '#000' : '#fff' : 'red',
+                                                key={`${index}-fila-${hora.hora}`}
+                                                className="m-1 font-bold text-xl col-span-1"
+                                                style={{
+                                                    gridRow: rowPosition, // Place in correct row
+                                                    gridColumn: 1 // First column
                                                 }}
-                                            >
-                                                {consultorio.doctores.filter(d => d.atencion).length > 0
-                                                ? consultorio.doctores.filter(d => d.atencion).map(doctor => (
-                                                    <React.Fragment key={`${doctor.id}-${hora.hora}-${consultorio.consultorioId}-fragment`}>
-                                                        <div
-                                                            key={`${doctor.id}-${hora.hora}-${consultorio.consultorioId}`}
-                                                            className="p-1 rounded-md"
-                                                            title={doctor.nombre}
-                                                            style={{
-                                                                backgroundColor: doctor.color,
-                                                                color: isColorLight(doctor.color) ? '#000' : '#fff',
-                                                            }}
-                                                            >
-                                                            {doctor.emoji}
-                                                        </div>
-                                                        {(!consultorio.turnos || consultorio.turnos.filter(t => t.estado !== 'cancelado').length === 0) && (
-                                                            <div 
-                                                                key={`${doctor.id}-${hora.hora}-${consultorio.consultorioId}-nuevo-turno`}
-                                                                className="text-lg flex items-center justify-center w-full"
-                                                            >
-                                                                <button 
-                                                                    onClick={() => abrirModalNuevoTurnoDispo({
-                                                                        desde: combinarFechaYHora(fecha, hora.hora),
-                                                                        duracion: 15,
-                                                                        doctor,
-                                                                        tipoDeTurnoId: '',
-                                                                        consultorioId: consultorio.consultorioId
-                                                                    })}
-                                                                    title="Nuevo turno"
-                                                                    className="text-[var(--color-primary)] hover:text-orange-900 dark:text-[var(--color-primary)] p-4 rounded-md bg-slate-200 flex items-center justify-center gap-2"
-                                                                >
-                                                                    <i className="fa fa-plus fa-lg"></i>
-                                                                    <i className="fa fa-calendar fa-lg"></i>
-                                                                </button>
-                                                            </div>
-                                                        )}
-                                                    </React.Fragment>
-                                                    ))
-                                                : <div
-                                                        key={`${hora.hora}-${consultorio.consultorioId}`}
-                                                        className="p-1 rounded-md bg-slate-200 text-red-500"
+                                            >                           
+                                                <div className="px-2 py-2 border rounded-md text-center">
+                                                    {hora.hora}
+                                                </div>
+                                            </div>,
+                                            // ...existing code for rendering consultorio cells but using processedAgenda...
+                                            ...hora.consultorios.map((consultorio, consultorioIndex) => {
+                                                // Skip rendering if a previous cell is already spanning this position
+                                                const hasAppointmentBlockingThisSlot = processedAgenda
+                                                    .slice(0, index) // Look at previous rows
+                                                    .some((prevHora, prevIndex) => {
+                                                        const prevConsultorio = prevHora.consultorios[consultorioIndex];
+                                                        return prevConsultorio?.slotsOcupados > (index - prevIndex);
+                                                    });
+                                                    
+                                                if (hasAppointmentBlockingThisSlot) {
+                                                    return null; // Don't render anything, a previous slot is spanning this area
+                                                }                                
+                                                return (
+                                                    <div 
+                                                        key={`${consultorio.consultorioId}-${hora.hora}`}
+                                                        className={`m-1 p-2 col-span-4 rounded-lg flex flex-row items-start justify-start gap-2`}
+                                                        style={{ 
+                                                            backgroundColor: consultorio.doctores.filter(d => d.atencion).length > 0 ? consultorio.color : 'oklch(86.9% 0.022 252.894)',
+                                                            color: consultorio.doctores.filter(d => d.atencion).length > 0 ? isColorLight(consultorio.color) ? '#000' : '#fff' : 'red',
+                                                            gridRow: `${rowPosition} / span ${consultorio.slotsOcupados || 1}`, // Place in correct row with span
+                                                            gridColumn: `${2 + consultorioIndex * 4} / span 4`, // Calculate column position
+                                                            zIndex: consultorio.slotsOcupados > 1 ? 10 : 'auto'
+                                                        }}
                                                     >
-                                                        ❌
-                                                    </div>}
-                                                {consultorio.turnos && consultorio.turnos.length > 0 && (                                                    
-                                                    consultorio.turnos.map(turno => (
-                                                        <div 
-                                                            key={turno.id} 
-                                                            className="text-xs p-1 rounded-md flex flex-col items-center justify-start gap-1"
-                                                            style={{
-                                                                backgroundColor: turno.doctor.color,
-                                                                color: isColorLight(turno.doctor.color) ? '#000' : '#fff',
-                                                            }}>
-                                                            <div className="flex items-center gap-2 font-bold">
-                                                                {formatoFecha(turno.desde, true, false, false, false, true, false)}
-                                                                {turno.estado !== 'cancelado' && (  
-                                                                    <div 
-                                                                        className="text-xs font-normal p-1 rounded-md"
+                                                        {consultorio.doctores.filter(d => d.atencion).length > 0
+                                                            ? consultorio.doctores.filter(d => d.atencion).map(doctor => (
+                                                                <React.Fragment key={`${doctor.id}-${hora.hora}-${consultorio.consultorioId}-fragment`}>
+                                                                    <div
+                                                                        key={`${doctor.id}-${hora.hora}-${consultorio.consultorioId}`}
+                                                                        className="p-1 rounded-md"
+                                                                        title={doctor.nombre}
                                                                         style={{
-                                                                            backgroundColor: turno.coberturaMedica.color,
-                                                                            color: isColorLight(turno.coberturaMedica.color) ? '#000' : '#fff',
+                                                                            backgroundColor: doctor.color,
+                                                                            color: isColorLight(doctor.color) ? '#000' : '#fff',
+                                                                        }}
+                                                                        >
+                                                                        {doctor.emoji}
+                                                                    </div>
+                                                                    {(!consultorio.turnos || consultorio.turnos.filter(t => t.estado !== 'cancelado').length === 0) && (
+                                                                        <div 
+                                                                            key={`${doctor.id}-${hora.hora}-${consultorio.consultorioId}-nuevo-turno`}
+                                                                            className="text-lg flex items-center justify-center w-full"
+                                                                        >
+                                                                            <button 
+                                                                                onClick={() => abrirModalNuevoTurnoDispo({
+                                                                                    desde: combinarFechaYHora(fecha, hora.hora),
+                                                                                    duracion: 15,
+                                                                                    doctor,
+                                                                                    tipoDeTurnoId: '',
+                                                                                    consultorioId: consultorio.consultorioId
+                                                                                })}
+                                                                                title="Nuevo turno"
+                                                                                className="text-[var(--color-primary)] hover:text-orange-900 dark:text-[var(--color-primary)] p-4 rounded-md bg-slate-200 flex items-center justify-center gap-2"
+                                                                            >
+                                                                                <i className="fa fa-plus fa-lg"></i>
+                                                                                <i className="fa fa-calendar fa-lg"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                    )}
+                                                                </React.Fragment>
+                                                            ))
+                                                            : <div key={`${hora.hora}-${consultorio.consultorioId}`} className="p-1 rounded-md bg-slate-200 text-red-500">
+                                                                ❌
+                                                            </div>
+                                                        }
+                                                        <div className="flex flex-wrap items-start justify-start gap-2 w-full">
+                                                            {consultorio.turnos && consultorio.turnos.length > 0 && (                                                    
+                                                                consultorio.turnos.map(turno => (
+                                                                <div 
+                                                                        key={turno.id} 
+                                                                        className="text-xs p-2 rounded-md flex flex-col items-center justify-start gap-1 flex-wrap"
+                                                                        style={{
+                                                                            backgroundColor: turno.doctor.color,
+                                                                            color: isColorLight(turno.doctor.color) ? '#000' : '#fff',
                                                                         }}
                                                                     >
-                                                                        {turno.coberturaMedica.codigo.toUpperCase()}
+                                                                        <div className="flex items-center gap-2 font-bold flex-wrap">
+                                                                            {formatoFecha(turno.desde, true, false, false, false, true, false)}
+                                                                            {turno.estado !== 'cancelado' && (  
+                                                                                <div 
+                                                                                    className="text-xs font-normal p-1 rounded-md"
+                                                                                    style={{
+                                                                                        backgroundColor: turno.coberturaMedica.color,
+                                                                                        color: isColorLight(turno.coberturaMedica.color) ? '#000' : '#fff',
+                                                                                    }}
+                                                                                >
+                                                                                    {turno.coberturaMedica.codigo.toUpperCase()}
+                                                                                </div>
+                                                                            )}
+                                                                            <div className="flex items-center gap-2 flex-wrap">
+                                                                                <button
+                                                                                    onClick={() => abrirDetalleTurno(turno)}
+                                                                                    className="rounded-md bg-blue-50 p-1 text-blue-600 hover:bg-blue-100 border border-blue-600"
+                                                                                    title="Ver detalles"
+                                                                                >
+                                                                                    <i className="fa fa-eye text-blue-600 "></i>
+                                                                                </button>
+                                                                                    {turno.estado !== 'cancelado' && (<>
+                                                                                    <Link 
+                                                                                        href={`https://wa.me/${turno.paciente.celular}`} 
+                                                                                        target="_blank"
+                                                                                        title="Escribir por Whatsapp"
+                                                                                        className="rounded-md bg-green-100 p-1 text-green-600 hover:bg-green-100 border border-green-600"
+                                                                                    >
+                                                                                        <i className="fab fa-whatsapp text-green-600 "></i>
+                                                                                    </Link>
+                                                                                    <button
+                                                                                        onClick={() => enviarRecordatorio(turno.id)}
+                                                                                        className="rounded-md bg-green-50 p-1 text-green-700 hover:bg-green-100 border border-green-700"
+                                                                                        title="Enviar Recordatorios"
+                                                                                        >
+                                                                                        <i className="fa fa-solid fa-bell text-green-600 "></i>
+                                                                                    </button>
+                                                                                    <button
+                                                                                        onClick={() => abrirModalNuevoTurno(turno.paciente)}
+                                                                                        className="rounded-md bg-orange-50 p-1 text-[var(--color-primary)] hover:bg-orange-100 border border-[var(--color-primary)]"
+                                                                                        title="Nuevo turno"
+                                                                                        >
+                                                                                        <i className="fa-solid fa-plus"></i>
+                                                                                    </button>
+                                                                                    </>)}                                                                            
+                                                                                <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${obtenerColorEstado(turno.estado || 'sin confirmar')}`}>
+                                                                                    {obtenerNombreEstado(turno.estado) || 'sin confirmar'}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                        {turno.estado !== 'cancelado' && (
+                                                                            <div 
+                                                                                key={`${turno.id}-paciente-${turno.paciente.id}`}
+                                                                                className="flex items-center justify-start gap-4 w-full flex-wrap"
+                                                                            >
+                                                                                <div className="font-bold">{turno.paciente.nombre} {turno.paciente.apellido}</div>
+                                                                                <i className="fa-solid fa-calendar-check fa-lg"></i>
+                                                                                <div className="font-bold p-1 rounded-full bg-[var(--color-primary)] text-white">
+                                                                                    {formatoDuracion(turno.duracion)}
+                                                                                </div>
+                                                                                {/* {turno.tipoDeTurno.nombre.substring(0, 14).toUpperCase()} */}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                ))                                                    
+                                                            )}  
+                                                        </div>                                             
+                                                    </div>
+                                                );                                
+                                            })
+                                        ];
+                                    })}
+                                </div>
+                            );
+                        })()}
+                    </div>                
+                    {/* Vista móvil - se oculta en pantallas grandes */}
+                    <div className="md:hidden w-full">
+                        {(() => {
+                            // Deep clone to avoid modifying the original data - same processing as desktop view
+                            const processedAgenda = JSON.parse(JSON.stringify(agendaConsul));
+                            
+                            // For each consultorio column, check for spanning cells - same logic as desktop
+                            for (let consultorioIndex = 0; consultorioIndex < consultorios.length; consultorioIndex++) {
+                                for (let horaIndex = 0; horaIndex < processedAgenda.length; horaIndex++) {
+                                    const hora = processedAgenda[horaIndex];
+                                    const consultorio = hora.consultorios[consultorioIndex];
+                                    
+                                    if (consultorio && consultorio.slotsOcupados > 1) {
+                                        // This consultorio spans multiple slots
+                                        for (let spanIndex = 1; spanIndex < consultorio.slotsOcupados; spanIndex++) {
+                                            // Make sure we don't go out of bounds
+                                            if (horaIndex + spanIndex < processedAgenda.length) {
+                                                const spanHora = processedAgenda[horaIndex + spanIndex];
+                                                const spanConsultorio = spanHora.consultorios[consultorioIndex];
+                                                
+                                                // Check if the span slot has turnos to consolidate
+                                                if (spanConsultorio && spanConsultorio.turnos && spanConsultorio.turnos.length > 0) {
+                                                    // Initialize turnos array if needed
+                                                    if (!consultorio.turnos) consultorio.turnos = [];
+                                                    
+                                                    // Consolidate turnos from the span slot to the main slot
+                                                    consultorio.turnos = [
+                                                        ...consultorio.turnos,
+                                                        ...spanConsultorio.turnos
+                                                    ];
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            return (
+                                <div className="flex flex-col space-y-6">
+                                    {processedAgenda.map((hora, index) => {
+                                        // Skip rendering empty slots (no consultorio has appointments)
+                                        const hasAppointments = hora.consultorios.some(c => 
+                                            c.turnos && c.turnos.length > 0 && 
+                                            c.doctores && c.doctores.filter(d => d.atencion).length > 0
+                                        );
+                                        
+                                        // Check if this slot is blocked by a previous spanning appointment
+                                        const blockingConsultorios = [];
+                                        for (let consultorioIndex = 0; consultorioIndex < hora.consultorios.length; consultorioIndex++) {
+                                            const isBlocked = processedAgenda
+                                                .slice(0, index)
+                                                .some((prevHora, prevIndex) => {
+                                                    const prevConsultorio = prevHora.consultorios[consultorioIndex];
+                                                    return prevConsultorio?.slotsOcupados > (index - prevIndex);
+                                                });
+                                            
+                                            if (isBlocked) blockingConsultorios.push(consultorioIndex);
+                                        }
+                                        
+                                        // If all consultorios are blocked and there are no appointments, skip
+                                        if (blockingConsultorios.length === hora.consultorios.length && !hasAppointments) {
+                                            return null;
+                                        }
+                                        
+                                        return (
+                                            <div key={`mobile-slot-${hora.hora}`} className="bg-blue-50 rounded-lg overflow-hidden">
+                                                {/* Time slot header */}
+                                                <div className="py-3 px-4 border-b border-blue-200">
+                                                    <div className="inline-flex items-center justify-between w-full">
+                                                        <div className="bg-[var(--color-primary)] text-3xl font-bold border p-2 rounded-md shadow-xl">
+                                                            {hora.hora} 
+                                                        </div>
+                                                        <div className="calendar-icon border border-red-500 rounded-lg shadow-sm overflow-hidden flex flex-col">
+                                                            <div className="bg-red-600 text-white text-xs font-bold text-center px-2 py-1 w-14">
+                                                                {fecha.toLocaleDateString('es-AR', { month: 'short' }).toUpperCase()}
+                                                            </div>
+                                                            <div className="flex-grow flex items-center justify-center px-2 py-1 bg-[var(--color-primary)]">
+                                                                <span className="font-bold text-xl">{fecha.getDate()}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                {/* Consultorios for this time slot */}
+                                                <div className="divide-y divide-gray-200 p-4 flex flex-col gap-4">
+                                                    {hora.consultorios.map((consultorio, consultorioIndex) => {
+                                                        // Skip rendering if this consultorio is blocked by a previous appointment
+                                                        if (blockingConsultorios.includes(consultorioIndex)) {
+                                                            return null;
+                                                        }
+                                                        
+                                                        // Skip if no doctor is attending or no appointments
+                                                        const doctoresAtendiendo = consultorio.doctores.filter(d => d.atencion);
+                                                        const hasTurnos = consultorio.turnos && consultorio.turnos.length > 0;
+                                                        
+                                                        if (doctoresAtendiendo.length === 0 && !hasTurnos) {
+                                                            return null;
+                                                        }
+                                                        
+                                                        return (
+                                                            <div 
+                                                                key={`mobile-${hora.hora}-${consultorio.consultorioId}`}
+                                                                className="p-3 flex flex-col gap-2 rounded-md"
+                                                                style={{ 
+                                                                    backgroundColor: consultorio.color,                                                   
+                                                                    color: isColorLight(consultorio.color) ? '#000' : '#fff'
+                                                                }}
+                                                            >
+                                                                <div className="font-bold text-lg mb-2 p-2 shadow-lg border-md">{`${consultorio.nombre}`}</div>
+                                                                
+                                                                <div className="flex flex-wrap gap-2 mb-2">
+                                                                    {doctoresAtendiendo.map(doctor => (
+                                                                        <div
+                                                                            key={`mobile-doctor-${doctor.id}-${hora.hora}`}
+                                                                            className="p-1 rounded-md"
+                                                                            title={doctor.nombre}
+                                                                            style={{
+                                                                                backgroundColor: doctor.color,
+                                                                                color: isColorLight(doctor.color) ? '#000' : '#fff',
+                                                                            }}
+                                                                        >
+                                                                            {doctor.emoji}
+                                                                        </div>
+                                                                    ))}
+                                                                    
+                                                                    {doctoresAtendiendo.length > 0 && !hasTurnos 
+                                                                    ? (
+                                                                        <div className="ml-auto flex items-center gap-2">
+                                                                            <button 
+                                                                                onClick={() => abrirModalNuevoTurnoDispo({
+                                                                                    desde: combinarFechaYHora(fecha, hora.hora),
+                                                                                    duracion: 15,
+                                                                                    doctor: doctoresAtendiendo[0],
+                                                                                    tipoDeTurnoId: '',
+                                                                                    consultorioId: consultorio.consultorioId
+                                                                                })}
+                                                                                title="Nuevo turno"
+                                                                                className="text-[var(--color-primary)] border border-[var(--color-primary)] hover:text-orange-900 bg-slate-200 p-2 text-xl rounded-md flex items-center gap-2"
+                                                                            >
+                                                                                <span className="text-xs font-bold">
+                                                                                    Turno Disponible
+                                                                                </span>
+                                                                                <i className="fa fa-plus"></i>
+                                                                                <i className="fa fa-calendar"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                    )
+                                                                    : (
+                                                                        <div className="ml-auto flex items-center">
+                                                                            {doctoresAtendiendo.map(doctor => (
+                                                                                <div
+                                                                                    key={`mobile-doctor-${doctor.id}-${hora.hora}-nombre`}
+                                                                                    className="p-1 rounded-md text-sm"
+                                                                                    style={{
+                                                                                        backgroundColor: doctor.color,
+                                                                                        color: isColorLight(doctor.color) ? '#000' : '#fff',
+                                                                                    }}
+                                                                                >
+                                                                                    {doctor.nombre}
+                                                                                </div>
+                                                                            ))}                      
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                                
+                                                                {/* Turnos */}
+                                                                {hasTurnos && (
+                                                                    <div className="space-y-3">
+                                                                        {consultorio.turnos.map(turno => (
+                                                                            <div 
+                                                                                key={`mobile-turno-${turno.id}`}
+                                                                                className="p-3 rounded-md"
+                                                                                style={{
+                                                                                    backgroundColor: turno.doctor.color,
+                                                                                    color: isColorLight(turno.doctor.color) ? '#000' : '#fff',
+                                                                                }}
+                                                                            >
+                                                                                <div className="flex items-center justify-between mb-2">
+                                                                                    <div className="font-bold text-base">
+                                                                                        {formatoFecha(turno.desde, true, false, false, false, true, false)}
+                                                                                    </div>
+                                                                                    
+                                                                                    {turno.estado !== 'cancelado' && (
+                                                                                        <div 
+                                                                                            className="text-xs font-normal p-1 rounded-md"
+                                                                                            style={{
+                                                                                                backgroundColor: turno.coberturaMedica.color,
+                                                                                                color: isColorLight(turno.coberturaMedica.color) ? '#000' : '#fff',
+                                                                                            }}
+                                                                                        >
+                                                                                            {turno.coberturaMedica.codigo.toUpperCase()}
+                                                                                        </div>
+                                                                                    )}
+                                                                                    
+                                                                                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${obtenerColorEstado(turno.estado || 'sin confirmar')}`}>
+                                                                                        {obtenerNombreEstado(turno.estado) || 'sin confirmar'}
+                                                                                    </span>
+                                                                                </div>
+                                                                                
+                                                                                {turno.estado !== 'cancelado' && (
+                                                                                    <>
+                                                                                        <div className="font-bold text-sm mb-2">
+                                                                                            {turno.paciente.nombre} {turno.paciente.apellido}
+                                                                                        </div>
+                                                                                        
+                                                                                        <div className="flex items-center justify-between">
+                                                                                            <div className="bg-[var(--color-primary)] text-white rounded-full px-2 py-1 text-xs font-bold">
+                                                                                                {formatoDuracion(turno.duracion)}
+                                                                                            </div>
+                                                                                            
+                                                                                            <div className="flex gap-2">
+                                                                                                <button
+                                                                                                    onClick={() => abrirDetalleTurno(turno)}
+                                                                                                    className="rounded-md bg-blue-50 p-1 text-blue-600 hover:bg-blue-100 border border-blue-600"
+                                                                                                    title="Ver detalles"
+                                                                                                >
+                                                                                                    <i className="fa fa-eye"></i>
+                                                                                                </button>
+                                                                                                
+                                                                                                <Link 
+                                                                                                    href={`https://wa.me/${turno.paciente.celular}`} 
+                                                                                                    target="_blank"
+                                                                                                    title="Escribir por Whatsapp"
+                                                                                                    className="rounded-md bg-green-100 p-1 text-green-600 hover:bg-green-100 border border-green-600"
+                                                                                                >
+                                                                                                    <i className="fab fa-whatsapp"></i>
+                                                                                                </Link>
+                                                                                                
+                                                                                                <button
+                                                                                                    onClick={() => enviarRecordatorio(turno.id)}
+                                                                                                    className="rounded-md bg-green-50 p-1 text-green-700 hover:bg-green-100 border border-green-700"
+                                                                                                    title="Enviar Recordatorios"
+                                                                                                >
+                                                                                                    <i className="fa fa-solid fa-bell"></i>
+                                                                                                </button>
+                                                                                                
+                                                                                                <button
+                                                                                                    onClick={() => abrirModalNuevoTurno(turno.paciente)}
+                                                                                                    className="rounded-md bg-orange-50 p-1 text-[var(--color-primary)] hover:bg-orange-100 border border-[var(--color-primary)]"
+                                                                                                    title="Nuevo turno"
+                                                                                                >
+                                                                                                    <i className="fa-solid fa-plus"></i>
+                                                                                                </button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </>
+                                                                                )}
+                                                                            </div>
+                                                                        ))}
                                                                     </div>
                                                                 )}
-                                                                <div className="flex items-center gap-2">
-                                                                    <button
-                                                                        onClick={() => abrirDetalleTurno(turno)}
-                                                                        className="rounded-md bg-blue-50 p-1 text-blue-600 hover:bg-blue-100 border border-blue-600"
-                                                                        title="Ver detalles"
-                                                                    >
-                                                                       <i className="fa fa-eye text-blue-600 "></i>
-                                                                    </button>
-                                                                     {turno.estado !== 'cancelado' && (<>
-                                                                        <Link 
-                                                                            href={`https://wa.me/${turno.paciente.celular}`} 
-                                                                            target="_blank"
-                                                                            title="Escribir por Whatsapp"
-                                                                            className="rounded-md bg-green-100 p-1 text-green-600 hover:bg-green-100 border border-green-600"
-                                                                        >
-                                                                            <i className="fab fa-whatsapp text-green-600 "></i>
-                                                                        </Link>
-                                                                        <button
-                                                                            onClick={() => enviarRecordatorio(turno.id)}
-                                                                            className="rounded-md bg-green-50 p-1 text-green-700 hover:bg-green-100 border border-green-700"
-                                                                            title="Enviar Recordatorios"
-                                                                            >
-                                                                            <i className="fa fa-solid fa-bell text-green-600 "></i>
-                                                                        </button>
-                                                                        <button
-                                                                            onClick={() => abrirModalNuevoTurno(turno.paciente)}
-                                                                            className="rounded-md bg-orange-50 p-1 text-[var(--color-primary)] hover:bg-orange-100 border border-[var(--color-primary)]"
-                                                                            title="Nuevo turno"
-                                                                            >
-                                                                            <i className="fa-solid fa-plus"></i>
-                                                                        </button>
-                                                                     </>)}                                                                            
-                                                                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${obtenerColorEstado(turno.estado || 'sin confirmar')}`}>
-                                                                      {obtenerNombreEstado(turno.estado) || 'sin confirmar'}
-                                                                    </span>
-                                                                </div>
                                                             </div>
-                                                            {turno.estado !== 'cancelado' && (
-                                                               <div 
-                                                                    key={`${turno.id}-paciente-${turno.paciente.id}`}
-                                                                    className="flex items-center justify-start gap-4 w-full"
-                                                                >
-                                                                    <div className="font-bold">{turno.paciente.nombre} {turno.paciente.apellido}</div>
-                                                                    <i className="fa-solid fa-calendar-check fa-lg"></i>
-                                                                    <div className="font-bold p-1 rounded-full bg-[var(--color-primary)] text-white">
-                                                                        {formatoDuracion(turno.duracion)}
-                                                                    </div>
-                                                                    {/* {turno.tipoDeTurno.nombre.substring(0, 14).toUpperCase()} */}
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    ))                                                    
-                                                )}                                               
+                                                        );
+                                                    })}
+                                                </div>
                                             </div>
                                         );
                                     })}
                                 </div>
-                            </React.Fragment>
-                        ))
-                    }
+                            );
+                        })()}
                     </div>
                 </div>
-                )}
-                    {/* Vista móvil - solo aparece en pantallas pequeñas */}
-                <div className="relative md:hidden w-full">
-                    {agendaConsul.map((hora, index) => (
-                        <div 
-                            key={`mobile-hora-${index}-${hora.hora}`} 
-                            className="my-4 pb-2 bg-[var(--card-bg)]"
-                        >
-                            <div className="sticky top-20 z-10 p-2 flex items-center justify-between">
-                                <div className="w-38 rounded-md border border-[var(--color-primary)] bg-[var(--card-bg)] font-bold text-2xl text-center">
-                                    {hora.hora}
-                                </div>
-                                <div className="calendar-icon border border-red-500 rounded-lg shadow-sm overflow-hidden w-14 h-14 flex flex-col">
-                                    <div className="bg-red-600 text-xs font-bold text-center py-1">
-                                        {fecha.toLocaleDateString('es-AR', { month: 'short' }).toUpperCase()}
-                                    </div>
-                                    <div className="flex-grow flex items-center justify-center">
-                                        <span className="font-bold text-xl">
-                                        {fecha.getDate()}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            {hora.consultorios.map((consultorio) => (
-                                <div 
-                                    key={`mobile-${consultorio.consultorioId}-${hora.hora}`}
-                                    className="m-2 p-2 rounded-lg border border-slate-200"
-                                    style={{ 
-                                        backgroundColor: consultorio.doctores.filter(d => d.atencion).length > 0 ? consultorio.color : 'oklch(86.9% 0.022 252.894)',
-                                        color: consultorio.doctores.filter(d => d.atencion).length > 0 ? isColorLight(consultorio.color) ? '#000' : '#fff' : 'black',
-                                    }}
-                                >
-                                    <div className="font-bold text-lg mb-2">
-                                        {consultorio.nombre}
-                                    </div>
-                                    
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        {consultorio.doctores.filter(d => d.atencion).length > 0
-                                            ? consultorio.doctores.filter(d => d.atencion).map(doctor => (
-                                                <React.Fragment key={`mobile-${doctor.id}-${hora.hora}-${consultorio.consultorioId}-fragment`}>
-                                                    <div
-                                                        key={`mobile-${doctor.id}-${hora.hora}-${consultorio.consultorioId}`}
-                                                        className="p-1 rounded-md"
-                                                        title={doctor.nombre}
-                                                        style={{
-                                                            backgroundColor: doctor.color,
-                                                            color: isColorLight(doctor.color) ? '#000' : '#fff',
-                                                        }}
-                                                    >
-                                                        {doctor.emoji}
-                                                    </div>
-                                                    {(!consultorio.turnos || consultorio.turnos.filter(t => t.estado !== 'cancelado').length === 0) && (
-                                                        <div className="text-lg flex items-center justify-center">
-                                                            <button 
-                                                                onClick={() => abrirModalNuevoTurnoDispo({
-                                                                    desde: combinarFechaYHora(fecha, hora.hora),
-                                                                    duracion: 15,
-                                                                    doctor,
-                                                                    tipoDeTurnoId: '',
-                                                                    consultorioId: consultorio.consultorioId
-                                                                })}
-                                                                title="Nuevo turno"
-                                                                className="text-[var(--color-primary)] hover:text-orange-900 dark:text-[var(--color-primary)] p-2 rounded-md bg-slate-200 flex items-center justify-center gap-2"
-                                                            >
-                                                                <i className="fa fa-plus"></i>
-                                                                <i className="fa fa-calendar"></i>
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </React.Fragment>
-                                            ))
-                                            : <div
-                                                className="p-1 rounded-md bg-slate-200 text-red-500"
-                                            >
-                                                ❌
-                                            </div>}
-                                    </div>
-                                    
-                                    {consultorio.turnos && consultorio.turnos.length > 0 && (
-                                        <div className="mt-2 space-y-2">
-                                            {consultorio.turnos.map(turno => (
-                                                <div 
-                                                    key={`mobile-turno-${turno.id}`} 
-                                                    className="p-2 rounded-md"
-                                                    style={{
-                                                        backgroundColor: turno.doctor.color,
-                                                        color: isColorLight(turno.doctor.color) ? '#000' : '#fff',
-                                                    }}>
-                                                    <div className="flex flex-wrap items-center gap-2 font-bold mb-1">
-                                                        {formatoFecha(turno.desde, true, false, false, false, true, false)}
-                                                        {turno.estado !== 'cancelado' && (  
-                                                            <div 
-                                                                className="text-xs font-normal p-1 rounded-md"
-                                                                style={{
-                                                                    backgroundColor: turno.coberturaMedica.color,
-                                                                    color: isColorLight(turno.coberturaMedica.color) ? '#000' : '#fff',
-                                                                }}
-                                                            >
-                                                                {turno.coberturaMedica.codigo.toUpperCase()}
-                                                            </div>
-                                                        )}
-                                                    </div>
-
-                                                    <div className="flex flex-wrap items-center gap-2 mb-1">
-                                                        <button
-                                                            onClick={() => abrirDetalleTurno(turno)}
-                                                            className="rounded-md bg-blue-50 p-1 text-blue-600 hover:bg-blue-100 border border-blue-600"
-                                                            title="Ver detalles"
-                                                        >
-                                                            <i className="fa fa-eye text-blue-600 "></i>
-                                                        </button>
-                                                        
-                                                        {turno.estado !== 'cancelado' && (<>
-                                                            <Link 
-                                                                href={`https://wa.me/${turno.paciente.celular}`} 
-                                                                target="_blank"
-                                                                title="Escribir por Whatsapp"
-                                                                className="rounded-md bg-green-100 p-1 text-green-600 hover:bg-green-100 border border-green-600"
-                                                            >
-                                                                <i className="fab fa-whatsapp text-green-600 "></i>
-                                                            </Link>
-                                                            <button
-                                                                onClick={() => enviarRecordatorio(turno.id)}
-                                                                className="rounded-md bg-green-50 p-1 text-green-700 hover:bg-green-100 border border-green-700"
-                                                                title="Enviar Recordatorios"
-                                                            >
-                                                                <i className="fa fa-solid fa-bell text-green-600 "></i>
-                                                            </button>
-                                                            <button
-                                                                onClick={() => abrirModalNuevoTurno(turno.paciente)}
-                                                                className="rounded-md bg-orange-50 p-1 text-[var(--color-primary)] hover:bg-orange-100 border border-[var(--color-primary)]"
-                                                                title="Nuevo turno"
-                                                            >
-                                                                <i className="fa-solid fa-plus"></i>
-                                                            </button>
-                                                        </>)}                                                                            
-                                                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${obtenerColorEstado(turno.estado || 'sin confirmar')}`}>
-                                                            {obtenerNombreEstado(turno.estado) || 'sin confirmar'}
-                                                        </span>
-                                                    </div>
-                                                    
-                                                    {turno.estado !== 'cancelado' && (
-                                                        <div className="flex flex-wrap items-center gap-2 w-full">
-                                                            <div className="font-bold">
-                                                                {turno.paciente.nombre} {turno.paciente.apellido}
-                                                            </div>
-                                                            <div className="font-bold p-1 rounded-full bg-[var(--color-primary)] text-white">
-                                                                {formatoDuracion(turno.duracion)}
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ))}                                                    
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    ))}
-                </div>
+            )}
             
             {/* Modal para detalle de turno */}
             <Modal

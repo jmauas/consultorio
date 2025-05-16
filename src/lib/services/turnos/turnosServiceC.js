@@ -9,6 +9,7 @@ export const procesarAgendaConsultorios = (consultorios, turnos = []) => {
   // Find earliest start time and latest end time across all doctors
   let horaInicio = "23:59";
   let horaFin = "00:00";
+  const slotDuration = 15; // minutes
   
   consultorios.forEach(consultorio => {
     consultorio.doctores.forEach(doctor => {
@@ -35,7 +36,7 @@ export const procesarAgendaConsultorios = (consultorios, turnos = []) => {
   
   // Generate time slots
   let currentHour = inicioHora;
-  let currentMinute = inicioMinuto - (inicioMinuto % 15); // Round down to nearest 15 mins
+  let currentMinute = inicioMinuto - (inicioMinuto % slotDuration); // Round down to nearest slot duration
   
   while (currentHour < finHora || (currentHour === finHora && currentMinute <= finMinuto)) {
     // Format current time
@@ -45,7 +46,7 @@ export const procesarAgendaConsultorios = (consultorios, turnos = []) => {
     const slotStartHour = currentHour;
     const slotStartMinute = currentMinute;
     let slotEndHour = currentHour;
-    let slotEndMinute = currentMinute + 15;
+    let slotEndMinute = currentMinute + slotDuration;
     
     if (slotEndMinute >= 60) {
       slotEndHour++;
@@ -102,6 +103,10 @@ export const procesarAgendaConsultorios = (consultorios, turnos = []) => {
           if (turno.consultorioId !== consultorio.consultorioId) {
             return false;
           }
+
+          if (turno.yaAgregado) {
+            return false; // Skip already added turnos
+          }
           
           // Parse turno times
           const desdeDate = new Date(turno.desde);
@@ -115,8 +120,33 @@ export const procesarAgendaConsultorios = (consultorios, turnos = []) => {
           return desdeDate < slotEndDate && hastaDate > slotStartDate;
         });
         
+        // marco los turnos encontrados como ya agregados a la agenda
+        turnos = turnos.map(turno => {
+          const turnoEncontrado = turnosEnEstaFranja.find(t => t.id === turno.id);
+          if (turnoEncontrado) {
+            return { ...turno, yaAgregado: true };
+          }
+          return turno;
+        });
         // Add matching turnos to the consultorio
         consultorioInfo.turnos = turnosEnEstaFranja;
+        // calculo cuantos slots van a ocupar estos turnos
+        const slotsOcupados = turnosEnEstaFranja.reduce((total, turno) => {
+          const desdeDate = new Date(turno.desde);
+          const hastaDate = new Date(turno.hasta);
+          
+          // Determinar en qué slot inicia (redondeando hacia abajo)
+          const desdeMinutos = desdeDate.getHours() * 60 + desdeDate.getMinutes();
+          const slotInicio = Math.floor(desdeMinutos / slotDuration);
+          
+          // Determinar en qué slot termina (redondeando hacia arriba si no cae exacto en un límite)
+          const hastaMinutos = hastaDate.getHours() * 60 + hastaDate.getMinutes();
+          const slotFin = Math.ceil(hastaMinutos / slotDuration);
+          
+          // La cantidad de slots es la diferencia entre el slot final y el inicial
+          return total + (slotFin - slotInicio);
+        }, 0);        
+        consultorioInfo.slotsOcupados = slotsOcupados;
         if (turnosEnEstaFranja.length > 0) {
           hayTurnosEnEstaFranja = true;
         }
@@ -125,13 +155,13 @@ export const procesarAgendaConsultorios = (consultorios, turnos = []) => {
       timeSlot.consultorios.push(consultorioInfo);
     });
     
-    // Only add time slot if at least one doctor is available
-    if (hayAtencionEnAlgunConsultorio || hayTurnosEnEstaFranja) {
+    // Only add time slot if at least one doctor is available or if there are turnos
+    //if (hayAtencionEnAlgunConsultorio || hayTurnosEnEstaFranja) {
       agenda.push(timeSlot);
-    }
+    //}
     
-    // Advance to next 15-minute slot
-    currentMinute += 15;
+    // Advance to next slot
+    currentMinute += slotDuration;
     if (currentMinute >= 60) {
       currentHour++;
       currentMinute = 0;

@@ -510,14 +510,26 @@ export default function TurnosPage() {
           </div>
           
           {/* Botón para mostrar/ocultar filtros avanzados */}
-          <div className="col-span-3 flex justify-between items-center gap-4 border-b pb-2 mb-3">
+          <div className="col-span-3 flex justify-between items-center gap-4 border-b pb-2 ">
             <button
               onClick={toggleFiltrosAvanzados}
               className="text-blue-600 hover:text-blue-800 flex items-center focus:outline-none transition-colors border border-blue-500 rounded-md px-4 py-2"
             >
               <i className={`fas fa-${mostrarFiltros ? 'minus' : 'plus'} mr-2`}></i>
               {mostrarFiltros ? 'Ocultar filtros' : 'Mostrar Filtros Avanzados'}
-            </button>            
+            </button>
+            <button
+                onClick={() => {
+                  cargarTurnos(fechaSeleccionada, mostrarFiltros);
+                  cargarContadoresTurnos(diasCalendario);
+                }}
+                className="ml-2 px-3 py-2 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary-dark)] flex items-center gap-2"
+                title="Actualizar datos de turnos"
+              >
+                <i className="fas fa-sync-alt"></i>
+                <span className="hidden sm:inline">Actualizar</span>
+            </button>
+
             <div className={`lg:col-span-2 lg:text-right transition-all duration-300 ${
                 mostrarFiltros ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100'
             }`}>
@@ -549,62 +561,70 @@ export default function TurnosPage() {
             </div>
           </div>
           
-          {/* Filtros simples siempre visibles (Doctor y Consultorio) */}
-          <div className="col-span-3 md:col-span-1">
-            <label className="block text-sm font-medium mb-1">Doctor</label>
-            <select
-              value={filtroDoctor}
-              onChange={(e) => handleFiltroDoctor(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="todos">Todos los Doctores</option>
-              {doctores.map((doctor) => (
-                <option key={doctor.id} value={doctor.id}>
-                  {doctor.emoji} {doctor.nombre}
-                </option>
-              ))}
-            </select>
-          </div>
+          <div
+            className={`${
+              mostrarFiltros 
+                ? 'max-h-[1000px] opacity-100 ' 
+                : 'hidden'
+            }`}
+          >
+            {/* Filtros simples  (Doctor y Consultorio) */}
+            <div className="col-span-3 md:col-span-1">
+              <label className="block text-sm font-medium mb-1">Doctor</label>
+              <select
+                value={filtroDoctor}
+                onChange={(e) => handleFiltroDoctor(e.target.value)}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="todos">Todos los Doctores</option>
+                {doctores.map((doctor) => (
+                  <option key={doctor.id} value={doctor.id}>
+                    {doctor.emoji} {doctor.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div className="col-span-3 md:col-span-1">
-            <label className="block text-sm font-medium mb-1">Consultorio</label>
-            <select
-              value={filtroConsultorio}
-              onChange={(e) => handleFiltroConsultorio(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="todos">Todos los consultorios</option>
-              {consultorios.map((consultorio) => (
-                <option key={consultorio.id} value={consultorio.id}>
-                  {consultorio.nombre}
-                </option>
-              ))}
-            </select>
-          </div>
-          
-          <div className="col-span-3 md:col-span-1 flex items-end">
-            <button
-              onClick={() => {
-                cargarTurnos(fechaSeleccionada, mostrarFiltros);
-                cargarContadoresTurnos(diasCalendario);
-              }}
-              className="ml-2 px-3 py-2 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary-dark)] flex items-center gap-2"
-              title="Actualizar datos de turnos"
-            >
-              <i className="fas fa-sync-alt"></i>
-              <span className="hidden sm:inline">Actualizar</span>
-            </button>
-            <button
-              onClick={() => {
-                handleExcelTurnos(turnos);
-                toast.success('Exportando a Excel...');
-              }}
-              className="ml-2 px-3 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 flex items-center gap-2"
-              title="Exportar A Excel"
-            >
-              <i className="fa-solid fa-file-excel"></i>
-              <span className="hidden sm:inline">Excel</span>
-            </button>
+            <div className="col-span-3 md:col-span-1">
+              <label className="block text-sm font-medium mb-1">Consultorio</label>
+              <select
+                value={filtroConsultorio}
+                onChange={(e) => handleFiltroConsultorio(e.target.value)}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="todos">Todos los consultorios</option>
+                {consultorios.map((consultorio) => (
+                  <option key={consultorio.id} value={consultorio.id}>
+                    {consultorio.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="col-span-3 md:col-span-1 flex items-end">
+              <button
+                onClick={() => {
+                  cargarTurnos(fechaSeleccionada, mostrarFiltros);
+                  cargarContadoresTurnos(diasCalendario);
+                }}
+                className="ml-2 px-3 py-2 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary-dark)] flex items-center gap-2"
+                title="Actualizar datos de turnos"
+              >
+                <i className="fas fa-sync-alt"></i>
+                <span className="hidden sm:inline">Actualizar</span>
+              </button>
+              <button
+                onClick={() => {
+                  handleExcelTurnos(turnos);
+                  toast.success('Exportando a Excel...');
+                }}
+                className="ml-2 px-3 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 flex items-center gap-2"
+                title="Exportar A Excel"
+              >
+                <i className="fa-solid fa-file-excel"></i>
+                <span className="hidden sm:inline">Excel</span>
+              </button>
+            </div>
           </div>
           
           
@@ -748,7 +768,7 @@ export default function TurnosPage() {
         />
       </div>
       }
-      {!mostrarFiltros &&
+      {!mostrarFiltros && configuracion && doctores && consultorios &&
         <CalendarioTurnos 
           fecha={fechaSeleccionada}
           turnos={turnos}

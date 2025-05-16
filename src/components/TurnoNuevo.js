@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { obtenerCoberturasDesdeDB } from '@/lib/utils/coberturasUtils';
 import Loader from '@/components/Loader';
 import { useTheme } from 'next-themes';
+import { zfill } from '@/lib/utils/dateUtils';
 
 const TurnoNuevo = ({
     desdeParam,
@@ -27,6 +28,7 @@ const TurnoNuevo = ({
    const [buscandoPaciente, setBuscandoPaciente] = useState(false);
    const [coberturas, setCoberturas] = useState([]);
    const [conflictoHorario, setConflictoHorario] = useState(null);
+   const [turnosDisponibles, setTurnosDisponibles] = useState([]);
    const [turno, setTurno] = useState({
      nombre: '',
      apellido: '',
@@ -117,27 +119,33 @@ const TurnoNuevo = ({
    };
  
    // Verificar conflictos de horario
-   const verificarConflictoHorario = async (fechaInicio, fechaFin) => {
+   const verificarConflictoHorario = async (fechaInicio, fechaFin, consultorioId, doctorId) => {
      try {
        const fechaInicioISO = new Date(fechaInicio).toISOString();
        const fechaFinISO = new Date(fechaFin).toISOString();
        
-       const response = await fetch(`/api/turnos/verificar-disponibilidad?desde=${fechaInicioISO}&hasta=${fechaFinISO}`);
+       const response = await fetch(`/api/turnos/verificar-disponibilidad?desde=${fechaInicioISO}&hasta=${fechaFinISO}&consultorioId=${consultorioId}&doctorId=${doctorId}`);
        
        if (!response.ok) {
          throw new Error('Error al verificar disponibilidad');
        }
        
-       const data = await response.json();
-       
-       if (!data.disponible) {
+        const data = await response.json();
+        let disp = []
+        if (!data.disponible && data.disponibles && data.disponibles.length > 0) {
+          disp = data.disponibles[0].turnos
+        }
+
+        if (!data.disponible) {
          setConflictoHorario({
            mensaje: 'El horario seleccionado entra en conflicto con otro turno existente',
            detalle: data.turno ? `Turno de ${data.turno.paciente.nombre} ${data.turno.paciente.apellido} (${new Date(data.turno.desde).toLocaleTimeString()} - ${new Date(data.turno.hasta).toLocaleTimeString()})` : 'Hay un turno programado en ese horario'
          });
+         setTurnosDisponibles(disp || []);
          return false;
        } else {
          setConflictoHorario(null);
+         setTurnosDisponibles([]);
          return true;
        }
      } catch (error) {
@@ -229,7 +237,7 @@ const TurnoNuevo = ({
          fechaFin.setMinutes(fechaFin.getMinutes() + parseInt(updatedTurno.duracion));
          
          // Verificar conflicto de horario
-         await verificarConflictoHorario(fechaInicio, fechaFin);
+         await verificarConflictoHorario(fechaInicio, fechaFin, turno.consultorioId, turno.doctor);
        }
      } else {
        setTurno(prev => ({
@@ -259,7 +267,7 @@ const TurnoNuevo = ({
        fechaFin.setMinutes(fechaFin.getMinutes() + parseInt(turno.duracion));
        
        // Verificar conflicto de horario
-       const disponible = await verificarConflictoHorario(fechaInicio, fechaFin);
+       const disponible = await verificarConflictoHorario(fechaInicio, fechaFin, turno.consultorioId, turno.doctor);
        if (!disponible) {
          setLoading(false);
          return;
@@ -465,7 +473,7 @@ const TurnoNuevo = ({
             {conflictoHorario.detalle && <p className="text-sm mt-1">{conflictoHorario.detalle}</p>}
           </div>
         )}
-
+       
         <form onSubmit={handleSubmit} className="shadow-md rounded-lg p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <h2 className="text-lg font-medium md:col-span-2">Datos del Paciente</h2>
@@ -597,48 +605,6 @@ const TurnoNuevo = ({
                 ))}
               </select>
             </div>
-              {/* Tipo de turno - Segundo */}
-            <div>
-              <label className="block text-sm font-medium  dark:text-gray-300 mb-1">Tipo de turno *</label>
-              <select
-                name="servicio"
-                value={turno.tipoDeTurnoId}
-                onChange={handleChange}
-                className={`px-3 py-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='light' ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-200'}`}
-                disabled={!turno.doctor}
-              >
-                <option value="">Seleccione tipo de turno</option>
-                {tiposTurnosDisponibles.map((tipo) => (
-                  <option key={tipo.nombre} value={tipo.id}>
-                    {tipo.nombre} ({tipo.duracion} min)
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            {/* Fecha y hora */}
-            <div>
-              <label className="block text-sm font-medium  mb-1">Fecha y hora *</label>
-              <input
-                type="datetime-local"
-                name="desde"
-                value={turno.desde}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-lg font-bold"
-              />
-            </div>
-            
-            {/* Duración */}
-            <div>
-              <label className="block text-sm font-medium  mb-1">Duración (minutos)</label>
-              <input
-                type="number"
-                name="duracion"
-                value={turno.duracion}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-lg"
-              />
-            </div>
 
             {/* Consultorios */}
             <div>
@@ -658,7 +624,51 @@ const TurnoNuevo = ({
                 ))}
               </select>
             </div>
+
+            {/* Tipo de turno - Segundo */}
+            <div>
+              <label className="block text-sm font-medium  dark:text-gray-300 mb-1">Tipo de turno *</label>
+              <select
+                name="servicio"
+                value={turno.tipoDeTurnoId}
+                onChange={handleChange}
+                className={`px-3 py-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='light' ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-200'}`}
+                disabled={!turno.doctor}
+              >
+                <option value="">Seleccione tipo de turno</option>
+                {tiposTurnosDisponibles.map((tipo) => (
+                  <option key={tipo.nombre} value={tipo.id}>
+                    {tipo.nombre} ({tipo.duracion} min)
+                  </option>
+                ))}
+              </select>
+            </div>
             
+            
+            {/* Duración */}
+            <div>
+              <label className="block text-sm font-medium  mb-1">Duración (minutos)</label>
+              <input
+                type="number"
+                name="duracion"
+                value={turno.duracion}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded px-3 py-2 text-lg"
+              />
+            </div>
+            
+            {/* Fecha y hora */}
+            <div>
+              <label className="block text-sm font-medium  mb-1">Fecha y hora *</label>
+              <input
+                type="datetime-local"
+                name="desde"
+                value={turno.desde}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded px-3 py-2 text-lg font-bold"
+              />
+            </div>
+
             {/* Observaciones */}
             <div>
               <label className="block text-sm font-medium  mb-1">Observaciones</label>
@@ -679,6 +689,43 @@ const TurnoNuevo = ({
               <p className="font-medium">{conflictoHorario.mensaje}</p>
               {conflictoHorario.detalle && <p className="text-sm mt-1">{conflictoHorario.detalle}</p>}
             </div>
+          )}
+
+           {/* Detalle de Turnos Alternativos Disponibles */}
+          {turnosDisponibles && turnosDisponibles.length > 0 && (
+          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6">
+              <p className="font-medium"><i className="fas fa-calendar-check mr-2"></i> Turnos Alternativos del Día Disponibles:</p>
+              <div className="p-2 m-4 flex flex-wrap gap-3">
+                {turnosDisponibles.map((t, i) => (
+                  <div
+                    key={`${t.consultorioId}-${i}`} 
+                    className="text-lg font-bold p-2 border rounded-md w-26 text-center cursor-pointer hover:bg-yellow-200"
+                    onClick={() => {
+                      const slotDateTime = new Date(turno.desde);
+                      // Extract hour and minute from the clicked slot
+                      const slotHour = parseInt(t.hora);
+                      const slotMinute = parseInt(t.min);
+                      
+                      // Set the current date but with the new hour and minute
+                      slotDateTime.setHours(slotHour, slotMinute, 0, 0);
+                      slotDateTime.setHours(slotDateTime.getHours() - 3);
+                      
+                      setTurno(prev => ({
+                        ...prev,
+                        desde: slotDateTime.toISOString().slice(0, 16),
+                      }));
+
+                      const fechaInicio = new Date(slotDateTime);
+                      const fechaFin = new Date(fechaInicio);
+                      fechaFin.setMinutes(fechaFin.getMinutes() + parseInt(turno.duracion));                      
+                      verificarConflictoHorario(fechaInicio, fechaFin, turno.consultorioId, turno.doctor);                      
+                    }}
+                  >
+                    {zfill(t.hora, 2)}:{zfill(t.min, 2)} <i className="fas fa-clock ml-2"></i>
+                  </div>
+                ))}
+              </div>
+            </div>        
           )}
           
           {error && (
