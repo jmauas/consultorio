@@ -393,7 +393,7 @@ const cardLibre = (turno, anterior, color, index) => {
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm font-medium ">Doctor</p>
+                  <p className="text-sm font-medium mb-2">Doctor</p>
                     <span 
                       className="text-xs font-bold p-2 rounded-lg"
                       style={{ 

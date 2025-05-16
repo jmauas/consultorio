@@ -738,6 +738,7 @@ export default function TurnosPage() {
       </div>
            
       {/* Listado de turnos */}
+      {mostrarFiltros &&
       <div className="shadow rounded-lg overflow-hidden">
         <GrillaTurnos
           turnos={turnos}
@@ -746,6 +747,7 @@ export default function TurnosPage() {
           onTurnoActualizado={handleTurnoActualizado}
         />
       </div>
+      }
       {!mostrarFiltros &&
         <CalendarioTurnos 
           fecha={fechaSeleccionada}
