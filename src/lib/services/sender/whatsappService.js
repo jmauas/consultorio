@@ -89,6 +89,7 @@ export async function enviarRecordatorioTurno(turno, cambioEstado) {
     if (!celularNormalizado) {
       throw new Error('Número de celular inválido');
     }
+    console.log('cuentas', cuentas);
     if (cuentas.length === 0) {
       throw new Error('No hay cuentas de WhatsApp disponibles para enviar el mensaje');
     }

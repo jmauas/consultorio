@@ -518,7 +518,8 @@ export default function DetalleTurno({
                   </span>
                 </div>
               </div>
-            </div>            {/* Información del turno */}
+            </div>            
+            {/* Información del turno */}
             <div>
               <h3 className="text-lg font-bold mb-3">Información del Turno</h3>
               {/* Vista en modo lectura */}

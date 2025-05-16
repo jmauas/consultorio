@@ -267,8 +267,16 @@ const cardLibre = (turno, anterior, color, index) => {
                       {turno.coberturaMedica.codigo ? turno.coberturaMedica.codigo.toUpperCase() : 'No asignado'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm ">
-                    {turno.doctor.emoji} {turno.doctor.nombre}
+                  <td className="px-6 py-4 whitespace-nowrap ">
+                    <span 
+                      className="text-xs font-bold p-2 rounded-lg"
+                      style={{ 
+                        backgroundColor: turno.doctor?.color || '#CCCCCC',
+                        color: isColorLight(turno.doctor?.color || '#CCCCCC') ? '#000000' : '#FFFFFF'
+                      }}
+                    >                      
+                      {turno.doctor.emoji} {turno.doctor.nombre}
+                    </span>
                   </td>                  
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <span 
@@ -386,13 +394,27 @@ const cardLibre = (turno, anterior, color, index) => {
                 </div>
                 <div>
                   <p className="text-sm font-medium ">Doctor</p>
-                  <p className="mt-1 text-sm font-bold">{turno.doctor.emoji} {turno.doctor.nombre}</p>
+                    <span 
+                      className="text-xs font-bold p-2 rounded-lg"
+                      style={{ 
+                        backgroundColor: turno.doctor?.color || '#CCCCCC',
+                        color: isColorLight(turno.doctor?.color || '#CCCCCC') ? '#000000' : '#FFFFFF'
+                      }}
+                    >                      
+                      {turno.doctor.emoji} {turno.doctor.nombre}
+                    </span>
                 </div>
                 <div>
                   <p className="text-sm font-medium mb-2">Consultorio</p>
-                  <p className="mt-1 text-sm font-bold">
-                    {turno.consultorio?.nombre || (typeof turno.consultorio === 'string' ? turno.consultorio : 'No especificado')}
-                  </p>
+                  <span 
+                      className="px-2 py-1 inline-flex text-sm font-medium rounded-lg"
+                      style={{ 
+                        backgroundColor: turno.consultorio?.color || '#CCCCCC',
+                        color: isColorLight(turno.consultorio?.color || '#CCCCCC') ? '#000000' : '#FFFFFF'
+                      }}
+                    >
+                      {turno.consultorio?.nombre || (typeof turno.consultorio === 'string' ? turno.consultorio : 'No especificado')}
+                    </span>
                 </div>
                 <div>
                   <p className="text-sm font-medium mb-2">Cobertura</p>
@@ -419,28 +441,28 @@ const cardLibre = (turno, anterior, color, index) => {
                 className="inline-flex rounded-md bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 border border-blue-600"
                 title="Ver detalles"
                 >
-                 <i className="fa fa-eye text-blue-600 "></i>
+                 <div><i className="fa fa-eye text-blue-600 "></i></div>
               </button>
               <button
                 onClick={() => enviarRecordatorio(turno.id)}
                 className="inline-flex rounded-md bg-green-50 p-2 text-green-700 hover:bg-green-100 border border-green-700"
                 title="Recordar"
               >
-                <i className="fa fa-solid fa-bell text-green-600 "></i>
+                <div><i className="fa fa-solid fa-bell text-green-600 "></i></div>
               </button>
               <button
                 onClick={() => abrirModalNuevoTurno(turno.paciente)}
                 className="inline-flex rounded-md bg-orange-50 p-2 text-[var(--color-primary)] hover:bg-orange-100 border border-[var(--color-primary)]"
                 title="Nuevo turno"
               >
-                <i className="fas fa-plus fa-lg"></i>
+                <div><i className="fas fa-plus fa-lg"></i></div>
               </button>
               <button
                 onClick={() => cancelarTurno(turno.id)}
                 className="inline-flex rounded-md bg-red-50 p-2 text-red-700 hover:bg-red-100 border border-red-700"
                 title="Cancelar"
                 >
-                <i className="fas fa-trash"></i>
+                <div><i className="fas fa-trash"></i></div>
               </button>
             </div>
           </div>

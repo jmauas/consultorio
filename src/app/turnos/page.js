@@ -746,6 +746,7 @@ export default function TurnosPage() {
           onTurnoActualizado={handleTurnoActualizado}
         />
       </div>
+      {!mostrarFiltros &&
         <CalendarioTurnos 
           fecha={fechaSeleccionada}
           turnos={turnos}
@@ -754,7 +755,7 @@ export default function TurnosPage() {
           configuracion={configuracion}
           doctores={doctores}
           consultorios={consultorios}
-        />
+        />}
        {/* Modal para nuevo Turno */}
         <Modal
           isOpen={modalTurnoNuevo || modalTurnoDisponibilidad}

@@ -191,9 +191,31 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                 <div className="m-5 p-4 flex flex-col items-start justify-center rounded-xl">
                     <div className="flex items-center justify-between w-full">
                         <h1 className="m-5 font-bold text-3xl">Calendario de Turnos</h1>
-                        <span className="p-2 border rounded-md bg-[var(--card-bg)] text-xl font-bold">
-                            {formatoFecha(fecha, false, false, false, true, false, true)}
-                        </span>
+                        <div className="inline-flex items-center justify-center">
+                            <div className="calendar-icon border border-red-500 rounded-lg shadow-sm overflow-hidden w-14 h-14 flex flex-col">
+                                <div className="bg-red-600 text-xs font-bold text-center py-1">
+                                    {fecha.toLocaleDateString('es-AR', { month: 'short' }).toUpperCase()}
+                                </div>
+                                <div className="flex-grow flex items-center justify-center">
+                                    <span className="font-bold text-xl">
+                                    {fecha.getDate()}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="ml-2 flex flex-col items-start">
+                                <span className="text-lg font-bold ">
+                                    {fecha.toLocaleDateString('es-AR', {
+                                    weekday: 'long',
+                                    })}
+                                </span>
+                                <span className="text-sm">
+                                    {fecha.toLocaleDateString('es-AR', {
+                                    month: 'long',
+                                    year: 'numeric'
+                                    })}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                     <div 
                         className={`hidden md:grid items-center justify-start w-full bg-[var(--card-bg)] p-3 font-bold text-xl rounded-md sticky top-18 z-50`}
@@ -378,11 +400,26 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                 </div>
                 )}
                     {/* Vista móvil - solo aparece en pantallas pequeñas */}
-                <div className="block md:hidden w-full">
+                <div className="relative md:hidden w-full">
                     {agendaConsul.map((hora, index) => (
-                        <div key={`mobile-hora-${index}-${hora.hora}`} className="mb-4 bg-[var(--card-bg)]">
-                            <div className="sticky top-20 z-10 p-2 w-38 rounded-md border border-[var(--color-primary)] bg-[var(--card-bg)] font-bold text-3xl text-center">
-                                {hora.hora}
+                        <div 
+                            key={`mobile-hora-${index}-${hora.hora}`} 
+                            className="my-4 pb-2 bg-[var(--card-bg)]"
+                        >
+                            <div className="sticky top-20 z-10 p-2 flex items-center justify-between">
+                                <div className="w-38 rounded-md border border-[var(--color-primary)] bg-[var(--card-bg)] font-bold text-2xl text-center">
+                                    {hora.hora}
+                                </div>
+                                <div className="calendar-icon border border-red-500 rounded-lg shadow-sm overflow-hidden w-14 h-14 flex flex-col">
+                                    <div className="bg-red-600 text-xs font-bold text-center py-1">
+                                        {fecha.toLocaleDateString('es-AR', { month: 'short' }).toUpperCase()}
+                                    </div>
+                                    <div className="flex-grow flex items-center justify-center">
+                                        <span className="font-bold text-xl">
+                                        {fecha.getDate()}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                             
                             {hora.consultorios.map((consultorio) => (
@@ -391,7 +428,7 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                     className="m-2 p-2 rounded-lg border border-slate-200"
                                     style={{ 
                                         backgroundColor: consultorio.doctores.filter(d => d.atencion).length > 0 ? consultorio.color : 'oklch(86.9% 0.022 252.894)',
-                                        color: consultorio.doctores.filter(d => d.atencion).length > 0 ? isColorLight(consultorio.color) ? '#000' : '#fff' : 'red',
+                                        color: consultorio.doctores.filter(d => d.atencion).length > 0 ? isColorLight(consultorio.color) ? '#000' : '#fff' : 'black',
                                     }}
                                 >
                                     <div className="font-bold text-lg mb-2">
