@@ -34,7 +34,7 @@ export async function GET(request) {
       }, { status: 400 });
     }
     
-    const res = disponibilidadDeTurnos = async (doctor, tipo, minutosTurno, asa, ccr)
+    const res = await disponibilidadDeTurnos(doctor, tipo, minutosTurno, asa, ccr)
     return NextResponse.json(res, { status: 200 });
     
   } catch (error) {

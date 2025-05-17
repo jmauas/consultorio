@@ -23,8 +23,6 @@ export async function POST(request) {
       where: { id: idDr}
     });
     
-    console.log('Doctor encontrado:', doctor);
-
     if (!doctor) {
       return NextResponse.json({ 
         ok: false, 
@@ -36,9 +34,7 @@ export async function POST(request) {
     let consultorio = await prisma.consultorio.findFirst({
       where: { id: datos.consultorioId }
     });
-
-    console.log('Consultorio encontrado:', consultorio);
-    
+  
     if (!consultorio) {
       // Si no hay consultorios, 
       return NextResponse.json({ 

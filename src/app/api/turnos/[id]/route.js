@@ -93,8 +93,8 @@ export async function GET(request, { params }) {
 
 // Esta función permite actualizar un turno específico por ID
 export async function PATCH(request, { params }) {
-  console.log('Iniciando la actualización del turno...');
   try {
+    const session = await getServerSession(authOptions);
     const isPublicEndpoint = request.headers.get('x-api-source') === 'whatsapp' || 
                              request.headers.get('x-api-source') === 'cancelacion-token';
     
@@ -123,7 +123,7 @@ export async function PATCH(request, { params }) {
 // Esta función permite eliminar un turno específico por ID
 export async function DELETE(request, { params }) {
   try {
-  
+    const session = await getServerSession(authOptions);
     // Para eliminar, siempre requerimos autenticación
     if (!session) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });

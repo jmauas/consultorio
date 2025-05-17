@@ -207,7 +207,7 @@ export default function PacienteDetallePage() {
   };
 
   const abrirModalTurno = (turno) => {
-    setTurnoSeleccionado(turno);
+    setTurnoSeleccionado({...turno, paciente: paciente});
     setModalAbierto(true);
   };
 
@@ -412,7 +412,8 @@ export default function PacienteDetallePage() {
                   DNI
                 </label>
                 <input
-                  type="text"
+                  type="number"
+                  inputMode="tel"
                   id="dni"
                   name="dni"
                   value={formData.dni}
@@ -425,7 +426,8 @@ export default function PacienteDetallePage() {
                   Celular*
                 </label>
                 <input
-                  type="text"
+                  type="number"
+                  inputMode="tel"
                   id="celular"
                   name="celular"
                   value={formData.celular}
@@ -443,6 +445,7 @@ export default function PacienteDetallePage() {
                 </label>
                 <input
                   type="email"
+                  inputMode="email"
                   id="email"
                   name="email"
                   value={formData.email}
@@ -692,7 +695,7 @@ export default function PacienteDetallePage() {
       >
         {turnoSeleccionado && (
           <DetalleTurno 
-            turnoId={turnoSeleccionado.id}
+            turno={turnoSeleccionado}
             onClose={cerrarModalTurno}
             onSuccess={(tipo, datos) => {
               if (tipo === 'delete' || tipo === 'update') {

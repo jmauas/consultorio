@@ -455,7 +455,7 @@ const TurnoNuevo = ({
         {/* Mensaje de éxito */}
         {success && (
           <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6">
-            <p><i className="fas fa-check-circle mr-2"></i> Turno creado exitosamente. Redirigiendo...</p>
+            <p><i className="fas fa-check-circle mr-2"></i> Turno Creado Exitosamente</p>
           </div>
         )}
 
@@ -483,7 +483,9 @@ const TurnoNuevo = ({
               <div className="flex-grow">
                 <label className="block text-sm font-medium mb-1">DNI *</label>
                 <input
-                  type="text"
+                  type="number"
+                  inputMode="tel"
+                  autoComplete="off"
                   name="dni"
                   value={turno.dni}
                   onChange={handleChange}
@@ -508,6 +510,7 @@ const TurnoNuevo = ({
               <input
                 type="text"
                 name="nombre"
+                autoComplete="off"
                 value={turno.nombre}
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded px-3 py-2"
@@ -521,6 +524,7 @@ const TurnoNuevo = ({
               <input
                 type="text"
                 name="apellido"
+                autoComplete="off"
                 value={turno.apellido}
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded px-3 py-2"
@@ -533,7 +537,9 @@ const TurnoNuevo = ({
               <div className="flex-grow">
                 <label className="block text-sm font-medium  mb-1">Celular *</label>
                 <input
-                  type="text"
+                  type="number"
+                  inputMode="tel"
+                  autoComplete="off"
                   name="celular"
                   value={turno.celular}
                   onChange={handleChange}
@@ -556,7 +562,9 @@ const TurnoNuevo = ({
             <div>
               <label className="block text-sm font-medium  mb-1">Email</label>
               <input
-                type="email"
+                type="text"
+                inputMode="email"
+                autoComplete="off"
                 name="email"
                 value={turno.email}
                 onChange={handleChange}
@@ -682,6 +690,20 @@ const TurnoNuevo = ({
               ></textarea>
             </div>
           </div>
+
+           {/* Mensaje de éxito */}
+          {success && (
+            <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6">
+              <p><i className="fas fa-check-circle mr-2"></i> Turno Creado Exitosamente</p>
+            </div>
+          )}
+
+          {/* Mensaje de error */}
+          {error && (
+            <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6">
+              <p><i className="fas fa-exclamation-circle mr-2"></i> {error}</p>
+            </div>
+          )}
           
           {/* Alerta de conflicto de horario */}
           {conflictoHorario && (

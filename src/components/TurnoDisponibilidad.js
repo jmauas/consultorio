@@ -743,6 +743,7 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                   <input
                     type="number"
                     inputMode="tel"
+                    autoComplete='dni'
                     id="dni"
                     className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200
                       ${fieldErrors.dni ? 'border-red-500 dark:border-red-400' : 'border-gray-300 dark:border-gray-600'}`}
@@ -773,6 +774,7 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                   <input
                     type="text"
                     id="nombre"
+                    autoComplete='given-name'
                     className={`flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 
                       ${fieldErrors.nombre ? 'border-red-500' : 'border-gray-300'}`}
                     value={formData.nombre}
@@ -784,6 +786,7 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                   <input
                     type="text"
                     id="apellido"
+                    autoComplete='family-name'
                     className={`flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 
                       ${fieldErrors.apellido ? 'border-red-500' : 'border-gray-300'}`}
                     value={formData.apellido}
@@ -796,6 +799,7 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                     <input
                       type="number"
                       inputMode="tel"
+                      autoComplete='tel'
                       id="celular"
                       className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 
                         ${fieldErrors.celular ? 'border-red-500' : 'border-gray-300'}`}
@@ -809,6 +813,8 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                   <label htmlFor="email" className="font-medium  w-24">Mail:</label>
                   <input
                     type="text"
+                    inputMode="email"
+                    autoComplete='email'
                     id="email"
                     className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={formData.email}

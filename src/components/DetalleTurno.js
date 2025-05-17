@@ -23,8 +23,7 @@ export default function DetalleTurno({
   const [success, setSuccess] = useState(null);
   const [nuevoEstado, setNuevoEstado] = useState('');
 
-  console.log('Turno:', turno);
-  
+
   // Estado para controlar el modo de edición
   const [modoEdicion, setModoEdicion] = useState(false);
   
