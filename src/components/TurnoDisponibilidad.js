@@ -67,6 +67,19 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
     servicio: false
   });
 
+  const limpiarTurno = () => {
+    setFormData(prev => ({
+      ...prev,
+      dni: '',
+      nombre: '',
+      apellido: '',
+      celular: '',
+      email: '',
+      coberturaMedicaId: '',
+      observaciones: '',
+    }));
+  };
+
   // Búsqueda de paciente por DNI desde parámetros de URL
   const buscarPacientePorParam = async (param) => {
    
@@ -517,8 +530,9 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
       
       if (data.ok) {
         toast.success('Turno registrado con éxito!');
-        handleVolver();       
-        
+        setShowSuccessMessage(true);
+        limpiarTurno();
+        handleVolver(); 
       } else {
         // Show error
         setShowErrorMessage(true);
@@ -526,6 +540,7 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
         document.getElementById('btnRegistrar').style.display = 'flex';
         document.getElementById('btnVolver').style.display = 'flex';
       }
+      setShowLoading(false);
     } catch (error) {
       console.error('Error al registrar turno:', error);
       setShowErrorMessage(true);
@@ -537,6 +552,7 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
 
   // Cancel existing appointment
   const handleCancelarTurno = async (id) => {
+    setShowLoading(true);
     try {
       const res = await fetch(`/api/turnos/${id}`, {
         method: 'PATCH',
@@ -555,6 +571,7 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
     } catch (error) {
       console.error('Error al cancelar turno:', error);
     }
+    setShowLoading(false);
   };
 
   // Return to part 1
@@ -597,11 +614,8 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
           // Guardar la configuración del consultorio
           if (data.config) {
             setConfiguracion(data.config);
-          }
-          
+          }          
           setShowLoading(false);
-          
-          
           if (dniParam) {
             // Actualizar estado y buscar paciente por DNI
             setFormData(prev => ({
@@ -667,7 +681,9 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
           />
         )}
       </div>
-
+      {showLoading && (
+        <Loader titulo={'Buscando Información ...'}/>
+      )}
       <div className="container mx-auto rounded-xl p-5 m-5  shadow-lg md:max-w-3xl">
         {/* Part 1: Doctor and patient selection */}
         {showParte1 && (
@@ -893,9 +909,6 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
         {/* Part 2: Available appointments */}
         {showParte2 && (
           <div>
-            {showLoading && (
-              <Loader titulo={'Buscando Turnos Disponibles ...'}/>
-            )}
             
             <div id="agenda" 
                 className={showLoading ? 'hidden' : 'block'}

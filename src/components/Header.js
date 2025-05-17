@@ -196,7 +196,7 @@ export default function Header() {
           {!session?.user && (
             <Link
               href="/auth/signin" 
-              className="p-2 text-[var(--color-primary-dark)] dark:text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] dark:hover:text-[var(--color-primary)] border border-[var(--color-primary)] dark:border-[var(--color-primary)] rounded-md hover:bg-[var(--color-secondary)] dark:hover:bg-[var(--color-secondary)] transition-colors flex items-center"
+              className="p-2 text-[var(--color-primary)] dark:text-[var(--color-primary-dark)] hover:text-[var(--color-primary-dark)] dark:hover:text-[var(--color-primary)] border border-[var(--color-primary)] dark:border-[var(--color-primary)] rounded-md hover:bg-[var(--color-secondary)] dark:hover:bg-[var(--color-secondary)] transition-colors flex items-center"
             >
               <i className="fa-solid fa-sign-in-alt mr-1"></i>
               <span>Iniciar sesión</span>

@@ -18,7 +18,7 @@ import { obtenerEstados } from '@/lib/utils/estadosUtils';
 
 const estados = obtenerEstados();
 
-const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doctores, consultorios}) => {
+const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doctores, consultorios, setForzarMostrarGrilla}) => {
     const [agendaConsul, setAgendaConsul] = useState([]);
     const [modalAbierto, setModalAbierto] = useState(false);
     const [turnoSeleccionado, setTurnoSeleccionado] = useState(null);
@@ -176,6 +176,15 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [turnos, fecha, configuracion.feriados, consultorios, doctores]);
 
+    useEffect(() => {
+        if (agendaConsul && agendaConsul.length === 0) {
+            setForzarMostrarGrilla(true);
+        } else {
+            setForzarMostrarGrilla(false);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [agendaConsul]);
+
     if (loading) {
         return <Loader />;
     }
@@ -183,8 +192,10 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
     return (
         <section>
             {!consultorios || consultorios.length === 0 || !agendaConsul || agendaConsul.length === 0 && (
-                <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                    <h2>No hay turnos disponibles para la fecha seleccionada.</h2>
+                <div className="flex items-center justify-center flex-wrap gap-5 w-full h-full p-5 mt-5 font-bold bg-[var(--card-bg)] border border-amber-200 rounded-md">
+                    <i className="fa-solid fa-calendar-xmark fa-2xl text-amber-500"></i>
+                    <h2>No hay Calendario de Consultorio Disponible para la Fecha Seleccionada.</h2>
+                    <i className="fa-solid fa-calendar-xmark fa-2xl text-amber-500"></i>
                 </div>
             )}
             {consultorios && consultorios.length > 0 && agendaConsul && agendaConsul.length > 0 && (

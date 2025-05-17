@@ -21,7 +21,6 @@ export default function TurnosPage() {
   const isFirstRender = useRef(true);
   const filterTimeoutRef = useRef(null);
 
-
   const [turnos, setTurnos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -36,6 +35,7 @@ export default function TurnosPage() {
   const [tiposTurno, setTiposTurno] = useState([]);
   const [coberturas, setCoberturas] = useState([]);
   const [configuracion, setConfiguracion] = useState(null);
+  const [forzarMostarGrilla, setForzarMostrarGrilla] = useState(false);
 
   // Estados para filtros de fecha avanzados
   const fechaHoy = new Date();
@@ -758,7 +758,7 @@ export default function TurnosPage() {
       </div>
            
       {/* Listado de turnos */}
-      {mostrarFiltros &&
+      {(mostrarFiltros || forzarMostarGrilla) &&
       <div className="shadow rounded-lg overflow-hidden">
         <GrillaTurnos
           turnos={turnos}
@@ -777,6 +777,7 @@ export default function TurnosPage() {
           configuracion={configuracion}
           doctores={doctores}
           consultorios={consultorios}
+          setForzarMostrarGrilla={setForzarMostrarGrilla}
         />}
        {/* Modal para nuevo Turno */}
         <Modal
