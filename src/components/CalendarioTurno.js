@@ -10,7 +10,6 @@ import Modal from '@/components/Modal';
 import DetalleTurno from './DetalleTurno';
 import { toast } from 'react-hot-toast';
 import { enviarMailConfTurno } from "@/lib/services/sender/resendService";
-import { textoMensajeConfTurno } from '@/lib/services/sender/whatsappService';
 import { enviarRecordatorioTurno } from '@/lib/services/sender/whatsappService';
 import ModalNuevoTurno from '@/components/ModalNuevoTurno';
 import { agregarFeriados } from '@/lib/utils/variosUtils.js';
@@ -68,9 +67,7 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
             toast.error('No se encontró información de contacto para este paciente');
             return;
         }
-        
-        const msg = await textoMensajeConfTurno(turno);
-        
+    
         let celular = turno.paciente.celular;
 
         if (celular.length >= 8) {

@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { obtenerCoberturasDesdeDB } from '@/lib/utils/coberturasUtils';
 import Loader from '@/components/Loader';
 import { useTheme } from 'next-themes';
-import { zfill } from '@/lib/utils/dateUtils';
+import { formatoFecha, zfill } from '@/lib/utils/dateUtils';
+import Link from 'next/link';
 
 const TurnoNuevo = ({
     desdeParam,
@@ -29,6 +30,7 @@ const TurnoNuevo = ({
    const [coberturas, setCoberturas] = useState([]);
    const [conflictoHorario, setConflictoHorario] = useState(null);
    const [turnosDisponibles, setTurnosDisponibles] = useState([]);
+   const [turnosPaciente, setTurnosPaciente] = useState([]);
    const [turno, setTurno] = useState({
      nombre: '',
      apellido: '',
@@ -63,7 +65,19 @@ const TurnoNuevo = ({
        const data = await response.json();      
        if (data.ok && data.pacientes && data.pacientes.length > 0) {
          setPacienteData(data.pacientes[0])
-       }      
+         if (data.pacientes[0].turnos && data.pacientes[0].turnos.length > 0) {
+         const proximosTurnos = data.pacientes[0].turnos.filter(turno => {
+           const fechaTurno = new Date(turno.desde);
+           return fechaTurno > new Date() && turno.estado!== 'cancelado';
+         });
+         if (proximosTurnos.length > 0) {
+          console.log('Proximos turnos', proximosTurnos);
+           setTurnosPaciente(proximosTurnos);
+         } else {
+           setConflictoHorario(null);
+         }
+       }
+      }
        setBuscandoPaciente(false);
      } catch (error) {
        console.error('Error al buscar paciente por celular:', error);
@@ -592,6 +606,35 @@ const TurnoNuevo = ({
               </select>
             </div>
           </div>
+
+          {
+            turnosPaciente.length > 0 && (
+              <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-6">
+                <p className="font-medium"><i className="fas fa-calendar-check mr-2"></i> Turnos Próximos del Paciente:</p>
+                <div className="p-2 m-4 flex flex-wrap gap-3">
+                  {turnosPaciente.map((t, i) => (
+                    <div className="grid grid-cols-12 border rounded-md p-4 items-center" key={i}>
+                      <i className="fas fa-calendar-check text-blue-500 fa-2xl col-span-2"></i>
+                      <div className="font-bold p-2 col-span-10 flex flex-col" key={i}>                      
+                        <span>{t.consultorio.nombre}</span>
+                        <span>{formatoFecha(t.desde, true, false, false, true, false, false)}</span>
+                        <span>{t.servicio}</span>
+                        <span>{t.duracion} min</span>
+                        <span>{t.doctor.nombre} {t.doctor.apellido}</span>
+                        <Link 
+                          href={`/turnos/${t.id}`} 
+                          target='_blank'
+                          className="text-blue-500 text-sm p-3 rounded-md flex items-center bg-blue-200 border border-blue-500 hover:bg-blue-500 hover:text-white">
+                            <i className="fas fa-eye mr-2"></i> 
+                            Ver Detalle
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) 
+          }
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <h2 className="text-lg font-medium md:col-span-2 dark:text-gray-200">Datos del Turno</h2>

@@ -9,6 +9,9 @@ import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 import Loader from '@/components/Loader';
+import { enviarMailConfTurno } from "@/lib/services/sender/resendService";
+import { enviarRecordatorioTurno } from '@/lib/services/sender/whatsappService';
+
 
 const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
   const { data: session } = useSession();
@@ -306,9 +309,11 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
             turnoData.description = turnoData.description.substring(0, index - 1);
             turnoData.description = turnoData.description.replaceAll('\n', '<br />');
           }
-        }
-        
-        setExistingTurno(turnoData);
+        }        
+        setExistingTurno({
+          ...turnoData,
+          paciente: paciente
+        });
       }
     }
   };
@@ -573,6 +578,24 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
     }
     setShowLoading(false);
   };
+
+  // Función para enviar recordatorio por WhatsApp e EMail
+    const enviarRecordatorio = async (turno) => {
+        try {
+          console.log('Enviando recordatorio para el turno:', turno);
+          let celular = turno.paciente.celular;
+
+          if (celular.length >= 8) {
+              const res = await enviarRecordatorioTurno(turno);
+          }
+            await enviarMailConfTurno(turno);
+        
+          toast.success('Iniciando envío de confirmación');
+        } catch (error) {
+          console.error('Error al enviar recordatorio:', error);
+          toast.error('Error al enviar el recordatorio: ' + (error.message || 'Error desconocido'));
+        }
+    };
 
   // Return to part 1
   const handleVolver = () => {
@@ -876,7 +899,7 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                     
                     <div className="space-y-2 text-center">
                       <p>Para el <span className="font-bold">{formatoFecha(new Date(existingTurno.desde), true, true, false, true)}</span></p>
-                      <p>✔️ Paciente: {formData.nombre || ''} {formData.apellido || ''}</p>
+                      <p>✔️ Paciente: {existingTurno.paciente.nombre || ''} {existingTurno.paciente.apellido || ''}</p>
                       <p>✔️ Tipo: {existingTurno.servicio || ''}</p>
                       <p>✔️ Dr.: {existingTurno.doctor.nombre || ''}
                       </p>
@@ -890,6 +913,15 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                         <i className="fa-solid fa-times text-red-500 text-xl"></i>
                         Cancelar Turno
                         <i className="fa-solid fa-times text-red-500 text-xl"></i>
+                      </button>
+                       <button
+                          onClick={() => enviarRecordatorio(existingTurno)}
+                          className="bg-slate-400 hover:bg-slate-500 text-black font-bold py-3 px-6 rounded-lg mt-4 flex items-center gap-2 mx-auto transition duration-300"
+                          title="Enviar Recordatorios"
+                          >
+                          <i className="fa fa-solid fa-bell text-green-600 "></i>
+                          Re Enviar Recordatorio
+                          <i className="fa fa-solid fa-bell text-green-600 "></i>
                       </button>
                     </div>
                   </div>

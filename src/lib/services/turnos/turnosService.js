@@ -12,7 +12,11 @@ export const getTurnoById = async (id) => {
         const turno = await prisma.turno.findUnique({
         where: { id },
         include: {
-            paciente: true,
+            paciente: {
+                include: {
+                  coberturaMedica: true,
+                }
+            },
             consultorio: true,
             doctor: true,
             coberturaMedica: true,
