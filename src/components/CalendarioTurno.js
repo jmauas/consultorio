@@ -357,8 +357,11 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                                                     consultorioId: consultorio.consultorioId
                                                                                 })}
                                                                                 title="Nuevo turno"
-                                                                                className="text-[var(--color-primary)] hover:text-orange-900 dark:text-[var(--color-primary)] p-4 rounded-md bg-slate-200 flex items-center justify-center gap-2"
+                                                                                className="text-[var(--color-primary)] hover:text-orange-900 dark:text-[var(--color-primary)] p-2 rounded-md bg-slate-200 flex items-center justify-center gap-2"
                                                                             >
+                                                                                <span className="text-xs font-bold animate-bounce">
+                                                                                   ‼️ Turno Disponible ‼️
+                                                                                </span>
                                                                                 <i className="fa fa-plus fa-lg"></i>
                                                                                 <i className="fa fa-calendar fa-lg"></i>
                                                                             </button>
@@ -526,14 +529,14 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                 {/* Time slot header */}
                                                 <div className="py-3 px-4 border-b border-blue-200">
                                                     <div className="inline-flex items-center justify-between w-full">
-                                                        <div className="bg-[var(--color-primary)] text-3xl font-bold border p-2 rounded-md shadow-xl">
-                                                            {hora.hora} 
+                                                        <div className="text-[var(--color-primary)] bg-[var(--card-bg)] text-3xl font-bold border p-2 rounded-md shadow-xl">
+                                                            {hora.hora}
                                                         </div>
                                                         <div className="calendar-icon border border-red-500 rounded-lg shadow-sm overflow-hidden flex flex-col">
                                                             <div className="bg-red-600 text-white text-xs font-bold text-center px-2 py-1 w-14">
                                                                 {fecha.toLocaleDateString('es-AR', { month: 'short' }).toUpperCase()}
                                                             </div>
-                                                            <div className="flex-grow flex items-center justify-center px-2 py-1 bg-[var(--color-primary)]">
+                                                            <div className="flex-grow flex items-center justify-center px-2 py-1 text-[var(--color-primary)] bg-[var(--card-bg)]">
                                                                 <span className="font-bold text-xl">{fecha.getDate()}</span>
                                                             </div>
                                                         </div>
@@ -549,10 +552,13 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                         }
                                                         
                                                         // Skip if no doctor is attending or no appointments
-                                                        const doctoresAtendiendo = consultorio.doctores.filter(d => d.atencion);
+                                                        const doctoresAtendiendo = consultorio.doctores.filter(d => d.atencion===true);
                                                         const hasTurnos = consultorio.turnos && consultorio.turnos.length > 0;
-                                                        
+                                                        console.log('HORAAAAA', hora.hora);
+                                                        console.log('doctoresAtendiendo', doctoresAtendiendo);
+                                                        console.log('hasTurnos', hasTurnos);
                                                         if (doctoresAtendiendo.length === 0 && !hasTurnos) {
+                                                            console.log('No hay atención en consultorio');
                                                             return null;
                                                         }
                                                         
@@ -582,7 +588,7 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                                         </div>
                                                                     ))}
                                                                     
-                                                                    {doctoresAtendiendo.length > 0 && !hasTurnos 
+                                                                    {doctoresAtendiendo.length > 0 && (!hasTurnos || consultorio.turnos.filter(t => t.estado !== 'cancelado').length === 0) 
                                                                     ? (
                                                                         <div className="ml-auto flex items-center gap-2">
                                                                             <button 
@@ -596,8 +602,8 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                                                 title="Nuevo turno"
                                                                                 className="text-[var(--color-primary)] border border-[var(--color-primary)] hover:text-orange-900 bg-slate-200 p-2 text-xl rounded-md flex items-center gap-2"
                                                                             >
-                                                                                <span className="text-xs font-bold">
-                                                                                    Turno Disponible
+                                                                                <span className="text-xs font-bold animate-bounce">
+                                                                                   ‼️ Turno Disponible ‼️
                                                                                 </span>
                                                                                 <i className="fa fa-plus"></i>
                                                                                 <i className="fa fa-calendar"></i>
