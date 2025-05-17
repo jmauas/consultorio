@@ -2,16 +2,15 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
-import { enviarRecordatorioTurno } from '@/lib/services/sender/whatsappService';
-import { enviarMailConfTurno } from "@/lib/services/sender/resendService";
+import { updateTurnoService } from '@/lib/services/turnos/turnosService.js';  
 
 // Esta función permite obtener un turno específico por ID
 export async function GET(request, { params }) {
   try {
-    const session = await getServerSession(authOptions);
+   
     const isPublicEndpoint = request.headers.get('x-api-source') === 'whatsapp' || 
                              request.headers.get('x-api-source') === 'cancelacion-token';
-    
+    const session = await getServerSession(authOptions);
     // Verificar autenticación excepto para endpoints públicos
     if (!session && !isPublicEndpoint) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
@@ -94,13 +93,10 @@ export async function GET(request, { params }) {
 
 // Esta función permite actualizar un turno específico por ID
 export async function PATCH(request, { params }) {
+  console.log('Iniciando la actualización del turno...');
   try {
-    const session = await getServerSession(authOptions);
     const isPublicEndpoint = request.headers.get('x-api-source') === 'whatsapp' || 
                              request.headers.get('x-api-source') === 'cancelacion-token';
-    
-    // Obtener el ID del usuario si existe sesión
-    const userId = session?.user?.id || null;
     
     // Verificar autenticación excepto para endpoints públicos
     if (!session && !isPublicEndpoint) {
@@ -110,75 +106,10 @@ export async function PATCH(request, { params }) {
     params = await params;
     const { id } = params;
     const datos = await request.json();
+
+    const res = await updateTurnoService(id, datos);    
     
-    if (!id) {
-      return NextResponse.json({ 
-        ok: false, 
-        message: 'ID del turno no proporcionado' 
-      }, { status: 400 });
-    }
-
-    // Verificar si el turno existe
-    const turnoExistente = await prisma.turno.findUnique({
-      where: { id }
-    });
-
-    if (!turnoExistente) {
-      return NextResponse.json({ 
-        ok: false, 
-        message: 'Turno no encontrado' 
-      }, { status: 404 });
-    }
-
-    let notificar = false;
-    if (datos && datos.estado === 'cancelado' && turnoExistente.estado !== 'cancelado') {
-      notificar = true
-      const fhTurno = new Date(turnoExistente.desde);
-      const ahora = new Date();
-      const diffInMs = fhTurno - ahora;
-      console.log(new Date().toLocaleString()+'  -  '+'Diferencia en ms:', diffInMs)
-      const diffInHours = diffInMs / 1000 / 60 / 60;
-      console.log(new Date().toLocaleString()+'  -  '+'Diferencia en horas:', diffInHours)
-      datos.hsAviso = diffInHours.toString();
-      datos.fhCambioEstado = new Date().toISOString();
-      if (diffInHours <= 0) {
-          datos.penal = 'asa';
-      } else if (diffInHours < 48) {
-          datos.penal = 'ccr';
-      }
-    }    
-    if (datos && datos.estado != turnoExistente.estado) {
-      notificar = true
-    }
-    // Agregar el ID del usuario que actualiza el registro
-    datos.updatedById = userId;
-    
-    // Actualizar el turno
-    const turnoActualizado = await prisma.turno.update({
-      where: { id },
-      data: datos,
-      include: {
-        paciente: true,
-        doctor: true,
-        consultorio: true,
-        coberturaMedica: true,
-        tipoDeTurno: true // Incluir el tipo de turno en la respuesta
-      }
-    });
-
-    if (notificar) {
-      // Enviar notificación por WhatsApp
-      await enviarRecordatorioTurno(turnoActualizado, true);
-     
-      // Enviar correo electrónico
-      await enviarMailConfTurno(turnoActualizado, true);
-    }
-    
-    return NextResponse.json({ 
-      ok: true, 
-      message: 'Turno actualizado correctamente',
-      turno: turnoActualizado
-    });
+    return NextResponse.json(res);
   } catch (error) {
     console.error('Error al actualizar turno:', error);
     return NextResponse.json({ 
@@ -192,8 +123,7 @@ export async function PATCH(request, { params }) {
 // Esta función permite eliminar un turno específico por ID
 export async function DELETE(request, { params }) {
   try {
-    const session = await getServerSession(authOptions);
-    
+  
     // Para eliminar, siempre requerimos autenticación
     if (!session) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });

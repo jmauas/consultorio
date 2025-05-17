@@ -24,6 +24,7 @@ export default function CancelarTurnoPage({ }) {
         const data = await response.json();
         
         if (data.ok) {
+          console.log('Turno encontrado:', data.turno);
           setTurno(data.turno);
           
           // Si el turno ya está cancelado, mostrarlo así
@@ -141,7 +142,7 @@ export default function CancelarTurnoPage({ }) {
           {turno && (
             <div className="mb-6 p-4 bg-gray-50 rounded-lg">
               <p className="font-semibold">Detalles del turno cancelado:</p>
-              <p>Servicio: {turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}</p>
+              <p>Servicio: {turno.servicio && turno.servicio || 'No especificado'}</p>
               <p>Fecha: {formatoFecha(turno.desde)}</p>
               <p>Profesional: {turno.doctor.nombre}</p>
             </div>
@@ -182,32 +183,34 @@ export default function CancelarTurnoPage({ }) {
           <p className="text-center mb-6">¿Estás seguro de que deseas cancelar este turno?</p>
           
           {turno && (
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <p className="font-semibold">Detalles del turno:</p>
-              <p>Servicio: {turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}</p>
-              <p>Fecha: {formatoFecha(turno.desde)}</p>
-              <p>Profesional: {turno.doctor.nombre}</p>
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg font-bold">
+              <h2 className="text-lg font-bold mb-2">Detalles del Turno</h2>
+              <p><span className="font-normal">Paciente: </span> {turno.paciente.nombre} {turno.paciente.apellido}</p>
+              <p><span className="font-normal">Servicio: </span> {turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}</p>
+              <p><span className="font-normal">Fecha: </span> {formatoFecha(turno.desde)}</p>
+              <p><span className="font-normal">Profesional :</span> {turno.doctor.nombre}</p>
+              <p><span className="font-normal">Consultorio :</span> {turno.consultorio.nombre}</p>
             </div>
           )}
           
-          <div className="flex justify-between mt-6">
-            <button
-              onClick={() => setConfirmationStep(false)}
-              className="px-4 py-2 bg-gray-300 text-gray-800 font-medium rounded-lg hover:bg-gray-400 inline-flex items-center"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
-              </svg>
-              Volver
-            </button>
+          <div className="flex justify-center mt-6 flex-wrap gap-4">
             <button
               onClick={handleCancelarTurno}
-              className="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 inline-flex items-center"
+              className="px-4 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 inline-flex items-center"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
               Confirmar Cancelación
+            </button>
+            <button
+              onClick={() => setConfirmationStep(false)}
+              className="px-4 py-2 bg-gray-300 text-gray-800 font-medium  rounded-md rounded-lg hover:bg-gray-400 inline-flex items-center"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+              </svg>
+              Volver
             </button>
           </div>
         </div>
@@ -223,13 +226,13 @@ export default function CancelarTurnoPage({ }) {
         
         {turno && (
           <div className="mb-6">
-            <div className="p-4 bg-gray-50 rounded-lg mb-6">
-              <h2 className="text-lg font-semibold mb-2">Detalles del Turno</h2>
-              <p><span className="font-medium">Paciente:</span> {turno.paciente.nombre} {turno.paciente.apellido}</p>
-              <p><span className="font-medium">Servicio:</span> {turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}</p>
-              <p><span className="font-medium">Fecha:</span> {formatoFecha(turno.desde)}</p>
-              <p><span className="font-medium">Profesional:</span> {turno.doctor.nombre}</p>
-              <p><span className="font-medium">Consultorio:</span> {turno.consultorio.nombre}</p>
+            <div className="p-4 bg-gray-50 rounded-lg mb-6 font-bold">
+              <h2 className="text-lg font-bold mb-2">Detalles del Turno</h2>
+              <p><span className="font-normal">Paciente: </span> {turno.paciente.nombre} {turno.paciente.apellido}</p>
+              <p><span className="font-normal">Servicio: </span> {turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}</p>
+              <p><span className="font-normal">Fecha: </span> {formatoFecha(turno.desde)}</p>
+              <p><span className="font-normal">Profesional :</span> {turno.doctor.nombre}</p>
+              <p><span className="font-normal">Consultorio :</span> {turno.consultorio.nombre}</p>
             </div>
             
             <p className="text-center mb-6">
@@ -239,7 +242,7 @@ export default function CancelarTurnoPage({ }) {
             <div className="flex justify-center">
               <button 
                 onClick={() => setConfirmationStep(true)} 
-                className="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 inline-flex items-center"
+                className="px-4 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 inline-flex items-center"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -253,7 +256,7 @@ export default function CancelarTurnoPage({ }) {
         <div className="mt-6 text-center">
           <Link 
             href="/"
-            className="text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] font-medium inline-flex items-center"
+            className="text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] bg-gray-300 px-4 py-2  rounded-md font-medium inline-flex items-center"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />

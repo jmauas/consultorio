@@ -2,6 +2,10 @@
 import { prisma } from '@/lib/prisma';
 import { obtenerConfig } from '@/lib/services/configService.js';
 import { agregarFeriados } from '@/lib/utils/variosUtils.js';
+import { enviarRecordatorioTurno } from '@/lib/services/sender/whatsappService';
+import { enviarMailConfTurno } from "@/lib/services/sender/resendService";
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 export const getTurnoById = async (id) => {
     try {
@@ -20,6 +24,92 @@ export const getTurnoById = async (id) => {
         return null;
     }
 }
+
+export const updateTurnoService = async (id, datos) => {
+  try {
+      console.log('ID del turno:', id);
+     
+      if (!id) {
+        return { 
+          ok: false, 
+          message: 'ID del turno no proporcionado' 
+        };
+      }
+  
+      // Verificar si el turno existe
+      const turnoExistente = await prisma.turno.findUnique({
+        where: { id }
+      });
+  
+      if (!turnoExistente) {
+        return { 
+          ok: false, 
+          message: 'Turno no encontrado' 
+        }
+      }
+  
+      let notificar = false;
+      
+      if (datos && datos.estado === 'cancelado' && turnoExistente.estado !== 'cancelado') {
+        notificar = true
+        const fhTurno = new Date(turnoExistente.desde);
+        const ahora = new Date();
+        const diffInMs = fhTurno - ahora;
+        console.log(new Date().toLocaleString()+'  -  '+'Diferencia en ms:', diffInMs)
+        const diffInHours = diffInMs / 1000 / 60 / 60;
+        console.log(new Date().toLocaleString()+'  -  '+'Diferencia en horas:', diffInHours)
+        datos.hsAviso = diffInHours.toString();
+        datos.fhCambioEstado = new Date().toISOString();
+        if (diffInHours <= 0) {
+            datos.penal = 'asa';
+        } else if (diffInHours < 48) {
+            datos.penal = 'ccr';
+        }
+      }    
+      if (datos && datos.estado != turnoExistente.estado) {
+        notificar = true
+      }
+      const session = await getServerSession(authOptions);
+      // Obtener el ID del usuario si existe sesión
+      const userId = session?.user?.id || null;
+      datos.updatedById = userId;
+      
+      // Actualizar el turno
+      const turnoActualizado = await prisma.turno.update({
+        where: { id },
+        data: datos,
+        include: {
+          paciente: true,
+          doctor: true,
+          consultorio: true,
+          coberturaMedica: true,
+          tipoDeTurno: true // Incluir el tipo de turno en la respuesta
+        }
+      });
+  
+      if (notificar) {
+        // Enviar notificación por WhatsApp
+        await enviarRecordatorioTurno(turnoActualizado, true);
+        
+        // Enviar correo electrónico
+        await enviarMailConfTurno(turnoActualizado, true);
+      }
+      return {
+        ok: true,
+        message: 'Turno cancelado exitosamente',
+        turno: turnoActualizado
+      };
+    } catch (error) {
+      console.error('Error al cancelar el turno:', error);
+      return {
+        ok: false,
+        message: 'Error al cancelar el turno',
+        error: error.message
+      };
+    }
+  }   
+
+
 
 export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, asa, ccr) => {
   try {

@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { obtenerConfig, obtenerUrlApp } from '@/lib/services/configService.js';
-
-const config = await obtenerConfig();
-    
+import { updateTurnoService } from '@/lib/services/turnos/turnosService.js'; 
+   
 // Ruta para manejar la cancelación de turnos mediante token
 export async function POST(request) {
   try {
@@ -42,31 +41,16 @@ export async function POST(request) {
       }, { status: 400 });
     }
     
-    const url = await obtenerUrlApp();
-    // Hacer una llamada a la API de turnos para actualizar el estado
-    const actualizacionResponse = await fetch(`${url || 'http://localhost:3000'}/api/turnos/${turno.id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-source': 'cancelacion-token'
-      },
-      body: JSON.stringify({
+   const res = await updateTurnoService(turno.id, {
         estado: 'cancelado',
         fhCambioEstado: new Date().toISOString()
-      })
-    });
+      });
     
-    if (!actualizacionResponse.ok) {
+    if (!res.ok) {
       throw new Error('Error al actualizar el estado del turno');
     }
     
-    const resultado = await actualizacionResponse.json();
-    
-    return NextResponse.json({ 
-      ok: true, 
-      message: 'Turno cancelado exitosamente',
-      turno: resultado.turno
-    });
+    return NextResponse.json(res, { status: 200 });
     
   } catch (error) {
     console.error('Error al cancelar turno:', error);
