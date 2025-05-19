@@ -6,6 +6,7 @@ import { enviarRecordatorioTurno } from '@/lib/services/sender/whatsappService';
 import { enviarMailConfTurno } from "@/lib/services/sender/resendService";
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { sonMismaFecha } from  '@/lib/utils/dateUtils';
 
 export const getTurnoById = async (id) => {
     try {
@@ -230,17 +231,9 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
             fechaFer.setHours(fechaFer.getHours() - 3);
             let dia = hoy.getUTCDay();
             const aten = { ...agenda.find(d => d.dia === dia) };
-            const esFeriado = feriados.some(f =>
-              f.getDate() === fechaFer.getDate() &&
-              f.getMonth() === fechaFer.getMonth() &&
-              f.getFullYear() === fechaFer.getFullYear()
-            );
+            const esFeriado = feriados.some(f => sonMismaFecha(f, fechaFer));
             const diasNoAitende = agregarFeriados([], doctor.feriados);
-            const noAtiende = diasNoAitende.some(f =>
-              f.getDate() === fechaFer.getDate() &&
-              f.getMonth() === fechaFer.getMonth() &&
-              f.getFullYear() === fechaFer.getFullYear()
-            );
+            const noAtiende = diasNoAitende.some(f => sonMismaFecha(f, fechaFer));
             if (noAtiende) {
               aten.atencion = false;
             } else if (atenEnFeriado && esFeriado) {
@@ -251,10 +244,26 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
               aten.corteHasta = atenEnFeriado.corteHasta;
             }
             if (!aten.atencion) {
-              hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-              hoy.setDate(hoy.getDate() + 1);
-              hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-              continue;
+               const agendaFecha = agenda.find(age =>
+                    age.atencion === true &&
+                    age.dia === 99
+                );
+                  if (agendaFecha) {
+                    const fechaAgenda = new Date(agendaFecha.fecha);
+                    if (sonMismaFecha(fechaAgenda, hoy)) {
+                        aten.atencion = true;
+                        aten.desde = agendaFecha.desde;
+                        aten.hasta = agendaFecha.hasta;
+                        aten.corteDesde = agendaFecha.corteDesde;
+                        aten.corteHasta = agendaFecha.corteHasta;
+                    }
+                }
+                if (!aten.atencion) {
+                  hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+                  hoy.setDate(hoy.getDate() + 1);
+                  hoy.setMinutes(hoy.getMinutes() - minutosTurno);
+                  continue;
+                }
             }
             const hora = hoy.getHours();
             const minutos = hoy.getMinutes();

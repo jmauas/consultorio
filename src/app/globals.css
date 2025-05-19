@@ -4,7 +4,7 @@
   --background: #ffffff;
   --foreground: #171717;
   /* --color-primary: #f97316; orange-500 */
-  --color-primary: #4823ad; /* orange-500 */
+  --color-primary: #f796f5; /* orange-500 */
   --color-primary-dark: #ea580c; /* orange-600 */
   --color-secondary: #f3f4f6; /* gray-100 */
   --card-bg: #d3e4ef; /* gris claro */
@@ -17,8 +17,8 @@
   --background: #121212;
   --foreground: #e0e0e0;
   /* --color-primary: #fb923c; orange-400 - más brillante en modo oscuro */
-  --color-primary: #cb13a3; /* orange-400 - más brillante en modo oscuro */
-  --color-primary-dark: #f97316; /* orange-500 */
+  --color-primary: #f057ee ; /* orange-400 - más brillante en modo oscuro */
+  --color-primary-dark: #750573; /* orange-500 */
   --color-secondary: #2d2d2d;
   --card-bg: #33383a; /* gris oscuro */
   --card-border: #333333;

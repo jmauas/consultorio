@@ -6,6 +6,7 @@ import EmailProvider from "next-auth/providers/email";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { PERFILES_USUARIO } from "@/lib/services/users/userService";
 
 // Configuración de NextAuth
 export const authOptions = {
@@ -45,6 +46,9 @@ export const authOptions = {
               where: { 
                 id: credentials.userId,
                 email: credentials.email
+              },
+              include: {
+                doctores: true,
               }
             });
             
@@ -66,7 +70,8 @@ export const authOptions = {
               name: user.name,
               email: user.email,
               image: user.image,
-              enabled: user.enabled
+              enabled: user.enabled,
+              perfil: PERFILES_USUARIO.find(p => p.id === user.perfil), 
             };
           } catch (error) {
             console.error("Error en autenticación con token:", error);
@@ -82,7 +87,10 @@ export const authOptions = {
         try {
           // Buscar usuario por email
           const user = await prisma.user.findUnique({
-            where: { email: credentials.email }
+            where: { email: credentials.email },
+              include: {
+                doctores: true,
+              }
           });
           
           // Si no se encuentra el usuario o no tiene contraseña
@@ -105,14 +113,15 @@ export const authOptions = {
           if (!passwordMatches) {
             return null;
           }
-          
           // Usuario autenticado correctamente - retornar datos sin incluir la contraseña
-          return {
+         return {
             id: user.id,
             name: user.name,
             email: user.email,
             image: user.image,
-            enabled: user.enabled
+            enabled: user.enabled,
+            perfil: PERFILES_USUARIO.find(p => p.id === user.perfil),
+            doctores: user.doctores,
           };
         } catch (error) {
           console.error("Error en autenticación:", error);
@@ -132,12 +141,18 @@ export const authOptions = {
     async session({ session, token }) {
       // Enviar propiedades del token a la sesión del cliente
       session.user.id = token.id;
+      session.user.enabled = token.enabled;
+      session.user.perfil = token.perfil;
+      session.user.doctores = token.doctores;
       return session;
     },
     async jwt({ token, user }) {
       // Persistir datos del usuario en el token JWT
       if (user) {
         token.id = user.id;
+        token.enabled = user.enabled;
+        token.perfil = user.perfil;
+        token.doctores = user.doctores;
       }
       return token;
     }

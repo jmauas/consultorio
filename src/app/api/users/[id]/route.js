@@ -74,14 +74,15 @@ export async function PUT(request, { params }) {
     
     // Obtener datos de actualización del cuerpo
     const userData = await request.json();
-    
-    // Actualizar el usuario
+      // Actualizar el usuario
     const resultado = await updateUser(id, userData);
     
     if (!resultado.ok) {
+      console.error('Error al actualizar usuario:', resultado);
       return NextResponse.json({
         ok: false,
-        message: resultado.message || 'Error al actualizar usuario'
+        message: resultado.message || 'Error al actualizar usuario',
+        error: resultado.error || null
       }, { status: 400 });
     }
     

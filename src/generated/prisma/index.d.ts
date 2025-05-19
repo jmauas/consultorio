@@ -2058,6 +2058,7 @@ export namespace Prisma {
     pacientesEditados: number
     turnosCreados: number
     turnosEditados: number
+    doctores: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2067,6 +2068,7 @@ export namespace Prisma {
     pacientesEditados?: boolean | UserCountOutputTypeCountPacientesEditadosArgs
     turnosCreados?: boolean | UserCountOutputTypeCountTurnosCreadosArgs
     turnosEditados?: boolean | UserCountOutputTypeCountTurnosEditadosArgs
+    doctores?: boolean | UserCountOutputTypeCountDoctoresArgs
   }
 
   // Custom InputTypes
@@ -2120,6 +2122,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountTurnosEditadosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TurnoWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountDoctoresArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DoctorWhereInput
   }
 
 
@@ -2180,12 +2189,14 @@ export namespace Prisma {
     AgendaDoctor: number
     TipoTurnoDoctor: number
     Turno: number
+    usuarios: number
   }
 
   export type DoctorCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     AgendaDoctor?: boolean | DoctorCountOutputTypeCountAgendaDoctorArgs
     TipoTurnoDoctor?: boolean | DoctorCountOutputTypeCountTipoTurnoDoctorArgs
     Turno?: boolean | DoctorCountOutputTypeCountTurnoArgs
+    usuarios?: boolean | DoctorCountOutputTypeCountUsuariosArgs
   }
 
   // Custom InputTypes
@@ -2218,6 +2229,13 @@ export namespace Prisma {
    */
   export type DoctorCountOutputTypeCountTurnoArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TurnoWhereInput
+  }
+
+  /**
+   * DoctorCountOutputType without action
+   */
+  export type DoctorCountOutputTypeCountUsuariosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserWhereInput
   }
 
 
@@ -4570,8 +4588,18 @@ export namespace Prisma {
 
   export type AggregateUser = {
     _count: UserCountAggregateOutputType | null
+    _avg: UserAvgAggregateOutputType | null
+    _sum: UserSumAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
+  }
+
+  export type UserAvgAggregateOutputType = {
+    perfil: number | null
+  }
+
+  export type UserSumAggregateOutputType = {
+    perfil: number | null
   }
 
   export type UserMinAggregateOutputType = {
@@ -4584,6 +4612,7 @@ export namespace Prisma {
     enabled: boolean | null
     token: string | null
     tokenExpires: Date | null
+    perfil: number | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -4596,6 +4625,7 @@ export namespace Prisma {
     enabled: boolean | null
     token: string | null
     tokenExpires: Date | null
+    perfil: number | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -4608,9 +4638,18 @@ export namespace Prisma {
     enabled: number
     token: number
     tokenExpires: number
+    perfil: number
     _all: number
   }
 
+
+  export type UserAvgAggregateInputType = {
+    perfil?: true
+  }
+
+  export type UserSumAggregateInputType = {
+    perfil?: true
+  }
 
   export type UserMinAggregateInputType = {
     id?: true
@@ -4622,6 +4661,7 @@ export namespace Prisma {
     enabled?: true
     token?: true
     tokenExpires?: true
+    perfil?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -4634,6 +4674,7 @@ export namespace Prisma {
     enabled?: true
     token?: true
     tokenExpires?: true
+    perfil?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -4646,6 +4687,7 @@ export namespace Prisma {
     enabled?: true
     token?: true
     tokenExpires?: true
+    perfil?: true
     _all?: true
   }
 
@@ -4687,6 +4729,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: UserAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: UserSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: UserMinAggregateInputType
@@ -4717,6 +4771,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: UserCountAggregateInputType | true
+    _avg?: UserAvgAggregateInputType
+    _sum?: UserSumAggregateInputType
     _min?: UserMinAggregateInputType
     _max?: UserMaxAggregateInputType
   }
@@ -4731,7 +4787,10 @@ export namespace Prisma {
     enabled: boolean
     token: string | null
     tokenExpires: Date | null
+    perfil: number
     _count: UserCountAggregateOutputType | null
+    _avg: UserAvgAggregateOutputType | null
+    _sum: UserSumAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
   }
@@ -4760,12 +4819,14 @@ export namespace Prisma {
     enabled?: boolean
     token?: boolean
     tokenExpires?: boolean
+    perfil?: boolean
     accounts?: boolean | User$accountsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     pacientesCreados?: boolean | User$pacientesCreadosArgs<ExtArgs>
     pacientesEditados?: boolean | User$pacientesEditadosArgs<ExtArgs>
     turnosCreados?: boolean | User$turnosCreadosArgs<ExtArgs>
     turnosEditados?: boolean | User$turnosEditadosArgs<ExtArgs>
+    doctores?: boolean | User$doctoresArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -4779,6 +4840,7 @@ export namespace Prisma {
     enabled?: boolean
     token?: boolean
     tokenExpires?: boolean
+    perfil?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -4791,6 +4853,7 @@ export namespace Prisma {
     enabled?: boolean
     token?: boolean
     tokenExpires?: boolean
+    perfil?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -4803,9 +4866,10 @@ export namespace Prisma {
     enabled?: boolean
     token?: boolean
     tokenExpires?: boolean
+    perfil?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "password" | "enabled" | "token" | "tokenExpires", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "password" | "enabled" | "token" | "tokenExpires" | "perfil", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | User$accountsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
@@ -4813,6 +4877,7 @@ export namespace Prisma {
     pacientesEditados?: boolean | User$pacientesEditadosArgs<ExtArgs>
     turnosCreados?: boolean | User$turnosCreadosArgs<ExtArgs>
     turnosEditados?: boolean | User$turnosEditadosArgs<ExtArgs>
+    doctores?: boolean | User$doctoresArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -4827,6 +4892,7 @@ export namespace Prisma {
       pacientesEditados: Prisma.$PacientePayload<ExtArgs>[]
       turnosCreados: Prisma.$TurnoPayload<ExtArgs>[]
       turnosEditados: Prisma.$TurnoPayload<ExtArgs>[]
+      doctores: Prisma.$DoctorPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4838,6 +4904,7 @@ export namespace Prisma {
       enabled: boolean
       token: string | null
       tokenExpires: Date | null
+      perfil: number
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -5238,6 +5305,7 @@ export namespace Prisma {
     pacientesEditados<T extends User$pacientesEditadosArgs<ExtArgs> = {}>(args?: Subset<T, User$pacientesEditadosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PacientePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     turnosCreados<T extends User$turnosCreadosArgs<ExtArgs> = {}>(args?: Subset<T, User$turnosCreadosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TurnoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     turnosEditados<T extends User$turnosEditadosArgs<ExtArgs> = {}>(args?: Subset<T, User$turnosEditadosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TurnoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    doctores<T extends User$doctoresArgs<ExtArgs> = {}>(args?: Subset<T, User$doctoresArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DoctorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5276,6 +5344,7 @@ export namespace Prisma {
     readonly enabled: FieldRef<"User", 'Boolean'>
     readonly token: FieldRef<"User", 'String'>
     readonly tokenExpires: FieldRef<"User", 'DateTime'>
+    readonly perfil: FieldRef<"User", 'Int'>
   }
     
 
@@ -5805,6 +5874,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: TurnoScalarFieldEnum | TurnoScalarFieldEnum[]
+  }
+
+  /**
+   * User.doctores
+   */
+  export type User$doctoresArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Doctor
+     */
+    select?: DoctorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Doctor
+     */
+    omit?: DoctorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DoctorInclude<ExtArgs> | null
+    where?: DoctorWhereInput
+    orderBy?: DoctorOrderByWithRelationInput | DoctorOrderByWithRelationInput[]
+    cursor?: DoctorWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DoctorScalarFieldEnum | DoctorScalarFieldEnum[]
   }
 
   /**
@@ -9338,6 +9431,7 @@ export namespace Prisma {
     AgendaDoctor?: boolean | Doctor$AgendaDoctorArgs<ExtArgs>
     TipoTurnoDoctor?: boolean | Doctor$TipoTurnoDoctorArgs<ExtArgs>
     Turno?: boolean | Doctor$TurnoArgs<ExtArgs>
+    usuarios?: boolean | Doctor$usuariosArgs<ExtArgs>
     _count?: boolean | DoctorCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["doctor"]>
 
@@ -9376,6 +9470,7 @@ export namespace Prisma {
     AgendaDoctor?: boolean | Doctor$AgendaDoctorArgs<ExtArgs>
     TipoTurnoDoctor?: boolean | Doctor$TipoTurnoDoctorArgs<ExtArgs>
     Turno?: boolean | Doctor$TurnoArgs<ExtArgs>
+    usuarios?: boolean | Doctor$usuariosArgs<ExtArgs>
     _count?: boolean | DoctorCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type DoctorIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -9387,6 +9482,7 @@ export namespace Prisma {
       AgendaDoctor: Prisma.$AgendaDoctorPayload<ExtArgs>[]
       TipoTurnoDoctor: Prisma.$TipoTurnoDoctorPayload<ExtArgs>[]
       Turno: Prisma.$TurnoPayload<ExtArgs>[]
+      usuarios: Prisma.$UserPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -9793,6 +9889,7 @@ export namespace Prisma {
     AgendaDoctor<T extends Doctor$AgendaDoctorArgs<ExtArgs> = {}>(args?: Subset<T, Doctor$AgendaDoctorArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgendaDoctorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     TipoTurnoDoctor<T extends Doctor$TipoTurnoDoctorArgs<ExtArgs> = {}>(args?: Subset<T, Doctor$TipoTurnoDoctorArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TipoTurnoDoctorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     Turno<T extends Doctor$TurnoArgs<ExtArgs> = {}>(args?: Subset<T, Doctor$TurnoArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TurnoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    usuarios<T extends Doctor$usuariosArgs<ExtArgs> = {}>(args?: Subset<T, Doctor$usuariosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10289,6 +10386,30 @@ export namespace Prisma {
   }
 
   /**
+   * Doctor.usuarios
+   */
+  export type Doctor$usuariosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+    orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
+    cursor?: UserWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
+  }
+
+  /**
    * Doctor without action
    */
   export type DoctorDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -10332,6 +10453,7 @@ export namespace Prisma {
     doctorId: string | null
     consultorioId: string | null
     dia: number | null
+    fecha: Date | null
     nombre: string | null
     atencion: boolean | null
     desde: string | null
@@ -10347,6 +10469,7 @@ export namespace Prisma {
     doctorId: string | null
     consultorioId: string | null
     dia: number | null
+    fecha: Date | null
     nombre: string | null
     atencion: boolean | null
     desde: string | null
@@ -10362,6 +10485,7 @@ export namespace Prisma {
     doctorId: number
     consultorioId: number
     dia: number
+    fecha: number
     nombre: number
     atencion: number
     desde: number
@@ -10387,6 +10511,7 @@ export namespace Prisma {
     doctorId?: true
     consultorioId?: true
     dia?: true
+    fecha?: true
     nombre?: true
     atencion?: true
     desde?: true
@@ -10402,6 +10527,7 @@ export namespace Prisma {
     doctorId?: true
     consultorioId?: true
     dia?: true
+    fecha?: true
     nombre?: true
     atencion?: true
     desde?: true
@@ -10417,6 +10543,7 @@ export namespace Prisma {
     doctorId?: true
     consultorioId?: true
     dia?: true
+    fecha?: true
     nombre?: true
     atencion?: true
     desde?: true
@@ -10519,6 +10646,7 @@ export namespace Prisma {
     doctorId: string
     consultorioId: string | null
     dia: number
+    fecha: Date | null
     nombre: string
     atencion: boolean
     desde: string
@@ -10553,6 +10681,7 @@ export namespace Prisma {
     doctorId?: boolean
     consultorioId?: boolean
     dia?: boolean
+    fecha?: boolean
     nombre?: boolean
     atencion?: boolean
     desde?: boolean
@@ -10570,6 +10699,7 @@ export namespace Prisma {
     doctorId?: boolean
     consultorioId?: boolean
     dia?: boolean
+    fecha?: boolean
     nombre?: boolean
     atencion?: boolean
     desde?: boolean
@@ -10587,6 +10717,7 @@ export namespace Prisma {
     doctorId?: boolean
     consultorioId?: boolean
     dia?: boolean
+    fecha?: boolean
     nombre?: boolean
     atencion?: boolean
     desde?: boolean
@@ -10604,6 +10735,7 @@ export namespace Prisma {
     doctorId?: boolean
     consultorioId?: boolean
     dia?: boolean
+    fecha?: boolean
     nombre?: boolean
     atencion?: boolean
     desde?: boolean
@@ -10614,7 +10746,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type AgendaDoctorOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "doctorId" | "consultorioId" | "dia" | "nombre" | "atencion" | "desde" | "hasta" | "corteDesde" | "corteHasta" | "createdAt" | "updatedAt", ExtArgs["result"]["agendaDoctor"]>
+  export type AgendaDoctorOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "doctorId" | "consultorioId" | "dia" | "fecha" | "nombre" | "atencion" | "desde" | "hasta" | "corteDesde" | "corteHasta" | "createdAt" | "updatedAt", ExtArgs["result"]["agendaDoctor"]>
   export type AgendaDoctorInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     doctor?: boolean | DoctorDefaultArgs<ExtArgs>
     consultorio?: boolean | AgendaDoctor$consultorioArgs<ExtArgs>
@@ -10639,6 +10771,7 @@ export namespace Prisma {
       doctorId: string
       consultorioId: string | null
       dia: number
+      fecha: Date | null
       nombre: string
       atencion: boolean
       desde: string
@@ -11076,6 +11209,7 @@ export namespace Prisma {
     readonly doctorId: FieldRef<"AgendaDoctor", 'String'>
     readonly consultorioId: FieldRef<"AgendaDoctor", 'String'>
     readonly dia: FieldRef<"AgendaDoctor", 'Int'>
+    readonly fecha: FieldRef<"AgendaDoctor", 'DateTime'>
     readonly nombre: FieldRef<"AgendaDoctor", 'String'>
     readonly atencion: FieldRef<"AgendaDoctor", 'Boolean'>
     readonly desde: FieldRef<"AgendaDoctor", 'String'>
@@ -18539,7 +18673,8 @@ export namespace Prisma {
     password: 'password',
     enabled: 'enabled',
     token: 'token',
-    tokenExpires: 'tokenExpires'
+    tokenExpires: 'tokenExpires',
+    perfil: 'perfil'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -18613,6 +18748,7 @@ export namespace Prisma {
     doctorId: 'doctorId',
     consultorioId: 'consultorioId',
     dia: 'dia',
+    fecha: 'fecha',
     nombre: 'nombre',
     atencion: 'atencion',
     desde: 'desde',
@@ -18973,12 +19109,14 @@ export namespace Prisma {
     enabled?: BoolFilter<"User"> | boolean
     token?: StringNullableFilter<"User"> | string | null
     tokenExpires?: DateTimeNullableFilter<"User"> | Date | string | null
+    perfil?: IntFilter<"User"> | number
     accounts?: AccountListRelationFilter
     sessions?: SessionListRelationFilter
     pacientesCreados?: PacienteListRelationFilter
     pacientesEditados?: PacienteListRelationFilter
     turnosCreados?: TurnoListRelationFilter
     turnosEditados?: TurnoListRelationFilter
+    doctores?: DoctorListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -18991,12 +19129,14 @@ export namespace Prisma {
     enabled?: SortOrder
     token?: SortOrderInput | SortOrder
     tokenExpires?: SortOrderInput | SortOrder
+    perfil?: SortOrder
     accounts?: AccountOrderByRelationAggregateInput
     sessions?: SessionOrderByRelationAggregateInput
     pacientesCreados?: PacienteOrderByRelationAggregateInput
     pacientesEditados?: PacienteOrderByRelationAggregateInput
     turnosCreados?: TurnoOrderByRelationAggregateInput
     turnosEditados?: TurnoOrderByRelationAggregateInput
+    doctores?: DoctorOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -19012,12 +19152,14 @@ export namespace Prisma {
     enabled?: BoolFilter<"User"> | boolean
     token?: StringNullableFilter<"User"> | string | null
     tokenExpires?: DateTimeNullableFilter<"User"> | Date | string | null
+    perfil?: IntFilter<"User"> | number
     accounts?: AccountListRelationFilter
     sessions?: SessionListRelationFilter
     pacientesCreados?: PacienteListRelationFilter
     pacientesEditados?: PacienteListRelationFilter
     turnosCreados?: TurnoListRelationFilter
     turnosEditados?: TurnoListRelationFilter
+    doctores?: DoctorListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -19030,9 +19172,12 @@ export namespace Prisma {
     enabled?: SortOrder
     token?: SortOrderInput | SortOrder
     tokenExpires?: SortOrderInput | SortOrder
+    perfil?: SortOrder
     _count?: UserCountOrderByAggregateInput
+    _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
+    _sum?: UserSumOrderByAggregateInput
   }
 
   export type UserScalarWhereWithAggregatesInput = {
@@ -19048,6 +19193,7 @@ export namespace Prisma {
     enabled?: BoolWithAggregatesFilter<"User"> | boolean
     token?: StringNullableWithAggregatesFilter<"User"> | string | null
     tokenExpires?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    perfil?: IntWithAggregatesFilter<"User"> | number
   }
 
   export type VerificationTokenWhereInput = {
@@ -19315,6 +19461,7 @@ export namespace Prisma {
     AgendaDoctor?: AgendaDoctorListRelationFilter
     TipoTurnoDoctor?: TipoTurnoDoctorListRelationFilter
     Turno?: TurnoListRelationFilter
+    usuarios?: UserListRelationFilter
   }
 
   export type DoctorOrderByWithRelationInput = {
@@ -19328,6 +19475,7 @@ export namespace Prisma {
     AgendaDoctor?: AgendaDoctorOrderByRelationAggregateInput
     TipoTurnoDoctor?: TipoTurnoDoctorOrderByRelationAggregateInput
     Turno?: TurnoOrderByRelationAggregateInput
+    usuarios?: UserOrderByRelationAggregateInput
   }
 
   export type DoctorWhereUniqueInput = Prisma.AtLeast<{
@@ -19344,6 +19492,7 @@ export namespace Prisma {
     AgendaDoctor?: AgendaDoctorListRelationFilter
     TipoTurnoDoctor?: TipoTurnoDoctorListRelationFilter
     Turno?: TurnoListRelationFilter
+    usuarios?: UserListRelationFilter
   }, "id">
 
   export type DoctorOrderByWithAggregationInput = {
@@ -19380,6 +19529,7 @@ export namespace Prisma {
     doctorId?: StringFilter<"AgendaDoctor"> | string
     consultorioId?: StringNullableFilter<"AgendaDoctor"> | string | null
     dia?: IntFilter<"AgendaDoctor"> | number
+    fecha?: DateTimeNullableFilter<"AgendaDoctor"> | Date | string | null
     nombre?: StringFilter<"AgendaDoctor"> | string
     atencion?: BoolFilter<"AgendaDoctor"> | boolean
     desde?: StringFilter<"AgendaDoctor"> | string
@@ -19397,6 +19547,7 @@ export namespace Prisma {
     doctorId?: SortOrder
     consultorioId?: SortOrderInput | SortOrder
     dia?: SortOrder
+    fecha?: SortOrderInput | SortOrder
     nombre?: SortOrder
     atencion?: SortOrder
     desde?: SortOrder
@@ -19417,6 +19568,7 @@ export namespace Prisma {
     doctorId?: StringFilter<"AgendaDoctor"> | string
     consultorioId?: StringNullableFilter<"AgendaDoctor"> | string | null
     dia?: IntFilter<"AgendaDoctor"> | number
+    fecha?: DateTimeNullableFilter<"AgendaDoctor"> | Date | string | null
     nombre?: StringFilter<"AgendaDoctor"> | string
     atencion?: BoolFilter<"AgendaDoctor"> | boolean
     desde?: StringFilter<"AgendaDoctor"> | string
@@ -19434,6 +19586,7 @@ export namespace Prisma {
     doctorId?: SortOrder
     consultorioId?: SortOrderInput | SortOrder
     dia?: SortOrder
+    fecha?: SortOrderInput | SortOrder
     nombre?: SortOrder
     atencion?: SortOrder
     desde?: SortOrder
@@ -19457,6 +19610,7 @@ export namespace Prisma {
     doctorId?: StringWithAggregatesFilter<"AgendaDoctor"> | string
     consultorioId?: StringNullableWithAggregatesFilter<"AgendaDoctor"> | string | null
     dia?: IntWithAggregatesFilter<"AgendaDoctor"> | number
+    fecha?: DateTimeNullableWithAggregatesFilter<"AgendaDoctor"> | Date | string | null
     nombre?: StringWithAggregatesFilter<"AgendaDoctor"> | string
     atencion?: BoolWithAggregatesFilter<"AgendaDoctor"> | boolean
     desde?: StringWithAggregatesFilter<"AgendaDoctor"> | string
@@ -20142,12 +20296,14 @@ export namespace Prisma {
     enabled?: boolean
     token?: string | null
     tokenExpires?: Date | string | null
+    perfil?: number
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     pacientesCreados?: PacienteCreateNestedManyWithoutCreatedByInput
     pacientesEditados?: PacienteCreateNestedManyWithoutUpdatedByInput
     turnosCreados?: TurnoCreateNestedManyWithoutCreatedByInput
     turnosEditados?: TurnoCreateNestedManyWithoutUpdatedByInput
+    doctores?: DoctorCreateNestedManyWithoutUsuariosInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -20160,12 +20316,14 @@ export namespace Prisma {
     enabled?: boolean
     token?: string | null
     tokenExpires?: Date | string | null
+    perfil?: number
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     pacientesCreados?: PacienteUncheckedCreateNestedManyWithoutCreatedByInput
     pacientesEditados?: PacienteUncheckedCreateNestedManyWithoutUpdatedByInput
     turnosCreados?: TurnoUncheckedCreateNestedManyWithoutCreatedByInput
     turnosEditados?: TurnoUncheckedCreateNestedManyWithoutUpdatedByInput
+    doctores?: DoctorUncheckedCreateNestedManyWithoutUsuariosInput
   }
 
   export type UserUpdateInput = {
@@ -20178,12 +20336,14 @@ export namespace Prisma {
     enabled?: BoolFieldUpdateOperationsInput | boolean
     token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    perfil?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     pacientesCreados?: PacienteUpdateManyWithoutCreatedByNestedInput
     pacientesEditados?: PacienteUpdateManyWithoutUpdatedByNestedInput
     turnosCreados?: TurnoUpdateManyWithoutCreatedByNestedInput
     turnosEditados?: TurnoUpdateManyWithoutUpdatedByNestedInput
+    doctores?: DoctorUpdateManyWithoutUsuariosNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -20196,12 +20356,14 @@ export namespace Prisma {
     enabled?: BoolFieldUpdateOperationsInput | boolean
     token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    perfil?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     pacientesCreados?: PacienteUncheckedUpdateManyWithoutCreatedByNestedInput
     pacientesEditados?: PacienteUncheckedUpdateManyWithoutUpdatedByNestedInput
     turnosCreados?: TurnoUncheckedUpdateManyWithoutCreatedByNestedInput
     turnosEditados?: TurnoUncheckedUpdateManyWithoutUpdatedByNestedInput
+    doctores?: DoctorUncheckedUpdateManyWithoutUsuariosNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -20214,6 +20376,7 @@ export namespace Prisma {
     enabled?: boolean
     token?: string | null
     tokenExpires?: Date | string | null
+    perfil?: number
   }
 
   export type UserUpdateManyMutationInput = {
@@ -20226,6 +20389,7 @@ export namespace Prisma {
     enabled?: BoolFieldUpdateOperationsInput | boolean
     token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    perfil?: IntFieldUpdateOperationsInput | number
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -20238,6 +20402,7 @@ export namespace Prisma {
     enabled?: BoolFieldUpdateOperationsInput | boolean
     token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    perfil?: IntFieldUpdateOperationsInput | number
   }
 
   export type VerificationTokenCreateInput = {
@@ -20550,6 +20715,7 @@ export namespace Prisma {
     AgendaDoctor?: AgendaDoctorCreateNestedManyWithoutDoctorInput
     TipoTurnoDoctor?: TipoTurnoDoctorCreateNestedManyWithoutDoctorInput
     Turno?: TurnoCreateNestedManyWithoutDoctorInput
+    usuarios?: UserCreateNestedManyWithoutDoctoresInput
   }
 
   export type DoctorUncheckedCreateInput = {
@@ -20563,6 +20729,7 @@ export namespace Prisma {
     AgendaDoctor?: AgendaDoctorUncheckedCreateNestedManyWithoutDoctorInput
     TipoTurnoDoctor?: TipoTurnoDoctorUncheckedCreateNestedManyWithoutDoctorInput
     Turno?: TurnoUncheckedCreateNestedManyWithoutDoctorInput
+    usuarios?: UserUncheckedCreateNestedManyWithoutDoctoresInput
   }
 
   export type DoctorUpdateInput = {
@@ -20576,6 +20743,7 @@ export namespace Prisma {
     AgendaDoctor?: AgendaDoctorUpdateManyWithoutDoctorNestedInput
     TipoTurnoDoctor?: TipoTurnoDoctorUpdateManyWithoutDoctorNestedInput
     Turno?: TurnoUpdateManyWithoutDoctorNestedInput
+    usuarios?: UserUpdateManyWithoutDoctoresNestedInput
   }
 
   export type DoctorUncheckedUpdateInput = {
@@ -20589,6 +20757,7 @@ export namespace Prisma {
     AgendaDoctor?: AgendaDoctorUncheckedUpdateManyWithoutDoctorNestedInput
     TipoTurnoDoctor?: TipoTurnoDoctorUncheckedUpdateManyWithoutDoctorNestedInput
     Turno?: TurnoUncheckedUpdateManyWithoutDoctorNestedInput
+    usuarios?: UserUncheckedUpdateManyWithoutDoctoresNestedInput
   }
 
   export type DoctorCreateManyInput = {
@@ -20624,6 +20793,7 @@ export namespace Prisma {
   export type AgendaDoctorCreateInput = {
     id?: string
     dia: number
+    fecha?: Date | string | null
     nombre: string
     atencion: boolean
     desde: string
@@ -20641,6 +20811,7 @@ export namespace Prisma {
     doctorId: string
     consultorioId?: string | null
     dia: number
+    fecha?: Date | string | null
     nombre: string
     atencion: boolean
     desde: string
@@ -20654,6 +20825,7 @@ export namespace Prisma {
   export type AgendaDoctorUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     dia?: IntFieldUpdateOperationsInput | number
+    fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nombre?: StringFieldUpdateOperationsInput | string
     atencion?: BoolFieldUpdateOperationsInput | boolean
     desde?: StringFieldUpdateOperationsInput | string
@@ -20671,6 +20843,7 @@ export namespace Prisma {
     doctorId?: StringFieldUpdateOperationsInput | string
     consultorioId?: NullableStringFieldUpdateOperationsInput | string | null
     dia?: IntFieldUpdateOperationsInput | number
+    fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nombre?: StringFieldUpdateOperationsInput | string
     atencion?: BoolFieldUpdateOperationsInput | boolean
     desde?: StringFieldUpdateOperationsInput | string
@@ -20686,6 +20859,7 @@ export namespace Prisma {
     doctorId: string
     consultorioId?: string | null
     dia: number
+    fecha?: Date | string | null
     nombre: string
     atencion: boolean
     desde: string
@@ -20699,6 +20873,7 @@ export namespace Prisma {
   export type AgendaDoctorUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     dia?: IntFieldUpdateOperationsInput | number
+    fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nombre?: StringFieldUpdateOperationsInput | string
     atencion?: BoolFieldUpdateOperationsInput | boolean
     desde?: StringFieldUpdateOperationsInput | string
@@ -20714,6 +20889,7 @@ export namespace Prisma {
     doctorId?: StringFieldUpdateOperationsInput | string
     consultorioId?: NullableStringFieldUpdateOperationsInput | string | null
     dia?: IntFieldUpdateOperationsInput | number
+    fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nombre?: StringFieldUpdateOperationsInput | string
     atencion?: BoolFieldUpdateOperationsInput | boolean
     desde?: StringFieldUpdateOperationsInput | string
@@ -21502,6 +21678,17 @@ export namespace Prisma {
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
   export type AccountListRelationFilter = {
     every?: AccountWhereInput
     some?: AccountWhereInput
@@ -21526,6 +21713,12 @@ export namespace Prisma {
     none?: TurnoWhereInput
   }
 
+  export type DoctorListRelationFilter = {
+    every?: DoctorWhereInput
+    some?: DoctorWhereInput
+    none?: DoctorWhereInput
+  }
+
   export type AccountOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -21542,6 +21735,10 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type DoctorOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -21552,6 +21749,11 @@ export namespace Prisma {
     enabled?: SortOrder
     token?: SortOrder
     tokenExpires?: SortOrder
+    perfil?: SortOrder
+  }
+
+  export type UserAvgOrderByAggregateInput = {
+    perfil?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -21564,6 +21766,7 @@ export namespace Prisma {
     enabled?: SortOrder
     token?: SortOrder
     tokenExpires?: SortOrder
+    perfil?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -21576,6 +21779,11 @@ export namespace Prisma {
     enabled?: SortOrder
     token?: SortOrder
     tokenExpires?: SortOrder
+    perfil?: SortOrder
+  }
+
+  export type UserSumOrderByAggregateInput = {
+    perfil?: SortOrder
   }
 
   export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -21598,6 +21806,22 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type VerificationTokenIdentifierTokenCompoundUniqueInput = {
@@ -21754,6 +21978,16 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type UserListRelationFilter = {
+    every?: UserWhereInput
+    some?: UserWhereInput
+    none?: UserWhereInput
+  }
+
+  export type UserOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type DoctorCountOrderByAggregateInput = {
     id?: SortOrder
     nombre?: SortOrder
@@ -21782,17 +22016,6 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
   export type DoctorScalarRelationFilter = {
     is?: DoctorWhereInput
     isNot?: DoctorWhereInput
@@ -21808,6 +22031,7 @@ export namespace Prisma {
     doctorId?: SortOrder
     consultorioId?: SortOrder
     dia?: SortOrder
+    fecha?: SortOrder
     nombre?: SortOrder
     atencion?: SortOrder
     desde?: SortOrder
@@ -21827,6 +22051,7 @@ export namespace Prisma {
     doctorId?: SortOrder
     consultorioId?: SortOrder
     dia?: SortOrder
+    fecha?: SortOrder
     nombre?: SortOrder
     atencion?: SortOrder
     desde?: SortOrder
@@ -21842,6 +22067,7 @@ export namespace Prisma {
     doctorId?: SortOrder
     consultorioId?: SortOrder
     dia?: SortOrder
+    fecha?: SortOrder
     nombre?: SortOrder
     atencion?: SortOrder
     desde?: SortOrder
@@ -21854,22 +22080,6 @@ export namespace Prisma {
 
   export type AgendaDoctorSumOrderByAggregateInput = {
     dia?: SortOrder
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type ConsultorioListRelationFilter = {
@@ -22244,6 +22454,12 @@ export namespace Prisma {
     connect?: TurnoWhereUniqueInput | TurnoWhereUniqueInput[]
   }
 
+  export type DoctorCreateNestedManyWithoutUsuariosInput = {
+    create?: XOR<DoctorCreateWithoutUsuariosInput, DoctorUncheckedCreateWithoutUsuariosInput> | DoctorCreateWithoutUsuariosInput[] | DoctorUncheckedCreateWithoutUsuariosInput[]
+    connectOrCreate?: DoctorCreateOrConnectWithoutUsuariosInput | DoctorCreateOrConnectWithoutUsuariosInput[]
+    connect?: DoctorWhereUniqueInput | DoctorWhereUniqueInput[]
+  }
+
   export type AccountUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -22286,12 +22502,26 @@ export namespace Prisma {
     connect?: TurnoWhereUniqueInput | TurnoWhereUniqueInput[]
   }
 
+  export type DoctorUncheckedCreateNestedManyWithoutUsuariosInput = {
+    create?: XOR<DoctorCreateWithoutUsuariosInput, DoctorUncheckedCreateWithoutUsuariosInput> | DoctorCreateWithoutUsuariosInput[] | DoctorUncheckedCreateWithoutUsuariosInput[]
+    connectOrCreate?: DoctorCreateOrConnectWithoutUsuariosInput | DoctorCreateOrConnectWithoutUsuariosInput[]
+    connect?: DoctorWhereUniqueInput | DoctorWhereUniqueInput[]
+  }
+
   export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null
   }
 
   export type BoolFieldUpdateOperationsInput = {
     set?: boolean
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type AccountUpdateManyWithoutUserNestedInput = {
@@ -22378,6 +22608,19 @@ export namespace Prisma {
     deleteMany?: TurnoScalarWhereInput | TurnoScalarWhereInput[]
   }
 
+  export type DoctorUpdateManyWithoutUsuariosNestedInput = {
+    create?: XOR<DoctorCreateWithoutUsuariosInput, DoctorUncheckedCreateWithoutUsuariosInput> | DoctorCreateWithoutUsuariosInput[] | DoctorUncheckedCreateWithoutUsuariosInput[]
+    connectOrCreate?: DoctorCreateOrConnectWithoutUsuariosInput | DoctorCreateOrConnectWithoutUsuariosInput[]
+    upsert?: DoctorUpsertWithWhereUniqueWithoutUsuariosInput | DoctorUpsertWithWhereUniqueWithoutUsuariosInput[]
+    set?: DoctorWhereUniqueInput | DoctorWhereUniqueInput[]
+    disconnect?: DoctorWhereUniqueInput | DoctorWhereUniqueInput[]
+    delete?: DoctorWhereUniqueInput | DoctorWhereUniqueInput[]
+    connect?: DoctorWhereUniqueInput | DoctorWhereUniqueInput[]
+    update?: DoctorUpdateWithWhereUniqueWithoutUsuariosInput | DoctorUpdateWithWhereUniqueWithoutUsuariosInput[]
+    updateMany?: DoctorUpdateManyWithWhereWithoutUsuariosInput | DoctorUpdateManyWithWhereWithoutUsuariosInput[]
+    deleteMany?: DoctorScalarWhereInput | DoctorScalarWhereInput[]
+  }
+
   export type AccountUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -22460,6 +22703,19 @@ export namespace Prisma {
     update?: TurnoUpdateWithWhereUniqueWithoutUpdatedByInput | TurnoUpdateWithWhereUniqueWithoutUpdatedByInput[]
     updateMany?: TurnoUpdateManyWithWhereWithoutUpdatedByInput | TurnoUpdateManyWithWhereWithoutUpdatedByInput[]
     deleteMany?: TurnoScalarWhereInput | TurnoScalarWhereInput[]
+  }
+
+  export type DoctorUncheckedUpdateManyWithoutUsuariosNestedInput = {
+    create?: XOR<DoctorCreateWithoutUsuariosInput, DoctorUncheckedCreateWithoutUsuariosInput> | DoctorCreateWithoutUsuariosInput[] | DoctorUncheckedCreateWithoutUsuariosInput[]
+    connectOrCreate?: DoctorCreateOrConnectWithoutUsuariosInput | DoctorCreateOrConnectWithoutUsuariosInput[]
+    upsert?: DoctorUpsertWithWhereUniqueWithoutUsuariosInput | DoctorUpsertWithWhereUniqueWithoutUsuariosInput[]
+    set?: DoctorWhereUniqueInput | DoctorWhereUniqueInput[]
+    disconnect?: DoctorWhereUniqueInput | DoctorWhereUniqueInput[]
+    delete?: DoctorWhereUniqueInput | DoctorWhereUniqueInput[]
+    connect?: DoctorWhereUniqueInput | DoctorWhereUniqueInput[]
+    update?: DoctorUpdateWithWhereUniqueWithoutUsuariosInput | DoctorUpdateWithWhereUniqueWithoutUsuariosInput[]
+    updateMany?: DoctorUpdateManyWithWhereWithoutUsuariosInput | DoctorUpdateManyWithWhereWithoutUsuariosInput[]
+    deleteMany?: DoctorScalarWhereInput | DoctorScalarWhereInput[]
   }
 
   export type ConfiguracionConsultorioCreateferiadosInput = {
@@ -22618,6 +22874,12 @@ export namespace Prisma {
     connect?: TurnoWhereUniqueInput | TurnoWhereUniqueInput[]
   }
 
+  export type UserCreateNestedManyWithoutDoctoresInput = {
+    create?: XOR<UserCreateWithoutDoctoresInput, UserUncheckedCreateWithoutDoctoresInput> | UserCreateWithoutDoctoresInput[] | UserUncheckedCreateWithoutDoctoresInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutDoctoresInput | UserCreateOrConnectWithoutDoctoresInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  }
+
   export type AgendaDoctorUncheckedCreateNestedManyWithoutDoctorInput = {
     create?: XOR<AgendaDoctorCreateWithoutDoctorInput, AgendaDoctorUncheckedCreateWithoutDoctorInput> | AgendaDoctorCreateWithoutDoctorInput[] | AgendaDoctorUncheckedCreateWithoutDoctorInput[]
     connectOrCreate?: AgendaDoctorCreateOrConnectWithoutDoctorInput | AgendaDoctorCreateOrConnectWithoutDoctorInput[]
@@ -22637,6 +22899,12 @@ export namespace Prisma {
     connectOrCreate?: TurnoCreateOrConnectWithoutDoctorInput | TurnoCreateOrConnectWithoutDoctorInput[]
     createMany?: TurnoCreateManyDoctorInputEnvelope
     connect?: TurnoWhereUniqueInput | TurnoWhereUniqueInput[]
+  }
+
+  export type UserUncheckedCreateNestedManyWithoutDoctoresInput = {
+    create?: XOR<UserCreateWithoutDoctoresInput, UserUncheckedCreateWithoutDoctoresInput> | UserCreateWithoutDoctoresInput[] | UserUncheckedCreateWithoutDoctoresInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutDoctoresInput | UserCreateOrConnectWithoutDoctoresInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
   }
 
   export type DoctorUpdateferiadosInput = {
@@ -22686,6 +22954,19 @@ export namespace Prisma {
     deleteMany?: TurnoScalarWhereInput | TurnoScalarWhereInput[]
   }
 
+  export type UserUpdateManyWithoutDoctoresNestedInput = {
+    create?: XOR<UserCreateWithoutDoctoresInput, UserUncheckedCreateWithoutDoctoresInput> | UserCreateWithoutDoctoresInput[] | UserUncheckedCreateWithoutDoctoresInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutDoctoresInput | UserCreateOrConnectWithoutDoctoresInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutDoctoresInput | UserUpsertWithWhereUniqueWithoutDoctoresInput[]
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutDoctoresInput | UserUpdateWithWhereUniqueWithoutDoctoresInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutDoctoresInput | UserUpdateManyWithWhereWithoutDoctoresInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
+  }
+
   export type AgendaDoctorUncheckedUpdateManyWithoutDoctorNestedInput = {
     create?: XOR<AgendaDoctorCreateWithoutDoctorInput, AgendaDoctorUncheckedCreateWithoutDoctorInput> | AgendaDoctorCreateWithoutDoctorInput[] | AgendaDoctorUncheckedCreateWithoutDoctorInput[]
     connectOrCreate?: AgendaDoctorCreateOrConnectWithoutDoctorInput | AgendaDoctorCreateOrConnectWithoutDoctorInput[]
@@ -22728,6 +23009,19 @@ export namespace Prisma {
     deleteMany?: TurnoScalarWhereInput | TurnoScalarWhereInput[]
   }
 
+  export type UserUncheckedUpdateManyWithoutDoctoresNestedInput = {
+    create?: XOR<UserCreateWithoutDoctoresInput, UserUncheckedCreateWithoutDoctoresInput> | UserCreateWithoutDoctoresInput[] | UserUncheckedCreateWithoutDoctoresInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutDoctoresInput | UserCreateOrConnectWithoutDoctoresInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutDoctoresInput | UserUpsertWithWhereUniqueWithoutDoctoresInput[]
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutDoctoresInput | UserUpdateWithWhereUniqueWithoutDoctoresInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutDoctoresInput | UserUpdateManyWithWhereWithoutDoctoresInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
+  }
+
   export type DoctorCreateNestedOneWithoutAgendaDoctorInput = {
     create?: XOR<DoctorCreateWithoutAgendaDoctorInput, DoctorUncheckedCreateWithoutAgendaDoctorInput>
     connectOrCreate?: DoctorCreateOrConnectWithoutAgendaDoctorInput
@@ -22738,14 +23032,6 @@ export namespace Prisma {
     create?: XOR<ConsultorioCreateWithoutAgendaDoctorInput, ConsultorioUncheckedCreateWithoutAgendaDoctorInput>
     connectOrCreate?: ConsultorioCreateOrConnectWithoutAgendaDoctorInput
     connect?: ConsultorioWhereUniqueInput
-  }
-
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type DoctorUpdateOneRequiredWithoutAgendaDoctorNestedInput = {
@@ -23351,11 +23637,13 @@ export namespace Prisma {
     enabled?: boolean
     token?: string | null
     tokenExpires?: Date | string | null
+    perfil?: number
     sessions?: SessionCreateNestedManyWithoutUserInput
     pacientesCreados?: PacienteCreateNestedManyWithoutCreatedByInput
     pacientesEditados?: PacienteCreateNestedManyWithoutUpdatedByInput
     turnosCreados?: TurnoCreateNestedManyWithoutCreatedByInput
     turnosEditados?: TurnoCreateNestedManyWithoutUpdatedByInput
+    doctores?: DoctorCreateNestedManyWithoutUsuariosInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
@@ -23368,11 +23656,13 @@ export namespace Prisma {
     enabled?: boolean
     token?: string | null
     tokenExpires?: Date | string | null
+    perfil?: number
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     pacientesCreados?: PacienteUncheckedCreateNestedManyWithoutCreatedByInput
     pacientesEditados?: PacienteUncheckedCreateNestedManyWithoutUpdatedByInput
     turnosCreados?: TurnoUncheckedCreateNestedManyWithoutCreatedByInput
     turnosEditados?: TurnoUncheckedCreateNestedManyWithoutUpdatedByInput
+    doctores?: DoctorUncheckedCreateNestedManyWithoutUsuariosInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -23401,11 +23691,13 @@ export namespace Prisma {
     enabled?: BoolFieldUpdateOperationsInput | boolean
     token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    perfil?: IntFieldUpdateOperationsInput | number
     sessions?: SessionUpdateManyWithoutUserNestedInput
     pacientesCreados?: PacienteUpdateManyWithoutCreatedByNestedInput
     pacientesEditados?: PacienteUpdateManyWithoutUpdatedByNestedInput
     turnosCreados?: TurnoUpdateManyWithoutCreatedByNestedInput
     turnosEditados?: TurnoUpdateManyWithoutUpdatedByNestedInput
+    doctores?: DoctorUpdateManyWithoutUsuariosNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -23418,11 +23710,13 @@ export namespace Prisma {
     enabled?: BoolFieldUpdateOperationsInput | boolean
     token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    perfil?: IntFieldUpdateOperationsInput | number
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     pacientesCreados?: PacienteUncheckedUpdateManyWithoutCreatedByNestedInput
     pacientesEditados?: PacienteUncheckedUpdateManyWithoutUpdatedByNestedInput
     turnosCreados?: TurnoUncheckedUpdateManyWithoutCreatedByNestedInput
     turnosEditados?: TurnoUncheckedUpdateManyWithoutUpdatedByNestedInput
+    doctores?: DoctorUncheckedUpdateManyWithoutUsuariosNestedInput
   }
 
   export type UserCreateWithoutSessionsInput = {
@@ -23435,11 +23729,13 @@ export namespace Prisma {
     enabled?: boolean
     token?: string | null
     tokenExpires?: Date | string | null
+    perfil?: number
     accounts?: AccountCreateNestedManyWithoutUserInput
     pacientesCreados?: PacienteCreateNestedManyWithoutCreatedByInput
     pacientesEditados?: PacienteCreateNestedManyWithoutUpdatedByInput
     turnosCreados?: TurnoCreateNestedManyWithoutCreatedByInput
     turnosEditados?: TurnoCreateNestedManyWithoutUpdatedByInput
+    doctores?: DoctorCreateNestedManyWithoutUsuariosInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -23452,11 +23748,13 @@ export namespace Prisma {
     enabled?: boolean
     token?: string | null
     tokenExpires?: Date | string | null
+    perfil?: number
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     pacientesCreados?: PacienteUncheckedCreateNestedManyWithoutCreatedByInput
     pacientesEditados?: PacienteUncheckedCreateNestedManyWithoutUpdatedByInput
     turnosCreados?: TurnoUncheckedCreateNestedManyWithoutCreatedByInput
     turnosEditados?: TurnoUncheckedCreateNestedManyWithoutUpdatedByInput
+    doctores?: DoctorUncheckedCreateNestedManyWithoutUsuariosInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -23485,11 +23783,13 @@ export namespace Prisma {
     enabled?: BoolFieldUpdateOperationsInput | boolean
     token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    perfil?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUpdateManyWithoutUserNestedInput
     pacientesCreados?: PacienteUpdateManyWithoutCreatedByNestedInput
     pacientesEditados?: PacienteUpdateManyWithoutUpdatedByNestedInput
     turnosCreados?: TurnoUpdateManyWithoutCreatedByNestedInput
     turnosEditados?: TurnoUpdateManyWithoutUpdatedByNestedInput
+    doctores?: DoctorUpdateManyWithoutUsuariosNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -23502,11 +23802,13 @@ export namespace Prisma {
     enabled?: BoolFieldUpdateOperationsInput | boolean
     token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    perfil?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     pacientesCreados?: PacienteUncheckedUpdateManyWithoutCreatedByNestedInput
     pacientesEditados?: PacienteUncheckedUpdateManyWithoutUpdatedByNestedInput
     turnosCreados?: TurnoUncheckedUpdateManyWithoutCreatedByNestedInput
     turnosEditados?: TurnoUncheckedUpdateManyWithoutUpdatedByNestedInput
+    doctores?: DoctorUncheckedUpdateManyWithoutUsuariosNestedInput
   }
 
   export type AccountCreateWithoutUserInput = {
@@ -23765,6 +24067,37 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type DoctorCreateWithoutUsuariosInput = {
+    id?: string
+    nombre: string
+    emoji: string
+    feriados?: DoctorCreateferiadosInput | string[]
+    color?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    AgendaDoctor?: AgendaDoctorCreateNestedManyWithoutDoctorInput
+    TipoTurnoDoctor?: TipoTurnoDoctorCreateNestedManyWithoutDoctorInput
+    Turno?: TurnoCreateNestedManyWithoutDoctorInput
+  }
+
+  export type DoctorUncheckedCreateWithoutUsuariosInput = {
+    id?: string
+    nombre: string
+    emoji: string
+    feriados?: DoctorCreateferiadosInput | string[]
+    color?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    AgendaDoctor?: AgendaDoctorUncheckedCreateNestedManyWithoutDoctorInput
+    TipoTurnoDoctor?: TipoTurnoDoctorUncheckedCreateNestedManyWithoutDoctorInput
+    Turno?: TurnoUncheckedCreateNestedManyWithoutDoctorInput
+  }
+
+  export type DoctorCreateOrConnectWithoutUsuariosInput = {
+    where: DoctorWhereUniqueInput
+    create: XOR<DoctorCreateWithoutUsuariosInput, DoctorUncheckedCreateWithoutUsuariosInput>
+  }
+
   export type AccountUpsertWithWhereUniqueWithoutUserInput = {
     where: AccountWhereUniqueInput
     update: XOR<AccountUpdateWithoutUserInput, AccountUncheckedUpdateWithoutUserInput>
@@ -23935,6 +24268,35 @@ export namespace Prisma {
     data: XOR<TurnoUpdateManyMutationInput, TurnoUncheckedUpdateManyWithoutUpdatedByInput>
   }
 
+  export type DoctorUpsertWithWhereUniqueWithoutUsuariosInput = {
+    where: DoctorWhereUniqueInput
+    update: XOR<DoctorUpdateWithoutUsuariosInput, DoctorUncheckedUpdateWithoutUsuariosInput>
+    create: XOR<DoctorCreateWithoutUsuariosInput, DoctorUncheckedCreateWithoutUsuariosInput>
+  }
+
+  export type DoctorUpdateWithWhereUniqueWithoutUsuariosInput = {
+    where: DoctorWhereUniqueInput
+    data: XOR<DoctorUpdateWithoutUsuariosInput, DoctorUncheckedUpdateWithoutUsuariosInput>
+  }
+
+  export type DoctorUpdateManyWithWhereWithoutUsuariosInput = {
+    where: DoctorScalarWhereInput
+    data: XOR<DoctorUpdateManyMutationInput, DoctorUncheckedUpdateManyWithoutUsuariosInput>
+  }
+
+  export type DoctorScalarWhereInput = {
+    AND?: DoctorScalarWhereInput | DoctorScalarWhereInput[]
+    OR?: DoctorScalarWhereInput[]
+    NOT?: DoctorScalarWhereInput | DoctorScalarWhereInput[]
+    id?: StringFilter<"Doctor"> | string
+    nombre?: StringFilter<"Doctor"> | string
+    emoji?: StringFilter<"Doctor"> | string
+    feriados?: StringNullableListFilter<"Doctor">
+    color?: StringNullableFilter<"Doctor"> | string | null
+    createdAt?: DateTimeFilter<"Doctor"> | Date | string
+    updatedAt?: DateTimeFilter<"Doctor"> | Date | string
+  }
+
   export type TurnoCreateWithoutConsultorioInput = {
     id?: string
     desde: Date | string
@@ -23994,6 +24356,7 @@ export namespace Prisma {
   export type AgendaDoctorCreateWithoutConsultorioInput = {
     id?: string
     dia: number
+    fecha?: Date | string | null
     nombre: string
     atencion: boolean
     desde: string
@@ -24009,6 +24372,7 @@ export namespace Prisma {
     id?: string
     doctorId: string
     dia: number
+    fecha?: Date | string | null
     nombre: string
     atencion: boolean
     desde: string
@@ -24098,6 +24462,7 @@ export namespace Prisma {
     doctorId?: StringFilter<"AgendaDoctor"> | string
     consultorioId?: StringNullableFilter<"AgendaDoctor"> | string | null
     dia?: IntFilter<"AgendaDoctor"> | number
+    fecha?: DateTimeNullableFilter<"AgendaDoctor"> | Date | string | null
     nombre?: StringFilter<"AgendaDoctor"> | string
     atencion?: BoolFilter<"AgendaDoctor"> | boolean
     desde?: StringFilter<"AgendaDoctor"> | string
@@ -24141,6 +24506,7 @@ export namespace Prisma {
   export type AgendaDoctorCreateWithoutDoctorInput = {
     id?: string
     dia: number
+    fecha?: Date | string | null
     nombre: string
     atencion: boolean
     desde: string
@@ -24156,6 +24522,7 @@ export namespace Prisma {
     id?: string
     consultorioId?: string | null
     dia: number
+    fecha?: Date | string | null
     nombre: string
     atencion: boolean
     desde: string
@@ -24266,6 +24633,49 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type UserCreateWithoutDoctoresInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    password?: string | null
+    enabled?: boolean
+    token?: string | null
+    tokenExpires?: Date | string | null
+    perfil?: number
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    pacientesCreados?: PacienteCreateNestedManyWithoutCreatedByInput
+    pacientesEditados?: PacienteCreateNestedManyWithoutUpdatedByInput
+    turnosCreados?: TurnoCreateNestedManyWithoutCreatedByInput
+    turnosEditados?: TurnoCreateNestedManyWithoutUpdatedByInput
+  }
+
+  export type UserUncheckedCreateWithoutDoctoresInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    password?: string | null
+    enabled?: boolean
+    token?: string | null
+    tokenExpires?: Date | string | null
+    perfil?: number
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    pacientesCreados?: PacienteUncheckedCreateNestedManyWithoutCreatedByInput
+    pacientesEditados?: PacienteUncheckedCreateNestedManyWithoutUpdatedByInput
+    turnosCreados?: TurnoUncheckedCreateNestedManyWithoutCreatedByInput
+    turnosEditados?: TurnoUncheckedCreateNestedManyWithoutUpdatedByInput
+  }
+
+  export type UserCreateOrConnectWithoutDoctoresInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutDoctoresInput, UserUncheckedCreateWithoutDoctoresInput>
+  }
+
   export type AgendaDoctorUpsertWithWhereUniqueWithoutDoctorInput = {
     where: AgendaDoctorWhereUniqueInput
     update: XOR<AgendaDoctorUpdateWithoutDoctorInput, AgendaDoctorUncheckedUpdateWithoutDoctorInput>
@@ -24314,6 +24724,38 @@ export namespace Prisma {
     data: XOR<TurnoUpdateManyMutationInput, TurnoUncheckedUpdateManyWithoutDoctorInput>
   }
 
+  export type UserUpsertWithWhereUniqueWithoutDoctoresInput = {
+    where: UserWhereUniqueInput
+    update: XOR<UserUpdateWithoutDoctoresInput, UserUncheckedUpdateWithoutDoctoresInput>
+    create: XOR<UserCreateWithoutDoctoresInput, UserUncheckedCreateWithoutDoctoresInput>
+  }
+
+  export type UserUpdateWithWhereUniqueWithoutDoctoresInput = {
+    where: UserWhereUniqueInput
+    data: XOR<UserUpdateWithoutDoctoresInput, UserUncheckedUpdateWithoutDoctoresInput>
+  }
+
+  export type UserUpdateManyWithWhereWithoutDoctoresInput = {
+    where: UserScalarWhereInput
+    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutDoctoresInput>
+  }
+
+  export type UserScalarWhereInput = {
+    AND?: UserScalarWhereInput | UserScalarWhereInput[]
+    OR?: UserScalarWhereInput[]
+    NOT?: UserScalarWhereInput | UserScalarWhereInput[]
+    id?: StringFilter<"User"> | string
+    name?: StringNullableFilter<"User"> | string | null
+    email?: StringNullableFilter<"User"> | string | null
+    emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
+    image?: StringNullableFilter<"User"> | string | null
+    password?: StringNullableFilter<"User"> | string | null
+    enabled?: BoolFilter<"User"> | boolean
+    token?: StringNullableFilter<"User"> | string | null
+    tokenExpires?: DateTimeNullableFilter<"User"> | Date | string | null
+    perfil?: IntFilter<"User"> | number
+  }
+
   export type DoctorCreateWithoutAgendaDoctorInput = {
     id?: string
     nombre: string
@@ -24324,6 +24766,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     TipoTurnoDoctor?: TipoTurnoDoctorCreateNestedManyWithoutDoctorInput
     Turno?: TurnoCreateNestedManyWithoutDoctorInput
+    usuarios?: UserCreateNestedManyWithoutDoctoresInput
   }
 
   export type DoctorUncheckedCreateWithoutAgendaDoctorInput = {
@@ -24336,6 +24779,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     TipoTurnoDoctor?: TipoTurnoDoctorUncheckedCreateNestedManyWithoutDoctorInput
     Turno?: TurnoUncheckedCreateNestedManyWithoutDoctorInput
+    usuarios?: UserUncheckedCreateNestedManyWithoutDoctoresInput
   }
 
   export type DoctorCreateOrConnectWithoutAgendaDoctorInput = {
@@ -24395,6 +24839,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     TipoTurnoDoctor?: TipoTurnoDoctorUpdateManyWithoutDoctorNestedInput
     Turno?: TurnoUpdateManyWithoutDoctorNestedInput
+    usuarios?: UserUpdateManyWithoutDoctoresNestedInput
   }
 
   export type DoctorUncheckedUpdateWithoutAgendaDoctorInput = {
@@ -24407,6 +24852,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     TipoTurnoDoctor?: TipoTurnoDoctorUncheckedUpdateManyWithoutDoctorNestedInput
     Turno?: TurnoUncheckedUpdateManyWithoutDoctorNestedInput
+    usuarios?: UserUncheckedUpdateManyWithoutDoctoresNestedInput
   }
 
   export type ConsultorioUpsertWithoutAgendaDoctorInput = {
@@ -24456,6 +24902,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     AgendaDoctor?: AgendaDoctorCreateNestedManyWithoutDoctorInput
     Turno?: TurnoCreateNestedManyWithoutDoctorInput
+    usuarios?: UserCreateNestedManyWithoutDoctoresInput
   }
 
   export type DoctorUncheckedCreateWithoutTipoTurnoDoctorInput = {
@@ -24468,6 +24915,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     AgendaDoctor?: AgendaDoctorUncheckedCreateNestedManyWithoutDoctorInput
     Turno?: TurnoUncheckedCreateNestedManyWithoutDoctorInput
+    usuarios?: UserUncheckedCreateNestedManyWithoutDoctoresInput
   }
 
   export type DoctorCreateOrConnectWithoutTipoTurnoDoctorInput = {
@@ -24583,6 +25031,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     AgendaDoctor?: AgendaDoctorUpdateManyWithoutDoctorNestedInput
     Turno?: TurnoUpdateManyWithoutDoctorNestedInput
+    usuarios?: UserUpdateManyWithoutDoctoresNestedInput
   }
 
   export type DoctorUncheckedUpdateWithoutTipoTurnoDoctorInput = {
@@ -24595,6 +25044,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     AgendaDoctor?: AgendaDoctorUncheckedUpdateManyWithoutDoctorNestedInput
     Turno?: TurnoUncheckedUpdateManyWithoutDoctorNestedInput
+    usuarios?: UserUncheckedUpdateManyWithoutDoctoresNestedInput
   }
 
   export type ConsultorioUpsertWithWhereUniqueWithoutTiposTurnoInput = {
@@ -24736,11 +25186,13 @@ export namespace Prisma {
     enabled?: boolean
     token?: string | null
     tokenExpires?: Date | string | null
+    perfil?: number
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     pacientesEditados?: PacienteCreateNestedManyWithoutUpdatedByInput
     turnosCreados?: TurnoCreateNestedManyWithoutCreatedByInput
     turnosEditados?: TurnoCreateNestedManyWithoutUpdatedByInput
+    doctores?: DoctorCreateNestedManyWithoutUsuariosInput
   }
 
   export type UserUncheckedCreateWithoutPacientesCreadosInput = {
@@ -24753,11 +25205,13 @@ export namespace Prisma {
     enabled?: boolean
     token?: string | null
     tokenExpires?: Date | string | null
+    perfil?: number
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     pacientesEditados?: PacienteUncheckedCreateNestedManyWithoutUpdatedByInput
     turnosCreados?: TurnoUncheckedCreateNestedManyWithoutCreatedByInput
     turnosEditados?: TurnoUncheckedCreateNestedManyWithoutUpdatedByInput
+    doctores?: DoctorUncheckedCreateNestedManyWithoutUsuariosInput
   }
 
   export type UserCreateOrConnectWithoutPacientesCreadosInput = {
@@ -24775,11 +25229,13 @@ export namespace Prisma {
     enabled?: boolean
     token?: string | null
     tokenExpires?: Date | string | null
+    perfil?: number
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     pacientesCreados?: PacienteCreateNestedManyWithoutCreatedByInput
     turnosCreados?: TurnoCreateNestedManyWithoutCreatedByInput
     turnosEditados?: TurnoCreateNestedManyWithoutUpdatedByInput
+    doctores?: DoctorCreateNestedManyWithoutUsuariosInput
   }
 
   export type UserUncheckedCreateWithoutPacientesEditadosInput = {
@@ -24792,11 +25248,13 @@ export namespace Prisma {
     enabled?: boolean
     token?: string | null
     tokenExpires?: Date | string | null
+    perfil?: number
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     pacientesCreados?: PacienteUncheckedCreateNestedManyWithoutCreatedByInput
     turnosCreados?: TurnoUncheckedCreateNestedManyWithoutCreatedByInput
     turnosEditados?: TurnoUncheckedCreateNestedManyWithoutUpdatedByInput
+    doctores?: DoctorUncheckedCreateNestedManyWithoutUsuariosInput
   }
 
   export type UserCreateOrConnectWithoutPacientesEditadosInput = {
@@ -24874,11 +25332,13 @@ export namespace Prisma {
     enabled?: BoolFieldUpdateOperationsInput | boolean
     token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    perfil?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     pacientesEditados?: PacienteUpdateManyWithoutUpdatedByNestedInput
     turnosCreados?: TurnoUpdateManyWithoutCreatedByNestedInput
     turnosEditados?: TurnoUpdateManyWithoutUpdatedByNestedInput
+    doctores?: DoctorUpdateManyWithoutUsuariosNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPacientesCreadosInput = {
@@ -24891,11 +25351,13 @@ export namespace Prisma {
     enabled?: BoolFieldUpdateOperationsInput | boolean
     token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    perfil?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     pacientesEditados?: PacienteUncheckedUpdateManyWithoutUpdatedByNestedInput
     turnosCreados?: TurnoUncheckedUpdateManyWithoutCreatedByNestedInput
     turnosEditados?: TurnoUncheckedUpdateManyWithoutUpdatedByNestedInput
+    doctores?: DoctorUncheckedUpdateManyWithoutUsuariosNestedInput
   }
 
   export type UserUpsertWithoutPacientesEditadosInput = {
@@ -24919,11 +25381,13 @@ export namespace Prisma {
     enabled?: BoolFieldUpdateOperationsInput | boolean
     token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    perfil?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     pacientesCreados?: PacienteUpdateManyWithoutCreatedByNestedInput
     turnosCreados?: TurnoUpdateManyWithoutCreatedByNestedInput
     turnosEditados?: TurnoUpdateManyWithoutUpdatedByNestedInput
+    doctores?: DoctorUpdateManyWithoutUsuariosNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPacientesEditadosInput = {
@@ -24936,11 +25400,13 @@ export namespace Prisma {
     enabled?: BoolFieldUpdateOperationsInput | boolean
     token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    perfil?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     pacientesCreados?: PacienteUncheckedUpdateManyWithoutCreatedByNestedInput
     turnosCreados?: TurnoUncheckedUpdateManyWithoutCreatedByNestedInput
     turnosEditados?: TurnoUncheckedUpdateManyWithoutUpdatedByNestedInput
+    doctores?: DoctorUncheckedUpdateManyWithoutUsuariosNestedInput
   }
 
   export type ConsultorioCreateWithoutTurnosInput = {
@@ -24984,6 +25450,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     AgendaDoctor?: AgendaDoctorCreateNestedManyWithoutDoctorInput
     TipoTurnoDoctor?: TipoTurnoDoctorCreateNestedManyWithoutDoctorInput
+    usuarios?: UserCreateNestedManyWithoutDoctoresInput
   }
 
   export type DoctorUncheckedCreateWithoutTurnoInput = {
@@ -24996,6 +25463,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     AgendaDoctor?: AgendaDoctorUncheckedCreateNestedManyWithoutDoctorInput
     TipoTurnoDoctor?: TipoTurnoDoctorUncheckedCreateNestedManyWithoutDoctorInput
+    usuarios?: UserUncheckedCreateNestedManyWithoutDoctoresInput
   }
 
   export type DoctorCreateOrConnectWithoutTurnoInput = {
@@ -25106,11 +25574,13 @@ export namespace Prisma {
     enabled?: boolean
     token?: string | null
     tokenExpires?: Date | string | null
+    perfil?: number
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     pacientesCreados?: PacienteCreateNestedManyWithoutCreatedByInput
     pacientesEditados?: PacienteCreateNestedManyWithoutUpdatedByInput
     turnosEditados?: TurnoCreateNestedManyWithoutUpdatedByInput
+    doctores?: DoctorCreateNestedManyWithoutUsuariosInput
   }
 
   export type UserUncheckedCreateWithoutTurnosCreadosInput = {
@@ -25123,11 +25593,13 @@ export namespace Prisma {
     enabled?: boolean
     token?: string | null
     tokenExpires?: Date | string | null
+    perfil?: number
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     pacientesCreados?: PacienteUncheckedCreateNestedManyWithoutCreatedByInput
     pacientesEditados?: PacienteUncheckedCreateNestedManyWithoutUpdatedByInput
     turnosEditados?: TurnoUncheckedCreateNestedManyWithoutUpdatedByInput
+    doctores?: DoctorUncheckedCreateNestedManyWithoutUsuariosInput
   }
 
   export type UserCreateOrConnectWithoutTurnosCreadosInput = {
@@ -25145,11 +25617,13 @@ export namespace Prisma {
     enabled?: boolean
     token?: string | null
     tokenExpires?: Date | string | null
+    perfil?: number
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     pacientesCreados?: PacienteCreateNestedManyWithoutCreatedByInput
     pacientesEditados?: PacienteCreateNestedManyWithoutUpdatedByInput
     turnosCreados?: TurnoCreateNestedManyWithoutCreatedByInput
+    doctores?: DoctorCreateNestedManyWithoutUsuariosInput
   }
 
   export type UserUncheckedCreateWithoutTurnosEditadosInput = {
@@ -25162,11 +25636,13 @@ export namespace Prisma {
     enabled?: boolean
     token?: string | null
     tokenExpires?: Date | string | null
+    perfil?: number
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     pacientesCreados?: PacienteUncheckedCreateNestedManyWithoutCreatedByInput
     pacientesEditados?: PacienteUncheckedCreateNestedManyWithoutUpdatedByInput
     turnosCreados?: TurnoUncheckedCreateNestedManyWithoutCreatedByInput
+    doctores?: DoctorUncheckedCreateNestedManyWithoutUsuariosInput
   }
 
   export type UserCreateOrConnectWithoutTurnosEditadosInput = {
@@ -25232,6 +25708,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     AgendaDoctor?: AgendaDoctorUpdateManyWithoutDoctorNestedInput
     TipoTurnoDoctor?: TipoTurnoDoctorUpdateManyWithoutDoctorNestedInput
+    usuarios?: UserUpdateManyWithoutDoctoresNestedInput
   }
 
   export type DoctorUncheckedUpdateWithoutTurnoInput = {
@@ -25244,6 +25721,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     AgendaDoctor?: AgendaDoctorUncheckedUpdateManyWithoutDoctorNestedInput
     TipoTurnoDoctor?: TipoTurnoDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+    usuarios?: UserUncheckedUpdateManyWithoutDoctoresNestedInput
   }
 
   export type PacienteUpsertWithoutTurnosInput = {
@@ -25378,11 +25856,13 @@ export namespace Prisma {
     enabled?: BoolFieldUpdateOperationsInput | boolean
     token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    perfil?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     pacientesCreados?: PacienteUpdateManyWithoutCreatedByNestedInput
     pacientesEditados?: PacienteUpdateManyWithoutUpdatedByNestedInput
     turnosEditados?: TurnoUpdateManyWithoutUpdatedByNestedInput
+    doctores?: DoctorUpdateManyWithoutUsuariosNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTurnosCreadosInput = {
@@ -25395,11 +25875,13 @@ export namespace Prisma {
     enabled?: BoolFieldUpdateOperationsInput | boolean
     token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    perfil?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     pacientesCreados?: PacienteUncheckedUpdateManyWithoutCreatedByNestedInput
     pacientesEditados?: PacienteUncheckedUpdateManyWithoutUpdatedByNestedInput
     turnosEditados?: TurnoUncheckedUpdateManyWithoutUpdatedByNestedInput
+    doctores?: DoctorUncheckedUpdateManyWithoutUsuariosNestedInput
   }
 
   export type UserUpsertWithoutTurnosEditadosInput = {
@@ -25423,11 +25905,13 @@ export namespace Prisma {
     enabled?: BoolFieldUpdateOperationsInput | boolean
     token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    perfil?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     pacientesCreados?: PacienteUpdateManyWithoutCreatedByNestedInput
     pacientesEditados?: PacienteUpdateManyWithoutUpdatedByNestedInput
     turnosCreados?: TurnoUpdateManyWithoutCreatedByNestedInput
+    doctores?: DoctorUpdateManyWithoutUsuariosNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTurnosEditadosInput = {
@@ -25440,11 +25924,13 @@ export namespace Prisma {
     enabled?: BoolFieldUpdateOperationsInput | boolean
     token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    perfil?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     pacientesCreados?: PacienteUncheckedUpdateManyWithoutCreatedByNestedInput
     pacientesEditados?: PacienteUncheckedUpdateManyWithoutUpdatedByNestedInput
     turnosCreados?: TurnoUncheckedUpdateManyWithoutCreatedByNestedInput
+    doctores?: DoctorUncheckedUpdateManyWithoutUsuariosNestedInput
   }
 
   export type PacienteCreateWithoutCoberturaMedicaInput = {
@@ -25965,6 +26451,42 @@ export namespace Prisma {
     tipoDeTurnoId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type DoctorUpdateWithoutUsuariosInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nombre?: StringFieldUpdateOperationsInput | string
+    emoji?: StringFieldUpdateOperationsInput | string
+    feriados?: DoctorUpdateferiadosInput | string[]
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    AgendaDoctor?: AgendaDoctorUpdateManyWithoutDoctorNestedInput
+    TipoTurnoDoctor?: TipoTurnoDoctorUpdateManyWithoutDoctorNestedInput
+    Turno?: TurnoUpdateManyWithoutDoctorNestedInput
+  }
+
+  export type DoctorUncheckedUpdateWithoutUsuariosInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nombre?: StringFieldUpdateOperationsInput | string
+    emoji?: StringFieldUpdateOperationsInput | string
+    feriados?: DoctorUpdateferiadosInput | string[]
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    AgendaDoctor?: AgendaDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+    TipoTurnoDoctor?: TipoTurnoDoctorUncheckedUpdateManyWithoutDoctorNestedInput
+    Turno?: TurnoUncheckedUpdateManyWithoutDoctorNestedInput
+  }
+
+  export type DoctorUncheckedUpdateManyWithoutUsuariosInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nombre?: StringFieldUpdateOperationsInput | string
+    emoji?: StringFieldUpdateOperationsInput | string
+    feriados?: DoctorUpdateferiadosInput | string[]
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type TurnoCreateManyConsultorioInput = {
     id?: string
     desde: Date | string
@@ -25992,6 +26514,7 @@ export namespace Prisma {
     id?: string
     doctorId: string
     dia: number
+    fecha?: Date | string | null
     nombre: string
     atencion: boolean
     desde: string
@@ -26074,6 +26597,7 @@ export namespace Prisma {
   export type AgendaDoctorUpdateWithoutConsultorioInput = {
     id?: StringFieldUpdateOperationsInput | string
     dia?: IntFieldUpdateOperationsInput | number
+    fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nombre?: StringFieldUpdateOperationsInput | string
     atencion?: BoolFieldUpdateOperationsInput | boolean
     desde?: StringFieldUpdateOperationsInput | string
@@ -26089,6 +26613,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     doctorId?: StringFieldUpdateOperationsInput | string
     dia?: IntFieldUpdateOperationsInput | number
+    fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nombre?: StringFieldUpdateOperationsInput | string
     atencion?: BoolFieldUpdateOperationsInput | boolean
     desde?: StringFieldUpdateOperationsInput | string
@@ -26103,6 +26628,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     doctorId?: StringFieldUpdateOperationsInput | string
     dia?: IntFieldUpdateOperationsInput | number
+    fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nombre?: StringFieldUpdateOperationsInput | string
     atencion?: BoolFieldUpdateOperationsInput | boolean
     desde?: StringFieldUpdateOperationsInput | string
@@ -26152,6 +26678,7 @@ export namespace Prisma {
     id?: string
     consultorioId?: string | null
     dia: number
+    fecha?: Date | string | null
     nombre: string
     atencion: boolean
     desde: string
@@ -26198,6 +26725,7 @@ export namespace Prisma {
   export type AgendaDoctorUpdateWithoutDoctorInput = {
     id?: StringFieldUpdateOperationsInput | string
     dia?: IntFieldUpdateOperationsInput | number
+    fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nombre?: StringFieldUpdateOperationsInput | string
     atencion?: BoolFieldUpdateOperationsInput | boolean
     desde?: StringFieldUpdateOperationsInput | string
@@ -26213,6 +26741,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     consultorioId?: NullableStringFieldUpdateOperationsInput | string | null
     dia?: IntFieldUpdateOperationsInput | number
+    fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nombre?: StringFieldUpdateOperationsInput | string
     atencion?: BoolFieldUpdateOperationsInput | boolean
     desde?: StringFieldUpdateOperationsInput | string
@@ -26227,6 +26756,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     consultorioId?: NullableStringFieldUpdateOperationsInput | string | null
     dia?: IntFieldUpdateOperationsInput | number
+    fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nombre?: StringFieldUpdateOperationsInput | string
     atencion?: BoolFieldUpdateOperationsInput | boolean
     desde?: StringFieldUpdateOperationsInput | string
@@ -26338,6 +26868,57 @@ export namespace Prisma {
     token?: NullableStringFieldUpdateOperationsInput | string | null
     coberturaMedicaId?: NullableStringFieldUpdateOperationsInput | string | null
     tipoDeTurnoId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type UserUpdateWithoutDoctoresInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    enabled?: BoolFieldUpdateOperationsInput | boolean
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    tokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    perfil?: IntFieldUpdateOperationsInput | number
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    pacientesCreados?: PacienteUpdateManyWithoutCreatedByNestedInput
+    pacientesEditados?: PacienteUpdateManyWithoutUpdatedByNestedInput
+    turnosCreados?: TurnoUpdateManyWithoutCreatedByNestedInput
+    turnosEditados?: TurnoUpdateManyWithoutUpdatedByNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutDoctoresInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    enabled?: BoolFieldUpdateOperationsInput | boolean
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    tokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    perfil?: IntFieldUpdateOperationsInput | number
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    pacientesCreados?: PacienteUncheckedUpdateManyWithoutCreatedByNestedInput
+    pacientesEditados?: PacienteUncheckedUpdateManyWithoutUpdatedByNestedInput
+    turnosCreados?: TurnoUncheckedUpdateManyWithoutCreatedByNestedInput
+    turnosEditados?: TurnoUncheckedUpdateManyWithoutUpdatedByNestedInput
+  }
+
+  export type UserUncheckedUpdateManyWithoutDoctoresInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    enabled?: BoolFieldUpdateOperationsInput | boolean
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    tokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    perfil?: IntFieldUpdateOperationsInput | number
   }
 
   export type TurnoCreateManyTipoDeTurnoInput = {

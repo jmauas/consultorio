@@ -49,7 +49,7 @@ export default function ConfiguracionLayout({ children }) {
   };
   
   return (
-    <div className="flex flex-col md:flex-row gap-6 p-4">
+    <div className="flex flex-col md:flex-row gap-6 mx-6 my-2">
       {/* Barra lateral con navegación */}
       <aside className="w-full md:w-64 flex-shrink-0">
         <div className="rounded-lg shadow-sm overflow-hidden">

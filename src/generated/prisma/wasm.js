@@ -148,7 +148,8 @@ exports.Prisma.UserScalarFieldEnum = {
   password: 'password',
   enabled: 'enabled',
   token: 'token',
-  tokenExpires: 'tokenExpires'
+  tokenExpires: 'tokenExpires',
+  perfil: 'perfil'
 };
 
 exports.Prisma.VerificationTokenScalarFieldEnum = {
@@ -207,6 +208,7 @@ exports.Prisma.AgendaDoctorScalarFieldEnum = {
   doctorId: 'doctorId',
   consultorioId: 'consultorioId',
   dia: 'dia',
+  fecha: 'fecha',
   nombre: 'nombre',
   atencion: 'atencion',
   desde: 'desde',

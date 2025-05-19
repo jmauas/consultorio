@@ -69,17 +69,30 @@ export async function POST(request) {
     // Si hay datos de agenda, crearla
     if (data.agenda && Array.isArray(data.agenda)) {
       for (const item of data.agenda) {
+        // Preparar datos base para la agenda
+        const agendaData = {
+          doctorId: nuevoDoctor.id,
+          dia: item.dia,
+          nombre: item.nombre,
+          atencion: item.atencion,
+          desde: item.desde,
+          hasta: item.hasta,
+          corteDesde: item.corteDesde,
+          corteHasta: item.corteHasta
+        };
+        
+        // Si hay consultorio, agregarlo
+        if (item.consultorioId) {
+          agendaData.consultorioId = item.consultorioId;
+        }
+        
+        // Si es una fecha específica (dia 99), agregar el campo fecha
+        if (item.dia === 99 && item.fecha) {
+          agendaData.fecha = new Date(item.fecha);
+        }
+        
         await prisma.agendaDoctor.create({
-          data: {
-            doctorId: nuevoDoctor.id,
-            dia: item.dia,
-            nombre: item.nombre,
-            atencion: item.atencion,
-            desde: item.desde,
-            hasta: item.hasta,
-            corteDesde: item.corteDesde,
-            corteHasta: item.corteHasta
-          }
+          data: agendaData
         });
       }
     }
@@ -182,18 +195,26 @@ export async function PUT(request) {
     
     if (data.agenda && Array.isArray(data.agenda)) {
       for (const item of data.agenda) {
+        // Preparar datos base para la agenda
+        const agendaData = {
+          doctorId: data.id,
+          consultorioId: item.consultorioId || null,
+          dia: item.dia,
+          nombre: item.nombre,
+          atencion: item.atencion,
+          desde: item.desde,
+          hasta: item.hasta,
+          corteDesde: item.corteDesde,
+          corteHasta: item.corteHasta
+        };
+        
+        // Si es una fecha específica (dia 99), agregar el campo fecha
+        if (item.dia === 99 && item.fecha) {
+          agendaData.fecha = new Date(item.fecha);
+        }
+        
         await prisma.agendaDoctor.create({
-          data: {
-            doctorId: data.id,
-            consultorioId: item.consultorioId || null,
-            dia: item.dia,
-            nombre: item.nombre,
-            atencion: item.atencion,
-            desde: item.desde,
-            hasta: item.hasta,
-            corteDesde: item.corteDesde,
-            corteHasta: item.corteHasta
-          }
+          data: agendaData
         });
       }
     }

@@ -5,7 +5,7 @@ import { procesarAgendaConsultorios } from '@/lib/services/turnos/turnosServiceC
 import Loader from '@/components/Loader';
 import Link from 'next/link';
 import { isColorLight } from '@/lib/utils/variosUtils';
-import { formatoFecha, formatoDuracion } from '@/lib/utils/dateUtils';
+import { formatoFecha, formatoDuracion, sonMismaFecha } from '@/lib/utils/dateUtils';
 import Modal from '@/components/Modal';
 import DetalleTurno from './DetalleTurno';
 import { toast } from 'react-hot-toast';
@@ -132,6 +132,7 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                 }
                 doctores.forEach(doctor => {
                     let atencionHoy = doctor.agenda.find(age => age.dia == diaSemana && age.consultorioId === consultorio.id && age.atencion === true);
+
                     let noLaborable = false;            
                     if (esFeriado) noLaborable = true;
                     const noLaborablesDoctor = agregarFeriados([], doctor.feriados);
@@ -142,6 +143,22 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                             f.getFullYear() === fecha.getFullYear()
                         );
                         if (esNoLaborable) noLaborable = true;
+                    }
+                    if (!atencionHoy) {
+                        const agendaFecha = doctor.agenda.find(age =>
+                            age.consultorioId === consultorio.id &&
+                            age.atencion === true &&
+                            age.dia === 99
+                        );
+                        if (agendaFecha) {
+                            const fechaAgenda = new Date(agendaFecha.fecha);
+                            if (sonMismaFecha(fechaAgenda, fecha)) {
+                                atencionHoy = agendaFecha;
+                            }
+                        }
+                        if (atencionHoy) {
+                            noLaborable = false;
+                        }
                     }
                     if (atencionHoy) {
                         agenda.doctores.push({
@@ -161,7 +178,6 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
             });
 
             const nueva = procesarAgendaConsultorios(agendas, turnos)
-            console.log('nueva', nueva);
             setAgendaConsul(nueva);
             } catch (error) {
                 console.error('Error al obtener datos:', error);
@@ -562,9 +578,6 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                         // Skip if no doctor is attending or no appointments
                                                         const doctoresAtendiendo = consultorio.doctores.filter(d => d.atencion===true);
                                                         const hasTurnos = consultorio.turnos && consultorio.turnos.length > 0;
-                                                        console.log('HORAAAAA', hora.hora);
-                                                        console.log('doctoresAtendiendo', doctoresAtendiendo);
-                                                        console.log('hasTurnos', hasTurnos);
                                                         if (doctoresAtendiendo.length === 0 && !hasTurnos) {
                                                             console.log('No hay atención en consultorio');
                                                             return null;

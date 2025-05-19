@@ -217,10 +217,11 @@ export async function GET(request) {
     const session = await getServerSession(authOptions);
     
     // Verificar si el usuario está autenticado
-    if (!session) {
+    if (!session || !session.user || !session.user.perfil) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
-    
+
+ 
     // Obtener parámetros de consulta
     const { searchParams } = new URL(request.url);
     const desde = searchParams.get('desde');
@@ -267,6 +268,20 @@ export async function GET(request) {
     if (doctorId && doctorId !== 'todos') {
       where.doctorId = doctorId;
     }
+
+    // filtro por perfil de usuario
+    if (Number(session.user.perfil.id) < 50) {
+      const dres = session.user.doctores;
+      if (dres && dres.length > 0) {
+        where.doctorId = { in: dres.map(d => d.id) };
+      } else {
+        return NextResponse.json({ 
+          ok: false, 
+          message: 'No se encontraron doctores asociados al usuario' 
+        }, { status: 400 });
+      }
+    }
+
 
     // Filtrar por estado
     if (estado && estado !== 'todos') {

@@ -124,27 +124,31 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
 
   // Change doctor handler
   const handleDoctorChange = (e) => {
-    const dr = e.target.value;
-    const nombre = e.target.options[e.target.selectedIndex].text;
+    const id = e.target.value;
+    const selectedDoctor = doctores.find(dr => dr.id === id);
+    validarDoctor(selectedDoctor);
+  };
+
+  const validarDoctor = (doctor) => { 
     setFormData(prev => ({ 
       ...prev,
-      doctorId: dr, 
-      doctor: nombre,
+      doctorId: doctor.id, 
+      doctor: doctor.nombre,
     }));
     
-    if (dr === '') return;
+    if (doctor.id === '') return;
     
     setShowTipoTurno(true);
     //setShowPacienteForm(false);
     
     let newTipos = [];
-    if (dr === 'Indistinto') {
+    if (doctor.id === 'Indistinto') {
       newTipos = unificarTipos(doctores);
     } else {
-      const selectedDoctor = doctores.find(doctor => doctor.id === dr);
-      if (selectedDoctor && selectedDoctor.tiposTurno) {
+      console.log("Doctor seleccionado:", doctor);
+      if (doctor && doctor.tiposTurno) {
         // filtro los tipos que estan habnilitados y que, o son publicos, o no lo son pero hay usuario logurado
-        newTipos = selectedDoctor.tiposTurno.filter(tipo =>
+        newTipos = doctor.tiposTurno.filter(tipo =>
           tipo.habilitado && (tipo.publico===true || (session && session.user))
         );
       }
@@ -624,11 +628,23 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
           }
           
           const data = await response.json();
-          
+          let doctoresDelUsuario = [];
+          if (session?.user) {
+              if (session.user.perfil?.id < 50 && session.user.doctores) {
+                doctoresDelUsuario = session.user.doctores || [];
+              }
+          }
           // Guardar doctores si existen
           if (data.doctores && Array.isArray(data.doctores) && data.doctores.length > 0) {
-            console.log('Doctores cargados en disponibilidad:', data.doctores);
-            setDoctores(data.doctores);
+            if (doctoresDelUsuario.length > 0) {
+              const filtrados = data.doctores.filter(doc => doctoresDelUsuario.some(docUsuario => doc.id === docUsuario.id));
+              setDoctores(filtrados);
+              if (filtrados.length === 1) {
+                validarDoctor(filtrados[0])
+              }
+            } else {
+              setDoctores(data.doctores);
+            }
           } else {
             console.warn('No se encontraron doctores en la configuración');
             setDoctores([]);

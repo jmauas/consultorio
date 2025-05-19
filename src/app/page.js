@@ -84,7 +84,6 @@ export default function Home() {
       limite.setDate(limite.getDate() + 7);
       
       // Realizar una sola consulta para obtener todos los turnos
-      console.log(formatoFecha(new Date(), false, false, true, false));
       const respTurnos = await fetch(
         `/api/turnos?desde=${formatoFecha(new Date(), false, false, true, false)}&hasta=${limite.toISOString()}`
       );

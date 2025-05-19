@@ -1,11 +1,20 @@
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const fechasParam = searchParams.get('fechas');
     const estado = searchParams.get('estado');
+
+    const session = await getServerSession(authOptions);
+    
+    // Verificar si el usuario está autenticado
+    if (!session || !session.user || !session.user.perfil) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
     
     // Validar que se proporcionen fechas
     if (!fechasParam) {
@@ -29,6 +38,7 @@ export async function GET(request) {
         filtroEstado.estado = estado;
       }
     }
+
     
     // Crear un objeto para almacenar los contadores
     const contadores = {};
@@ -37,6 +47,20 @@ export async function GET(request) {
     fechas.forEach(fecha => {
       contadores[fecha] = 0;
     });
+
+    const where = {}
+    // filtro por perfil de usuario
+    if (Number(session.user.perfil.id) < 50) {
+      const dres = session.user.doctores;
+      if (dres && dres.length > 0) {
+        where.doctorId = { in: dres.map(d => d.id) };
+      } else {
+        return NextResponse.json({ 
+          ok: false, 
+          message: 'No se encontraron doctores asociados al usuario' 
+        }, { status: 400 });
+      }
+    }
     
     // Realizar una consulta para contar los turnos por fecha
     const turnosPorFecha = await Promise.all(
@@ -57,7 +81,8 @@ export async function GET(request) {
               gte: fechaInicio,
               lt: fechaFin
             },
-            ...filtroEstado
+            ...where,
+            ...filtroEstado,
           }
         });
         
@@ -86,4 +111,4 @@ export async function GET(request) {
       { status: 500 }
     );
   }
-}
+} 

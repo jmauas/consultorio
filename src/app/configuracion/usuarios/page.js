@@ -7,10 +7,12 @@ import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import Modal from '@/components/Modal';
 
-export default function UsersAdmin() {
+export default function UsersAdmin() { 
   const { data: session, status } = useSession();
   const router = useRouter();
   const [users, setUsers] = useState([]);
+  const [doctores, setDoctores] = useState([]);
+  const [perfiles, setPerfiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -23,6 +25,8 @@ export default function UsersAdmin() {
     email: '',
     password: '',
     enabled: true,
+    perfil: 1,
+    doctoresIds: []
   });
 
   // Comprobar autenticación
@@ -36,6 +40,8 @@ export default function UsersAdmin() {
   useEffect(() => {
     if (status === 'authenticated') {
       loadUsers();
+      loadDoctores();
+      loadPerfiles();
     }
   }, [status]);
 
@@ -47,7 +53,11 @@ export default function UsersAdmin() {
       const data = await response.json();
 
       if (data.ok) {
-        setUsers(data.users || []);
+        const usersWithValidDoctores = data.users.map(user => ({
+          ...user,
+          doctores: user.doctores && Array.isArray(user.doctores) ? user.doctores : []
+        }));
+        setUsers(usersWithValidDoctores);
       } else {
         setError(data.message || 'Error al cargar usuarios');
       }
@@ -59,6 +69,38 @@ export default function UsersAdmin() {
     }
   };
 
+  // Función para cargar doctores
+  const loadDoctores = async () => {
+    try {
+      const response = await fetch('/api/configuracion/doctores');
+      const data = await response.json();
+
+      if (data.ok) {
+        setDoctores(data.doctores || []);
+      } else {
+        console.error('Error al cargar doctores:', data.message);
+      }
+    } catch (error) {
+      console.error('Error al cargar doctores:', error);
+    }
+  };
+
+  // Función para cargar perfiles
+  const loadPerfiles = async () => {
+    try {
+      const response = await fetch('/api/users/perfiles');
+      const data = await response.json();
+
+      if (data.ok) {
+        setPerfiles(data.perfiles || []);
+      } else {
+        console.error('Error al cargar perfiles:', data.message);
+      }
+    } catch (error) {
+      console.error('Error al cargar perfiles:', error);
+    }
+  };
+
   // Filtrar usuarios según término de búsqueda
   const filteredUsers = users.filter(user => {
     const searchText = searchTerm.toLowerCase();
@@ -67,6 +109,28 @@ export default function UsersAdmin() {
       (user.email && user.email.toLowerCase().includes(searchText))
     );
   });
+
+  // Manejar cambio de perfil y limpiar doctores si no es perfil 1
+  const handlePerfilChange = (e) => {
+    const perfilValue = parseInt(e.target.value, 10);
+    setFormData((prev) => ({
+      ...prev,
+      perfil: perfilValue,
+      doctoresIds: perfilValue === 1 ? prev.doctoresIds : []
+    }));
+  };
+
+  // Manejar selección/deselección de doctor
+  const handleDoctorToggle = (doctorId) => {
+    doctorId = String(doctorId);
+    setFormData((prev) => {
+      if (prev.doctoresIds.includes(doctorId)) {
+        return { ...prev, doctoresIds: prev.doctoresIds.filter(id => id !== doctorId) };
+      } else {
+        return { ...prev, doctoresIds: [...prev.doctoresIds, doctorId] };
+      }
+    });
+  };
 
   // Función para manejar la creación de usuarios
   const handleCreate = async (e) => {
@@ -84,15 +148,15 @@ export default function UsersAdmin() {
       const data = await response.json();
 
       if (data.ok) {
-        // Recargar lista de usuarios
         loadUsers();
         setShowCreateModal(false);
-        // Limpiar formulario
         setFormData({
           name: '',
           email: '',
           password: '',
           enabled: true,
+          perfil: 1,
+          doctoresIds: []
         });
       } else {
         setError(data.message || 'Error al crear usuario');
@@ -124,18 +188,20 @@ export default function UsersAdmin() {
       const data = await response.json();
 
       if (data.ok) {
-        // Recargar lista de usuarios
         loadUsers();
         setShowEditModal(false);
         toast.success('Usuario actualizado correctamente');
       } else {
-        setError(data.message || 'Error al actualizar usuario');
-        toast.error(data.message || 'Error al actualizar usuario');
+        const errorMessage = data.message || data.error || 'Error al actualizar usuario';
+        console.error('Error detallado:', data);
+        setError(errorMessage);
+        toast.error(errorMessage);
       }
     } catch (error) {
       console.error('Error al actualizar usuario:', error);
-      setError('Error al actualizar usuario. Por favor, intenta nuevamente.');
-      toast.error('Error al actualizar usuario. Por favor, intenta nuevamente.');
+      const errorMessage = error.message || 'Error al actualizar usuario. Por favor, intenta nuevamente.';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -154,7 +220,6 @@ export default function UsersAdmin() {
       const data = await response.json();
 
       if (data.ok) {
-        // Recargar lista de usuarios
         loadUsers();
         setShowDeleteModal(false);
       } else {
@@ -168,14 +233,20 @@ export default function UsersAdmin() {
     }
   };
 
-  // Preparar formulario para edición
+  // Preparar formulario para edición  
   const prepareEdit = (user) => {
+    const doctoresIds = user.doctores && Array.isArray(user.doctores) 
+        ? user.doctores.map(d => String(d.id))
+        : [];
+
     setSelectedUser(user);
     setFormData({
       name: user.name || '',
       email: user.email || '',
-      password: '', // No incluimos la contraseña por seguridad
-      enabled: user.enabled !== false, // Si no existe, asumimos que está habilitado
+      password: '',
+      enabled: user.enabled !== false,
+      perfil: user.perfil || 1,
+      doctoresIds: doctoresIds
     });
     setShowEditModal(true);
   };
@@ -186,7 +257,38 @@ export default function UsersAdmin() {
     setShowDeleteModal(true);
   };
 
-  // Si está cargando la sesión, mostrar indicador
+  // Función para renderizar tarjetas de doctores
+  const renderDoctorCards = () => {
+    return (
+      <div className="flex flex-wrap gap-6 mt-2">
+        {doctores.map(doctor => {
+          const isSelected = formData.doctoresIds.includes(String(doctor.id));
+          const cardBgColor = doctor.color ? `${doctor.color}40` : '#f3f4f6';
+          
+          return (
+            <div
+              key={doctor.id}
+              onClick={() => handleDoctorToggle(doctor.id)}
+              className={`
+                cursor-pointer p-2 rounded-lg flex items-center border transition-all flex-row justify-between gap-4
+                ${isSelected ? 'ring-2 ring-offset-2 ring-[var(--color-primary)] border-[var(--color-primary)]' : 'border-gray-200 hover:shadow'}
+              `}
+              style={{ backgroundColor: cardBgColor }}
+            >
+              <div className="flex-1 flex items-center flex-wrap">
+                <span className="text-xl mr-2">{doctor.emoji}</span>
+                <span className="text-sm font-medium">{doctor.nombre}</span>
+              </div>
+              <div className={`w-6 h-6 flex-shrink-0 rounded-full border ${isSelected ? 'bg-[var(--color-primary)] border-[var(--color-primary)]' : 'bg-white border-gray-300'} flex items-center justify-center`}>
+                {isSelected && <i className="fa-solid fa-check text-white fa-lg"></i>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   if (status === 'loading') {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -198,7 +300,6 @@ export default function UsersAdmin() {
     );
   }
 
-  // Contenido para mostrar cuando está cargando usuarios
   const loadingContent = (
     <div className="flex justify-center items-center py-8">
       <i className="fa-solid fa-spinner fa-spin text-[var(--color-primary)]"></i>
@@ -206,14 +307,12 @@ export default function UsersAdmin() {
     </div>
   );
 
-  // Contenido para mostrar cuando no hay usuarios
   const emptyContent = (
     <div className="text-center py-8 text-gray-500">
       {searchTerm ? 'No se encontraron usuarios que coincidan con la búsqueda.' : 'No hay usuarios registrados.'}
     </div>
   );
 
-  // Renderizar usuarios en formato de cards para móviles
   const cardsView = (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {filteredUsers.map((user) => (
@@ -239,7 +338,6 @@ export default function UsersAdmin() {
               <div className="text-sm text-gray-500">{user.email}</div>
             </div>
           </div>
-          
           <div className="flex flex-wrap gap-2 mb-3">
             {user.enabled !== false ? (
               <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
@@ -264,18 +362,46 @@ export default function UsersAdmin() {
               </span>
             )}
           </div>
-          
-          <div className="flex justify-end mt-2 pt-2 border-t border-gray-100">
+          <div className="mb-3">
+            <div className="text-xs font-medium text-gray-500 mb-1">Perfil:</div>
+            {perfiles.find(p => p.id === user.perfil) ? (
+              <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                {perfiles.find(p => p.id === user.perfil).emoji} {perfiles.find(p => p.id === user.perfil).nombre}
+              </span>
+            ) : (
+              <span className="text-sm text-gray-500">No asignado</span>
+            )}
+          </div>
+          <div className="mb-3">
+            <div className="text-xs font-medium text-gray-500 mb-1">Doctores:</div>
+            <div className="flex flex-wrap gap-1">
+              {user.doctores && user.doctores.length > 0 ? (
+                user.doctores.map(doctor => (
+                  <span 
+                    key={doctor.id} 
+                    className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800" 
+                    title={doctor.nombre}
+                    style={doctor.color ? { backgroundColor: doctor.color + '40' } : {}}
+                  >
+                    {doctor.emoji} {doctor.nombre}
+                  </span>
+                ))
+              ) : (
+                <span className="text-sm text-gray-500">Ninguno</span>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-end mt-2 pt-2 border-t border-t-gray-200">
             <button
               onClick={() => prepareEdit(user)}
-              className="text-indigo-600 hover:text-indigo-900 mr-3 text-xs"
+              className="text-indigo-600 hover:text-indigo-900 mr-3 text-xs p-2 border border-indigo-600 rounded-md"
             >
               <i className="fa-solid fa-edit mr-1"></i>
               Editar
             </button>
             <button
               onClick={() => prepareDelete(user)}
-              className="text-red-600 hover:text-red-900 text-xs"
+              className="text-red-600 hover:text-red-900 text-xs p-2 border border-red-600 rounded-md"
             >
               <i className="fa-solid fa-trash-alt mr-1"></i>
               Eliminar
@@ -286,25 +412,30 @@ export default function UsersAdmin() {
     </div>
   );
 
-  // Renderizar tabla para pantallas grandes
   const tableView = (
     <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow">
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+            <th scope="col" className="py-3 text-center text-xs font-medium uppercase tracking-wider">
               Usuario
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+            <th scope="col" className="py-3 text-center text-xs font-medium uppercase tracking-wider">
               Correo Electrónico
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+            <th scope="col" className="py-3 text-center text-xs font-medium uppercase tracking-wider">
+              Perfil
+            </th>
+            <th scope="col" className="py-3 text-center text-xs font-medium uppercase tracking-wider">
+              Doctores
+            </th>
+            <th scope="col" className="py-3 text-center text-xs font-medium uppercase tracking-wider">
               Estado
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+            <th scope="col" className="py-3 text-center text-xs font-medium uppercase tracking-wider">
               Verificado
             </th>
-            <th scope="col" className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
+            <th scope="col" className="py-3 text-center text-xs font-medium uppercase tracking-wider">
               Acciones
             </th>
           </tr>
@@ -312,14 +443,14 @@ export default function UsersAdmin() {
         <tbody className="divide-y divide-gray-200 bg-white">
           {loading ? (
             <tr>
-              <td colSpan="5" className="px-6 py-4 text-center">
+              <td colSpan="7" className="px-6 py-4 text-center">
                 <i className="fa-solid fa-spinner fa-spin text-[var(--color-primary)]"></i>
                 <span className="ml-2">Cargando usuarios...</span>
               </td>
             </tr>
           ) : filteredUsers.length === 0 ? (
             <tr>
-              <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+              <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
                 {searchTerm ? 'No se encontraron usuarios que coincidan con la búsqueda.' : 'No hay usuarios registrados.'}
               </td>
             </tr>
@@ -344,6 +475,33 @@ export default function UsersAdmin() {
                 </td>
                 <td className="whitespace-nowrap px-6 py-4">
                   <div className="text-sm text-gray-900">{user.email}</div>
+                </td>
+                <td className="whitespace-nowrap px-6 py-4">
+                  {perfiles.find(p => p.id === user.perfil) ? (
+                    <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                      {perfiles.find(p => p.id === user.perfil).emoji} {perfiles.find(p => p.id === user.perfil).nombre}
+                    </span>
+                  ) : (
+                    <span className="text-sm text-gray-500">No asignado</span>
+                  )}
+                </td>
+                <td className="whitespace-nowrap px-6 py-4">
+                  <div className="flex flex-wrap gap-1">
+                    {user.doctores && user.doctores.length > 0 ? (
+                      user.doctores.map(doctor => (
+                        <span 
+                          key={doctor.id} 
+                          className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800" 
+                          title={doctor.nombre}
+                          style={doctor.color ? { backgroundColor: doctor.color + '40' } : {}}
+                        >
+                          {doctor.emoji} {doctor.nombre}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-sm text-gray-500">Ninguno</span>
+                    )}
+                  </div>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4">
                   {user.enabled !== false ? (
@@ -371,17 +529,17 @@ export default function UsersAdmin() {
                     </span>
                   )}
                 </td>
-                <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                <td className="wpx-6 py-4 text-right text-sm font-medium flex gap-2 flex-wrap">
                   <button
                     onClick={() => prepareEdit(user)}
-                    className="text-indigo-600 hover:text-indigo-900 mr-3"
+                    className="text-indigo-600 hover:text-indigo-900 p-1 border border-indigo-600 rounded-md"
                   >
                     <i className="fa-solid fa-edit mr-1"></i>
                     Editar
                   </button>
                   <button
                     onClick={() => prepareDelete(user)}
-                    className="text-red-600 hover:text-red-900"
+                    className="text-red-600 hover:text-red-900 p-1 border border-red-600 rounded-md"
                   >
                     <i className="fa-solid fa-trash-alt mr-1"></i>
                     Eliminar
@@ -410,6 +568,8 @@ export default function UsersAdmin() {
                 email: '',
                 password: '',
                 enabled: true,
+                perfil: 1,
+                doctoresIds: []
               });
               setShowCreateModal(true);
             }}
@@ -445,7 +605,6 @@ export default function UsersAdmin() {
           </div>
         </div>
 
-        {/* Vista condicional según el tamaño de pantalla */}
         <div className="block lg:hidden">
           {loading ? loadingContent : filteredUsers.length === 0 ? emptyContent : cardsView}
         </div>
@@ -455,7 +614,6 @@ export default function UsersAdmin() {
         </div>
       </div>
 
-      {/* Modal para crear usuarios */}
       <Modal 
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
@@ -518,6 +676,35 @@ export default function UsersAdmin() {
                       </p>
                     )}
                   </div>
+                  <div>
+                    <label htmlFor="perfil" className="block text-sm font-medium text-gray-700">
+                      Perfil
+                    </label>
+                    <select
+                      id="perfil"
+                      name="perfil"
+                      value={formData.perfil}
+                      onChange={handlePerfilChange}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)] p-2 border"
+                    >
+                      {perfiles.map(perfil => (
+                        <option key={perfil.id} value={perfil.id}>
+                          {perfil.emoji} {perfil.nombre}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {formData.perfil === 1 && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Doctores Asignados
+                      </label>
+                      {renderDoctorCards()}
+                      <p className="mt-1 text-xs text-gray-500">
+                        Hacé clic en las tarjetas para seleccionar o deseleccionar los doctores.
+                      </p>
+                    </div>
+                  )}
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -562,7 +749,6 @@ export default function UsersAdmin() {
         </div>
       </Modal>
 
-      {/* Modal para editar usuarios */}
       <Modal
         isOpen={showEditModal && selectedUser !== null}
         onClose={() => setShowEditModal(false)}
@@ -623,6 +809,35 @@ export default function UsersAdmin() {
                       Deja en blanco para mantener la contraseña actual.
                     </p>
                   </div>
+                  <div>
+                    <label htmlFor="edit-perfil" className="block text-sm font-medium text-gray-700">
+                      Perfil
+                    </label>
+                    <select
+                      id="edit-perfil"
+                      name="perfil"
+                      value={formData.perfil}
+                      onChange={handlePerfilChange}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border"
+                    >
+                      {perfiles.map(perfil => (
+                        <option key={perfil.id} value={perfil.id}>
+                          {perfil.emoji} {perfil.nombre}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {formData.perfil === 1 && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Doctores Asignados
+                      </label>
+                      {renderDoctorCards()}
+                      <p className="mt-1 text-xs text-gray-500">
+                        Hacé clic en las tarjetas para seleccionar o deseleccionar los doctores.
+                      </p>
+                    </div>
+                  )}
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -667,7 +882,6 @@ export default function UsersAdmin() {
         </div>
       </Modal>
 
-      {/* Modal de confirmación para eliminar usuarios */}
       <Modal
         isOpen={showDeleteModal && selectedUser !== null}
         onClose={() => setShowDeleteModal(false)}

@@ -7,6 +7,7 @@ import Loader from '@/components/Loader';
 import { useTheme } from 'next-themes';
 import { formatoFecha, zfill } from '@/lib/utils/dateUtils';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 
 const TurnoNuevo = ({
     desdeParam,
@@ -18,6 +19,7 @@ const TurnoNuevo = ({
     pacienteIdParam,
     consultorioIdParam
 }) => {
+   const { data: session } = useSession();
    const router = useRouter();
    const [loading, setLoading] = useState(false);
    const [error, setError] = useState(null);
@@ -323,6 +325,7 @@ const TurnoNuevo = ({
      }
    };
 
+
   // Cargar datos iniciales
    useEffect(() => {
     const cargarDatos = async () => {
@@ -338,10 +341,22 @@ const TurnoNuevo = ({
          if (!response.ok) {
            throw new Error(`Error: ${response.status}`);
          }        
-         const config = await response.json();
-         // Verificar que doctores sea un array y tenga elementos
+        const config = await response.json();
+        let doctoresDelUsuario = [];
+        if (session?.user) {
+            if (session.user.perfil?.id < 50 && session.user.doctores) {
+              doctoresDelUsuario = session.user.doctores || [];
+              if (doctoresDelUsuario.length === 1) {
+               turno.doctor = doctoresDelUsuario[0].id;
+              }
+            }
+          }
          if (Array.isArray(config.doctores) && config.doctores.length > 0) {
-           setDoctores(config.doctores);
+          if (doctoresDelUsuario.length > 0) {
+            setDoctores(config.doctores.filter(doc => doctoresDelUsuario.some(docUsuario => doc.id === docUsuario.id)));
+          } else {
+            setDoctores(config.doctores);
+          }
          } else {
            console.warn('No se encontraron doctores en la configuración');
            setDoctores([]);
@@ -459,7 +474,9 @@ const TurnoNuevo = ({
     tipoTurnoIdParam,
     dniParam,
     celularParam,
-    pacienteIdParam]);
+    pacienteIdParam,
+    session,
+  ]);
 
   return (
    <div className="container mx-auto px-4 py-8">
@@ -648,7 +665,7 @@ const TurnoNuevo = ({
                 onChange={handleChange}
                 className={`px-3 py-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='light' ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-200'}`}
               >
-                <option value="">Seleccione doctor</option>
+                {doctores.length > 1 && (<option value="">Seleccione doctor</option>)}
                 {doctores.map((doctor) => (
                   <option key={doctor.nombre} value={doctor.id}>
                     {doctor.emoji} {doctor.nombre}

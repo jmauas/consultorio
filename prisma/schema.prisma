@@ -45,12 +45,16 @@ model User {
   enabled       Boolean   @default(true)
   token         String?
   tokenExpires  DateTime?
+  perfil        Int       @default(1)
   accounts      Account[]
   sessions      Session[]
   pacientesCreados   Paciente[] @relation("PacienteCreatedBy")
   pacientesEditados  Paciente[] @relation("PacienteUpdatedBy")
   turnosCreados      Turno[]    @relation("TurnoCreatedBy")
   turnosEditados     Turno[]    @relation("TurnoUpdatedBy")
+  doctores      Doctor[]  @relation("UserDoctores")
+
+  @@map("users")
 }
 
 model VerificationToken {
@@ -110,6 +114,9 @@ model Doctor {
   AgendaDoctor    AgendaDoctor[]
   TipoTurnoDoctor TipoTurnoDoctor[]
   Turno           Turno[]
+  usuarios        User[]            @relation("UserDoctores")
+
+  @@map("doctores")
 }
 
 model AgendaDoctor {
@@ -117,6 +124,7 @@ model AgendaDoctor {
   doctorId      String
   consultorioId String? // Added consultorioId field
   dia           Int
+  fecha         DateTime?    // Nueva columna fecha de tipo DateTime que puede ser nula
   nombre        String
   atencion      Boolean
   desde         String

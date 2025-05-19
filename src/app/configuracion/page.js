@@ -53,7 +53,7 @@ export default function ConfiguracionPage() {
       href: '/configuracion/usuarios',
       icon: 'fas fa-users',
       description: 'Gestione las cuentas de usuarios y sus permisos de acceso',
-      color: 'bg-[var(--color-primary)]or-primary)]' 
+      color: 'bg-[var(--color-primary)]' 
     },
     { 
       label: 'Opciones Técnicas', 

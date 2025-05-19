@@ -166,8 +166,8 @@ export default function ConsultorioPage() {
           // For each consultorio, ensure all days are registered
           consultorioIds.forEach(consultorioId => {
             // Day codes: 0-6 for days of week, 9 for feriado
-            const dayCodes = [1, 2, 3, 4, 5, 6, 0, 9];
-            const dayNames = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo', 'feriado'];
+            const dayCodes = [1, 2, 3, 4, 5, 6, 0, 9, 99];
+            const dayNames = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo', 'feriado', 'fecha'];
             
             dayCodes.forEach((dayCode, index) => {
               // Check if this day+consultorio combination already exists
@@ -193,7 +193,8 @@ export default function ConsultorioPage() {
                   hasta: "18:00",
                   corteDesde: "",
                   corteHasta: "",
-                  consultorioId: consultorioId
+                  consultorioId: consultorioId,
+                  fecha: null,
                 });
               }
             });

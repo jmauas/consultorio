@@ -19,21 +19,13 @@ async function readJsonFile(filePath) {
 async function main() {
   console.log('Iniciando seed de la base de datos...');
 
-  // Eliminar datos existentes (opcional)
-  await prisma.turno.deleteMany({});
-  await prisma.paciente.deleteMany({});
   await prisma.tipoTurnoDoctor.deleteMany({});
   await prisma.agendaDoctor.deleteMany({});
   await prisma.doctor.deleteMany({});
-  await prisma.configuracionConsultorio.deleteMany({});
   await prisma.user.deleteMany({});
-  await prisma.account.deleteMany({});
-  await prisma.session.deleteMany({});
   await prisma.verificationToken.deleteMany({});
 
-  console.log('Datos previos eliminados.');
-
-  // Crear usuario administrador
+    // Crear usuario administrador
   const adminUser = await prisma.user.create({
     data: {
       name: 'Administrador',
@@ -63,26 +55,6 @@ async function main() {
   const configFilePath = path.join(process.cwd(), '../', 'locales', 'config.json');
   const configData = await readJsonFile(configFilePath);
   
-  if (configData) {
-    const configuracion = await prisma.configuracionConsultorio.create({
-      data: {
-        nombreConsultorio: configData.nombreConsultorio,
-        domicilio: configData.domicilio,
-        telefono: configData.telefono,
-        mail: configData.mail,
-        horarioAtencion: configData.horarioAtencion,
-        web: configData.web || '',
-        limite: new Date(configData.limite),
-        feriados: configData.feriados || [],
-        envio: configData.envio || false,
-        horaEnvio: configData.horaEnvio,
-        diasEnvio: configData.diasEnvio,
-        urlApp: configData.urlApp,
-        coberturas: configData.coberturas || '',
-      }
-    });
-    
-    console.log(`Configuración de consultorio creada con ID: ${configuracion.id}`);
     
     // Migrar doctores
     if (configData.doctores && Array.isArray(configData.doctores)) {
@@ -112,49 +84,6 @@ async function main() {
       }
       console.log(`${configData.doctores.length} doctores migrados correctamente`);
     }
-  }
-  
-  // Migrar pacientes y turnos
-  const pacientesFilePath = path.join(process.cwd(), '../', 'locales', 'pacientes.json');
-  const pacientesData = await readJsonFile(pacientesFilePath);
-  
-  if (pacientesData && Array.isArray(pacientesData)) {
-    const pacientesMap = new Map(); // Para almacenar la relación DNI+Celular -> ID
-    
-    for (const turnoData of pacientesData) {
-      if (!turnoData.nombre || !turnoData.celular) continue;
-      
-      // Clave única para identificar pacientes (dni+celular)
-      const pacienteKey = `${turnoData.dni || ''}-${turnoData.celular}`;
-      
-      let pacienteId;
-      
-      // Verificar si el paciente ya existe
-      if (pacientesMap.has(pacienteKey)) {
-        pacienteId = pacientesMap.get(pacienteKey);
-      } else {
-        // Crear nuevo paciente
-        const paciente = await prisma.paciente.create({
-          data: {
-            nombre: turnoData.nombre,
-            apellido: turnoData.apellido || '',
-            dni: turnoData.dni || '',
-            celular: turnoData.celular,
-            email: turnoData.email || '',
-            cobertura: turnoData.cobertura || '',
-            observaciones: turnoData.observaciones || ''
-          }
-        });
-        
-        pacienteId = paciente.id;
-        pacientesMap.set(pacienteKey, pacienteId);
-      }
-    }
-    
-    console.log(`${pacientesMap.size} pacientes migrados correctamente`);
-  }
-  
-  console.log('Seed completado exitosamente!');
 }
 
 main()

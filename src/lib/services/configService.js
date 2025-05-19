@@ -209,19 +209,26 @@ export const registrarConfig = async (datos, seccion = 'completo') => {
             });
             
             // Crear nuevos items de agenda
-            for (const agendaItem of doctor.agenda) {
+            for (const agendaItem of doctor.agenda) {              // Preparar datos base para AgendaDoctor
+              const agendaData = {
+                doctorId: doctor.id,
+                consultorioId: agendaItem.consultorioId || null,
+                dia: agendaItem.dia,
+                nombre: agendaItem.nombre,
+                atencion: agendaItem.atencion,
+                desde: agendaItem.desde,
+                hasta: agendaItem.hasta,
+                corteDesde: agendaItem.corteDesde,
+                corteHasta: agendaItem.corteHasta
+              };
+              
+              // Si es agenda por fecha (dia 99), agregar el campo fecha
+              if (agendaItem.dia === 99 && agendaItem.fecha) {
+                agendaData.fecha = new Date(agendaItem.fecha);
+              }
+              
               await prisma.agendaDoctor.create({
-                data: {
-                  doctorId: doctor.id,
-                  consultorioId: agendaItem.consultorioId || null, // Add consultorioId field
-                  dia: agendaItem.dia,
-                  nombre: agendaItem.nombre,
-                  atencion: agendaItem.atencion,
-                  desde: agendaItem.desde,
-                  hasta: agendaItem.hasta,
-                  corteDesde: agendaItem.corteDesde,
-                  corteHasta: agendaItem.corteHasta
-                }
+                data: agendaData
               });
             }
           }
@@ -289,19 +296,26 @@ export const registrarConfig = async (datos, seccion = 'completo') => {
           
           // Crear agenda del doctor
           if (doctor.agenda && Array.isArray(doctor.agenda)) {
-            for (const agendaItem of doctor.agenda) {
+            for (const agendaItem of doctor.agenda) {              // Preparar datos base para AgendaDoctor
+              const agendaData = {
+                doctorId: doctorCreado.id,
+                consultorioId: agendaItem.consultorioId || null,
+                dia: agendaItem.dia,
+                nombre: agendaItem.nombre,
+                atencion: agendaItem.atencion,
+                desde: agendaItem.desde,
+                hasta: agendaItem.hasta,
+                corteDesde: agendaItem.corteDesde,
+                corteHasta: agendaItem.corteHasta
+              };
+              
+              // Si es agenda por fecha (dia 99), agregar el campo fecha
+              if (agendaItem.dia === 99 && agendaItem.fecha) {
+                agendaData.fecha = new Date(agendaItem.fecha);
+              }
+              
               await prisma.agendaDoctor.create({
-                data: {
-                  doctorId: doctorCreado.id,
-                  consultorioId: agendaItem.consultorioId || null, // Add consultorioId field
-                  dia: agendaItem.dia,
-                  nombre: agendaItem.nombre,
-                  atencion: agendaItem.atencion,
-                  desde: agendaItem.desde,
-                  hasta: agendaItem.hasta,
-                  corteDesde: agendaItem.corteDesde,
-                  corteHasta: agendaItem.corteHasta
-                }
+                data: agendaData
               });
             }
           }

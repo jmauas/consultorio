@@ -107,7 +107,7 @@ export default function Header() {
           )}
 
           {/* Botón de configuración para usuarios autenticados */}
-          {session?.user && (
+          {session?.user && session.user.perfil && Number(session.user.perfil.id) == 100 && (
             <Link
               href="/configuracion"             
               className="p-2 border border-[var(--color-primary)] dark:border-[var(--color-primary)] rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors hidden md:flex items-center"
@@ -145,9 +145,19 @@ export default function Header() {
         <div className="flex items-center space-x-4">
           {session?.user && (
             <>
-              <div className="text-sm font-bold">
-                {session.user.name || 'Usuario'}
-              </div>
+              <span className="flex flex-col items-start justify-center">
+                <span className="text-sm font-bold flex items-center justify-center gap-1">
+                  <span className="text-sm md:text-lg text-center">
+                    {session.user.name || 'Usuario'}
+                  </span>
+                  <span className="text-lg md:hidden">
+                    {session.user.perfil && session.user.perfil.emoji}
+                  </span>
+                </span>
+                <span className="text-xs hidden md:flex items-center gap-1">
+                  {session.user.perfil && session.user.perfil.nombre} {session.user.perfil && session.user.perfil.emoji}
+                </span>
+              </span>
 
               <div className="relative" ref={menuRef}>
                 <div 
@@ -163,6 +173,7 @@ export default function Header() {
                 
                 {menuOpen && (
                   <div className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 z-50 border border-gray-200 ${theme==='light' ? 'bg-white' : 'bg-black'}`}>
+                    {session?.user && session.user.perfil && Number(session.user.perfil.id) == 100 && (<>
                     <Link 
                       href="/configuracion/usuarios" 
                       className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -179,6 +190,7 @@ export default function Header() {
                       <i className="fa-solid fa-cogs mr-2 text-[var(--color-primary)] dark:text-[var(--color-primary)]"></i>
                       Panel de Configuración
                     </Link>
+                    </>)}
                     
                     <button 
                       onClick={handleSignOut}

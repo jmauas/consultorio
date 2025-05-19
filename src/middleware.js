@@ -4,7 +4,8 @@ import { getToken } from 'next-auth/jwt';
 // Configuración de rutas
 const publicRoutes = [
   '/auth/signin',
-  '/auth/reset-password', 
+  '/auth/reset-password',
+  '/auth/complete-signin/',
   '/api/auth',
   '/favicon.ico',
   '/logo.png',
@@ -13,8 +14,19 @@ const publicRoutes = [
   '/google-calendar-logo.png',
   '/api/debug',
   '/api/configuracion',
-  '/turnos/disponibilidad'
+  '/turnos/disponibilidad',
+  '/turnos/cancelar',
 ];
+const publicRoutesSource = [
+  '/api/auth',
+  '/auth/reset-password/',
+  '/auth/complete-signin/',
+];
+
+const adminRoutesSource = [
+  '/configuracion',
+];
+
 
 // Verificar si una ruta es pública
 const isPublicRoute = (pathname) => {
@@ -22,11 +34,13 @@ const isPublicRoute = (pathname) => {
   if (publicRoutes.includes(pathname)) return true;
   
   // Verificar rutas que comienzan con patrones específicos
-  return (
-    pathname.startsWith('/api/auth/') ||
-    pathname.startsWith('/auth/reset-password/') ||
-    pathname.startsWith('/auth/complete-signin/')
-  );
+  return publicRoutesSource.some(route => pathname.startsWith(route));
+};
+
+// Verificar si una ruta es de administrador
+const isAdminRoute = (pathname) => {
+  // Verificar rutas que comienzan con patrones específicos.
+  return adminRoutesSource.some(route => pathname.startsWith(route));
 };
 
 export async function middleware(request) {
@@ -48,8 +62,15 @@ export async function middleware(request) {
     url.searchParams.set('callbackUrl', encodeURI(request.url));
     return NextResponse.redirect(url);
   }
+
+  // Redirigir a la página de inicio si no es usuario administrador y está en ruta administrador
+  if ((!token || !token.perfil || Number(token.perfil.id) != 100) && isAdminRoute(pathname)) {
+    console.log('Redirigiendo a home desde admin');    
+    const url = new URL('/', request.url);
+      return NextResponse.redirect(url);
+  }
   
-  // Si está en la página de inicio de sesión pero ya está autenticado, redirigir al dashboard
+  // Si está en la página de inicio de sesión pero ya está autenticado, redirigir a home
   if (token && pathname.startsWith('/auth/signin')) {
     const url = new URL('/', request.url);
     return NextResponse.redirect(url);

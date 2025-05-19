@@ -2,28 +2,48 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 
 /**
+ * Modelo de perfiles de usuario
+ * @type {Array<{id: number, nombre: string, emoji: string}>}
+ */
+export const PERFILES_USUARIO = [
+  { id: 1, nombre: 'Asistente', emoji: '👨‍⚕️' },
+  { id: 50, nombre: 'Recepcionista', emoji: '👩‍💼' },
+  { id: 100, nombre: 'Administrador', emoji: '👑' }
+];
+
+/**
+ * Obtiene todos los perfiles de usuario disponibles
+ * @returns {Array<{id: number, nombre: string, emoji: string}>} Lista de perfiles
+ */
+export function getPerfilesUsuario() {
+  return PERFILES_USUARIO;
+}
+
+/**
  * Obtiene todos los usuarios
  * @returns {Promise<{ok: boolean, users?: Array, error?: string}>} Resultado de la operación
  */
 export async function getAllUsers() {
   try {
     const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        emailVerified: true,
-        image: true,
-        enabled: true,
-        tokenExpires: true,
-        // No incluimos el token ni password por seguridad
+      include: {
+        doctores: true
       },
       orderBy: {
         name: 'asc',
       },
     });
+
+     // Filtrar la información sensible como tokens y contraseñas
+    const filteredUsers = users.map(user => {
+      const { password, token, ...userData } = user;
+      return {
+        ...userData,
+        doctores: user.doctores // Aseguramos que la relación con doctores se mantenga
+      };
+    });
     
-    return { ok: true, users };
+    return { ok: true, users: filteredUsers };
   } catch (error) {
     console.error('Error al obtener usuarios:', error);
     return { ok: false, error: error.message };
@@ -39,23 +59,21 @@ export async function getUserById(id) {
   try {
     const user = await prisma.user.findUnique({
       where: { id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        emailVerified: true,
-        image: true,
-        enabled: true,
-        tokenExpires: true,
-        // No incluimos el token ni password por seguridad
+      include: {
+        doctores: true
       }
     });
     
     if (!user) {
       return { ok: false, message: 'Usuario no encontrado' };
     }
+      // Eliminar datos sensibles
+    const { password, token, ...userData } = user;
     
-    return { ok: true, user };
+    return { ok: true, user: {
+      ...userData,
+      doctores: user.doctores // Aseguramos que la relación con doctores se mantenga
+    } };
   } catch (error) {
     console.error('Error al obtener usuario:', error);
     return { ok: false, error: error.message };
@@ -69,7 +87,7 @@ export async function getUserById(id) {
  */
 export async function createUser(userData) {
   try {
-    // Verificar si el correo ya está en uso
+     // Verificar si el correo ya está en uso
     const existingUser = await prisma.user.findUnique({
       where: { email: userData.email },
     });
@@ -84,8 +102,16 @@ export async function createUser(userData) {
       hashedPassword = await bcrypt.hash(userData.password, 10);
     }
     
-    // Crear usuario
-    const user = await prisma.user.create({
+    // Guardar los doctoresIds antes de eliminarlos del objeto userData
+    const doctoresIds = userData.doctoresIds && Array.isArray(userData.doctoresIds) 
+      ? [...userData.doctoresIds] 
+      : [];
+    
+    // Eliminar el campo doctoresIds para que no interfiera con la creación
+    delete userData.doctoresIds;
+    
+    // Crear usuario (sin relaciones doctores primero)
+    let user = await prisma.user.create({
       data: {
         name: userData.name,
         email: userData.email,
@@ -94,18 +120,43 @@ export async function createUser(userData) {
         token: userData.token,
         tokenExpires: userData.tokenExpires,
         image: userData.image,
+        perfil: userData.perfil ?? 1,
       },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        enabled: true,
-        tokenExpires: true,
-        image: true,
-      }
     });
     
-    return { ok: true, user };
+    // Si hay doctores para conectar, actualiza el usuario con esas relaciones
+    if (doctoresIds.length > 0) {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          doctores: {
+            connect: doctoresIds.map(doctorId => ({ id: doctorId }))
+          }
+        },
+        include: {
+          doctores: true
+        }
+      });
+    } else {
+      // Si no hay doctores, aún necesitamos cargar la relación vacía
+      user = await prisma.user.findUnique({
+        where: { id: user.id },
+        include: {
+          doctores: true
+        }
+      });
+    }
+    
+    // Eliminar datos sensibles
+    const { password, token, ...userDataWithoutSensitive } = user;
+    
+    return { 
+      ok: true, 
+      user: {
+        ...userDataWithoutSensitive,
+        doctores: user.doctores 
+      } 
+    };
   } catch (error) {
     console.error('Error al crear usuario:', error);
     return { ok: false, error: error.message };
@@ -123,6 +174,9 @@ export async function updateUser(id, userData) {
     // Verificar si el usuario existe
     const userExists = await prisma.user.findUnique({
       where: { id },
+      include: {
+        doctores: true
+      }
     });
     
     if (!userExists) {
@@ -140,35 +194,88 @@ export async function updateUser(id, userData) {
       }
     }
     
-    // Preparar datos para la actualización
+     // Preparar datos para la actualización
     const updateData = { ...userData };
+    
+    // Guardar los doctoresIds antes de eliminarlos
+    const doctoresIds = userData.doctoresIds !== undefined 
+      ? (Array.isArray(userData.doctoresIds) ? [...userData.doctoresIds] : []) 
+      : undefined;
+    
+    // Eliminar el campo doctoresIds para la actualización básica
+    delete updateData.doctoresIds;
     
     // Encriptar contraseña si se proporciona una nueva
     if (updateData.password) {
       updateData.password = await bcrypt.hash(updateData.password, 10);
     } else {
-      // Si no se proporciona una nueva contraseña, eliminamos el campo para no actualizarlo
       delete updateData.password;
     }
     
-    // Actualizar usuario
-    const user = await prisma.user.update({
+    // Actualizar usuario con sus datos básicos
+    let user = await prisma.user.update({
       where: { id },
       data: updateData,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        enabled: true,
-        tokenExpires: true,
-        image: true,
-      }
     });
     
-    return { ok: true, user };
+    // Solo actualizar las relaciones de doctores si se proporcionaron
+    if (doctoresIds !== undefined) {
+      user = await prisma.user.update({
+        where: { id },
+        data: {
+          doctores: {
+            // Primero desconectar todos los doctores existentes
+            set: [],
+            // Luego conectar los nuevos
+            connect: doctoresIds.map(doctorId => ({ id: doctorId }))
+          }
+        },
+        include: {
+          doctores: true
+        }
+      });
+    } else {
+      // Si no actualizamos doctores, aún necesitamos cargarlos
+      user = await prisma.user.findUnique({
+        where: { id },
+        include: {
+          doctores: true
+        }
+      });
+    }
+    
+    // Eliminar datos sensibles
+    const { password, token, ...userDataWithoutSensitive } = user;
+     
+    return { ok: true, user: {
+      ...userDataWithoutSensitive,
+      doctores: user.doctores // Aseguramos que la relación con doctores se mantenga
+    } };
   } catch (error) {
     console.error('Error al actualizar usuario:', error);
-    return { ok: false, error: error.message };
+    // Proporcionar más información sobre el error
+    let errorMessage = error.message;
+    if (error.code) {
+      // Errores específicos de Prisma
+      switch (error.code) {
+        case 'P2002':
+          errorMessage = `Valor duplicado para ${error.meta?.target?.join(', ')}`;
+          break;
+        case 'P2003':
+          errorMessage = `Error de restricción de clave foránea en ${error.meta?.field_name}`;
+          break;
+        case 'P2025':
+          errorMessage = 'Registro no encontrado';
+          break;
+        default:
+          errorMessage = `${error.code}: ${error.message}`;
+      }
+    }
+    return { 
+      ok: false, 
+      error: errorMessage,
+      details: error
+    };
   }
 }
 
@@ -214,21 +321,23 @@ export async function searchUsers(query) {
           { email: { contains: query, mode: 'insensitive' } },
         ],
       },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        emailVerified: true,
-        image: true,
-        enabled: true,
-        tokenExpires: true,
+      include: {
+        doctores: true
       },
       orderBy: {
         name: 'asc',
       },
     });
+      // Filtrar la información sensible
+    const filteredUsers = users.map(user => {
+      const { password, token, ...userData } = user;
+      return {
+        ...userData,
+        doctores: user.doctores // Aseguramos que la relación con doctores se mantenga
+      };
+    });
     
-    return { ok: true, users };
+    return { ok: true, users: filteredUsers };
   } catch (error) {
     console.error('Error al buscar usuarios:', error);
     return { ok: false, error: error.message };
