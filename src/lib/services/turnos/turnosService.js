@@ -246,17 +246,15 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
             if (!aten.atencion) {
                const agendaFecha = agenda.find(age =>
                     age.atencion === true &&
-                    age.dia === 99
-                );
-                  if (agendaFecha) {
-                    const fechaAgenda = new Date(agendaFecha.fecha);
-                    if (sonMismaFecha(fechaAgenda, hoy)) {
-                        aten.atencion = true;
-                        aten.desde = agendaFecha.desde;
-                        aten.hasta = agendaFecha.hasta;
-                        aten.corteDesde = agendaFecha.corteDesde;
-                        aten.corteHasta = agendaFecha.corteHasta;
-                    }
+                    age.dia === 99 &&
+                    sonMismaFecha(new Date(age.fecha), fecha)
+                );              
+                if (agendaFecha) {
+                    aten.atencion = true;
+                    aten.desde = agendaFecha.desde;
+                    aten.hasta = agendaFecha.hasta;
+                    aten.corteDesde = agendaFecha.corteDesde;
+                    aten.corteHasta = agendaFecha.corteHasta;
                 }
                 if (!aten.atencion) {
                   hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());

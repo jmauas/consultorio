@@ -154,7 +154,7 @@ export default function ConsultorioPage() {
       setGuardando(true);
       
       const configActual = await obtenerConfig();
-      
+      console.log(config.doctores)
       const doctoresParaGuardar = config.doctores.map(doctor => {
         // Ensure each doctor has agenda items for all days in each consultorio
         const agendaCompleta = [];
@@ -166,8 +166,8 @@ export default function ConsultorioPage() {
           // For each consultorio, ensure all days are registered
           consultorioIds.forEach(consultorioId => {
             // Day codes: 0-6 for days of week, 9 for feriado
-            const dayCodes = [1, 2, 3, 4, 5, 6, 0, 9, 99];
-            const dayNames = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo', 'feriado', 'fecha'];
+            const dayCodes = [1, 2, 3, 4, 5, 6, 0, 9];
+            const dayNames = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo', 'feriado'];
             
             dayCodes.forEach((dayCode, index) => {
               // Check if this day+consultorio combination already exists
@@ -178,11 +178,7 @@ export default function ConsultorioPage() {
               
               if (existingDay) {
                 // If exists, use it
-                agendaCompleta.push({
-                  ...existingDay,
-                  corteDesde: existingDay.corteDesde || "",
-                  corteHasta: existingDay.corteHasta || "",
-                });
+                agendaCompleta.push(existingDay);
               } else {
                 // If doesn't exist, create it with default values
                 agendaCompleta.push({
@@ -198,6 +194,12 @@ export default function ConsultorioPage() {
                 });
               }
             });
+          });
+          // AGREGO AGENDA POR FECHAS
+          doctor.agenda.forEach(a => { 
+            if (a.dia === 99) {
+              agendaCompleta.push(a);
+            }
           });
         }
         

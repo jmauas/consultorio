@@ -148,15 +148,12 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                         const agendaFecha = doctor.agenda.find(age =>
                             age.consultorioId === consultorio.id &&
                             age.atencion === true &&
-                            age.dia === 99
+                            age.dia === 99 &&
+                            sonMismaFecha(new Date(age.fecha), fecha)
                         );
+                        console.log('agendaFecha', agendaFecha);
                         if (agendaFecha) {
-                            const fechaAgenda = new Date(agendaFecha.fecha);
-                            if (sonMismaFecha(fechaAgenda, fecha)) {
-                                atencionHoy = agendaFecha;
-                            }
-                        }
-                        if (atencionHoy) {
+                            atencionHoy = agendaFecha;
                             noLaborable = false;
                         }
                     }
