@@ -233,7 +233,7 @@ const SignIn = () => {
                     type="email"
                     autoComplete="email"
                     required
-                    className="relative block w-full rounded-md border-0 p-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-[var(--color-primary)] sm:text-sm sm:leading-6"
+                    className="relative block w-full rounded-md border-0 p-2 pl-10 ring-1 ring-inset ring-gray-300 focus:z-10 focus:ring-2 focus:ring-[var(--color-primary)] sm:text-sm sm:leading-6"
                     placeholder="Correo electrónico"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -294,7 +294,7 @@ const SignIn = () => {
                     type="email"
                     autoComplete="email"
                     required
-                    className={`relative block w-full border-0 p-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-[var(--color-primary)] sm:text-sm sm:leading-6 ${
+                    className={`relative block w-full border-0 p-2 pl-10 ring-1 ring-inset ring-gray-300 focus:z-10 focus:ring-2 focus:ring-[var(--color-primary)] sm:text-sm sm:leading-6 ${
                       authMethod === "credentials" ? "rounded-t-md" : "rounded-md"
                     }`}
                     placeholder="Correo electrónico"
@@ -317,7 +317,7 @@ const SignIn = () => {
                       type="password"
                       autoComplete="current-password"
                       required
-                      className="relative block w-full rounded-b-md border-0 p-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-[var(--color-primary)] sm:text-sm sm:leading-6"
+                      className="relative block w-full rounded-b-md border-0 p-2 pl-10 ring-1 ring-inset ring-gray-300 focus:z-10 focus:ring-2 focus:ring-[var(--color-primary)] sm:text-sm sm:leading-6"
                       placeholder="Contraseña"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}

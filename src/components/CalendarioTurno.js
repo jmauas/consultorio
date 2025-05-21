@@ -546,26 +546,23 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                         }
                                         
                                         return (
-                                            <div key={`mobile-slot-${hora.hora}`} className="bg-blue-50 rounded-lg overflow-hidden">
+                                            <div key={`mobile-slot-${hora.hora}`} className="bg-blue-50 rounded-lg grid grid-cols-5 gap-1">
                                                 {/* Time slot header */}
-                                                <div className="py-3 px-4 border-b border-blue-200">
-                                                    <div className="inline-flex items-center justify-between w-full">
-                                                        <div className="text-[var(--color-primary)] bg-[var(--card-bg)] text-3xl font-bold border p-2 rounded-md shadow-xl">
-                                                            {hora.hora}
+                                                <div className="w-full col-span-1 flex flex-col items-center justify-start gap-4 my-2">
+                                                    <div className="text-[var(--color-primary)] bg-[var(--card-bg)] text-xl font-bold border p-2 rounded-md shadow-xl">
+                                                        {hora.hora}
+                                                    </div>
+                                                    <div className="calendar-icon border border-red-500 rounded-lg shadow-sm overflow-hidden flex flex-col">
+                                                        <div className="bg-red-600 text-white text-xs font-bold text-center px-2 py-1 w-14">
+                                                            {fecha.toLocaleDateString('es-AR', { month: 'short' }).toUpperCase()}
                                                         </div>
-                                                        <div className="calendar-icon border border-red-500 rounded-lg shadow-sm overflow-hidden flex flex-col">
-                                                            <div className="bg-red-600 text-white text-xs font-bold text-center px-2 py-1 w-14">
-                                                                {fecha.toLocaleDateString('es-AR', { month: 'short' }).toUpperCase()}
-                                                            </div>
-                                                            <div className="flex-grow flex items-center justify-center px-2 py-1 text-[var(--color-primary)] bg-[var(--card-bg)]">
-                                                                <span className="font-bold text-xl">{fecha.getDate()}</span>
-                                                            </div>
+                                                        <div className="flex-grow flex items-center justify-center px-2 py-1 text-[var(--color-primary)] bg-[var(--card-bg)]">
+                                                            <span className="font-bold text-xl">{fecha.getDate()}</span>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                
+                                                </div>                                                
                                                 {/* Consultorios for this time slot */}
-                                                <div className="divide-y divide-gray-200 p-4 flex flex-col gap-4">
+                                                <div className="col-span-4 p-2 flex flex-col gap-4">
                                                     {hora.consultorios.map((consultorio, consultorioIndex) => {
                                                         // Skip rendering if this consultorio is blocked by a previous appointment
                                                         if (blockingConsultorios.includes(consultorioIndex)) {
@@ -583,19 +580,19 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                         return (
                                                             <div 
                                                                 key={`mobile-${hora.hora}-${consultorio.consultorioId}`}
-                                                                className="p-3 flex flex-col gap-2 rounded-md"
+                                                                className="p-1 flex flex-col gap-1 rounded-md"
                                                                 style={{ 
                                                                     backgroundColor: consultorio.color,                                                   
                                                                     color: isColorLight(consultorio.color) ? '#000' : '#fff'
                                                                 }}
                                                             >
-                                                                <div className="font-bold text-lg mb-2 p-2 shadow-lg border-md">{`${consultorio.nombre}`}</div>
                                                                 
-                                                                <div className="flex flex-wrap gap-2 mb-2">
+                                                                <div className="flex items-center justify-between mb-1">
+                                                                    <div className="font-bold p-2 shadow-lg border-md">{`${consultorio.nombre}`}</div>                                                                
                                                                     {doctoresAtendiendo.map(doctor => (
                                                                         <div
                                                                             key={`mobile-doctor-${doctor.id}-${hora.hora}`}
-                                                                            className="p-1 rounded-md"
+                                                                            className="p-2 rounded-md text-sm"
                                                                             title={doctor.nombre}
                                                                             style={{
                                                                                 backgroundColor: doctor.color,
@@ -605,10 +602,11 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                                             {doctor.emoji}
                                                                         </div>
                                                                     ))}
+                                                                </div>
                                                                     
                                                                     {doctoresAtendiendo.length > 0 && (!hasTurnos || consultorio.turnos.filter(t => t.estado !== 'cancelado').length === 0) 
                                                                     ? (
-                                                                        <div className="ml-auto flex items-center gap-2">
+                                                                        <div className="p-1 flex items-center gap-2">
                                                                             <button 
                                                                                 onClick={() => abrirModalNuevoTurnoDispo({
                                                                                     desde: combinarFechaYHora(fecha, hora.hora),
@@ -629,7 +627,7 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                                         </div>
                                                                     )
                                                                     : (
-                                                                        <div className="ml-auto flex items-center">
+                                                                        <div className="p-1 flex items-center">
                                                                             {doctoresAtendiendo.map(doctor => (
                                                                                 <div
                                                                                     key={`mobile-doctor-${doctor.id}-${hora.hora}-nombre`}
@@ -644,8 +642,7 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                                             ))}                      
                                                                         </div>
                                                                     )}
-                                                                </div>
-                                                                
+                                                               
                                                                 {/* Turnos */}
                                                                 {hasTurnos && (
                                                                     <div className="space-y-3">
@@ -659,7 +656,7 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                                                 }}
                                                                             >
                                                                                 <div className="flex items-center justify-between mb-2">
-                                                                                    <div className="font-bold text-base">
+                                                                                    <div className="font-bold text-xs p-1 border rounded-md">
                                                                                         {formatoFecha(turno.desde, true, false, false, false, true, false)}
                                                                                     </div>
                                                                                     
@@ -675,7 +672,7 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                                                         </div>
                                                                                     )}
                                                                                     
-                                                                                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${obtenerColorEstado(turno.estado || 'sin confirmar')}`}>
+                                                                                    <span className={`inline-flex p-1 text-xs font-medium rounded-full ${obtenerColorEstado(turno.estado || 'sin confirmar')}`}>
                                                                                         {obtenerNombreEstado(turno.estado) || 'sin confirmar'}
                                                                                     </span>
                                                                                 </div>
@@ -694,7 +691,7 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                                                             <div className="flex gap-2">
                                                                                                 <button
                                                                                                     onClick={() => abrirDetalleTurno(turno)}
-                                                                                                    className="rounded-md bg-blue-50 p-1 text-blue-600 hover:bg-blue-100 border border-blue-600"
+                                                                                                    className="rounded-md bg-blue-50 p-1 px-2 text-blue-600 hover:bg-blue-100 border border-blue-600"
                                                                                                     title="Ver detalles"
                                                                                                 >
                                                                                                     <i className="fa fa-eye"></i>
@@ -704,14 +701,14 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                                                                     href={`https://wa.me/${turno.paciente.celular}`} 
                                                                                                     target="_blank"
                                                                                                     title="Escribir por Whatsapp"
-                                                                                                    className="rounded-md bg-green-100 p-1 text-green-600 hover:bg-green-100 border border-green-600"
+                                                                                                    className="rounded-md bg-green-100 p-1 px-2 text-green-600 hover:bg-green-100 border border-green-600"
                                                                                                 >
                                                                                                     <i className="fab fa-whatsapp"></i>
                                                                                                 </Link>
                                                                                                 
                                                                                                 <button
                                                                                                     onClick={() => enviarRecordatorio(turno.id)}
-                                                                                                    className="rounded-md bg-green-50 p-1 text-green-700 hover:bg-green-100 border border-green-700"
+                                                                                                    className="rounded-md bg-green-50 p-1 px-2 text-green-700 hover:bg-green-100 border border-green-700"
                                                                                                     title="Enviar Recordatorios"
                                                                                                 >
                                                                                                     <i className="fa fa-solid fa-bell"></i>
@@ -719,7 +716,7 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                                                                 
                                                                                                 <button
                                                                                                     onClick={() => abrirModalNuevoTurno(turno.paciente)}
-                                                                                                    className="rounded-md bg-orange-50 p-1 text-[var(--color-primary)] hover:bg-orange-100 border border-[var(--color-primary)]"
+                                                                                                    className="rounded-md bg-orange-50 p-1 px-2 text-[var(--color-primary)] hover:bg-orange-100 border border-[var(--color-primary)]"
                                                                                                     title="Nuevo turno"
                                                                                                 >
                                                                                                     <i className="fa-solid fa-plus"></i>
