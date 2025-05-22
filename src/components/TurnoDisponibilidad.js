@@ -125,8 +125,12 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
   // Change doctor handler
   const handleDoctorChange = (e) => {
     const id = e.target.value;
-    const selectedDoctor = doctores.find(dr => dr.id === id);
-    validarDoctor(selectedDoctor);
+    if (id === 'Indistinto') {
+      validarDoctor({ id: 'Indistinto', nombre: 'Indistinto' });  
+    } else {
+      const selectedDoctor = doctores.find(dr => dr.id === id);
+      validarDoctor(selectedDoctor);
+    }
   };
 
   const validarDoctor = (doctor) => { 
