@@ -17,7 +17,6 @@ export default function CancelarTurnoPage({ }) {
   
   // Verificar el token y obtener información del turno al cargar la página
   useEffect(() => {
-    alert('Token: ' + token);
     const verificarToken = async () => {
       try {
         setLoading(true);
