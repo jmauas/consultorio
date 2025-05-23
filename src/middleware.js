@@ -7,6 +7,7 @@ const publicRoutes = [
   '/auth/reset-password',
   '/auth/complete-signin/',
   '/api/auth',
+  '/api/turnos/cancelar',
   '/favicon.ico',
   '/logo.png',
   '/logo.jpg',
@@ -21,6 +22,7 @@ const publicRoutesSource = [
   '/api/auth',
   '/auth/reset-password/',
   '/auth/complete-signin/',
+  '/turnos/cancelar',
 ];
 
 const adminRoutesSource = [
@@ -62,16 +64,17 @@ export async function middleware(request) {
     url.searchParams.set('callbackUrl', encodeURI(request.url));
     return NextResponse.redirect(url);
   }
-
+  
   // Redirigir a la página de inicio si no es usuario administrador y está en ruta administrador
   if ((!token || !token.perfil || Number(token.perfil.id) != 100) && isAdminRoute(pathname)) {
     console.log('Redirigiendo a home desde admin');    
     const url = new URL('/', request.url);
-      return NextResponse.redirect(url);
+    return NextResponse.redirect(url);
   }
   
   // Si está en la página de inicio de sesión pero ya está autenticado, redirigir a home
   if (token && pathname.startsWith('/auth/signin')) {
+    console.log('Redirigiendo a home desde signin');
     const url = new URL('/', request.url);
     return NextResponse.redirect(url);
   }
