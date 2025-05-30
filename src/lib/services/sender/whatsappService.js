@@ -112,10 +112,13 @@ export const textoMensajeConfTurno = async (turno, cambioEstado) => {
   const enlaceCancelacion = turno.token 
   ? `${urlApp}/turnos/cancelar/${turno.token}`
   : '';
+  const enlaceConfirmacion = turno.token
+  ? `${urlApp}/turnos/confirmar/${turno.token}`
+  : '';
   let msg = `Hola ${turno.paciente.nombre}. 👋
 Desde *${config.nombreConsultorio}*, te confirmamos tu Turno Agendado. 👍
 
-✅ Te Detallamos los datos:
+✔️ Te Detallamos los datos:
 🧑‍⚕️ Paciente: ${turno.paciente.nombre} ${turno.paciente.apellido || ''}.
 📅 Fecha del Turno: *${formatoFecha(turno.desde, true, false, false, true)}*.
 🦷 Tipo Turno: ${turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}.
@@ -125,6 +128,9 @@ Desde *${config.nombreConsultorio}*, te confirmamos tu Turno Agendado. 👍
 📧 Email: ${turno.consultorio.email || config.mail}.
 
 Recordá llegar 5 minutos antes.
+
+✅ Para confirmar tu asistencia, por favor hacé clic en este Link:
+${enlaceConfirmacion  }
 
 ❌ Si no podés asistir, por favor cancelá tu turno desde el siguiente link: 
 ${enlaceCancelacion}

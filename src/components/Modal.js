@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, cloneElement } from 'react';
 import { useTheme } from 'next-themes';
 
 export default function Modal({ isOpen, onClose, children, size = 'medium', title = '' }) {
@@ -93,7 +93,7 @@ export default function Modal({ isOpen, onClose, children, size = 'medium', titl
         
         {/* Contenido del modal */}
         <div className="overflow-y-auto flex-grow">
-          {children}
+          {cloneElement(children, { onClose })}
         </div>
       </div>
     </div>

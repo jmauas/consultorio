@@ -18,15 +18,18 @@ const publicRoutes = [
   '/api/pacientes',
   '/api/turnos',
   '/api/turnos/cancelar',
+  '/api/turnos/confirmar',
   '/api/turnos/disponibles',
   '/turnos/disponibilidad',
   '/turnos/cancelar',
+  '/turnos/confirmar',
 ];
 const publicRoutesSource = [
   '/api/auth',
   '/auth/reset-password/',
   '/auth/complete-signin/',
   '/turnos/cancelar',
+  '/turnos/confirmar',
 ];
 
 const adminRoutesSource = [

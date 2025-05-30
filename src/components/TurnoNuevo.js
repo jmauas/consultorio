@@ -17,7 +17,8 @@ const TurnoNuevo = ({
     dniParam,
     celularParam,
     pacienteIdParam,
-    consultorioIdParam
+    consultorioIdParam,
+    onClose
 }) => {
    const { data: session } = useSession();
    const router = useRouter();
@@ -315,6 +316,10 @@ const TurnoNuevo = ({
        
        // Turno creado exitosamente
        setSuccess(true);
+       setTimeout(() => {
+          onClose();
+       }, 1000); 
+
        
      } catch (error) {
        console.error('Error:', error);
@@ -820,7 +825,7 @@ const TurnoNuevo = ({
           <div className="flex justify-end space-x-2">
             <button
               type="button"
-              onClick={() => router.push('/turnos')}
+              onClick={() => onClose()}
               className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded"
             >
               <i className="fas fa-times mr-2"></i>Cancelar
@@ -847,7 +852,8 @@ export default function Page({
     dniParam,
     celularParam,
     pacienteIdParam,
-    consultorioIdParam
+    consultorioIdParam,
+    onClose
   }) {
   return (
     <Suspense fallback={<Loader titulo={'Cargando nuevo turno'}/>}>
@@ -860,6 +866,7 @@ export default function Page({
         celularParam={celularParam}
         pacienteIdParam={pacienteIdParam}
         consultorioIdParam={consultorioIdParam}
+        onClose={onClose}
       />
     </Suspense>
   );

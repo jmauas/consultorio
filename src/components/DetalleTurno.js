@@ -256,28 +256,12 @@ export default function DetalleTurno({
 
   const handleEnviarRecordatorio = async () => {
     try {
-      if (!turno || !turno.extendedProperties?.private) {
-        throw new Error('No hay información suficiente del turno');
-      }
-      
+           
       setLoadingAction(true);
       setError(null);
-      setSuccess(null);
+      setSuccess(null);     
       
-      if (celular.length >= 8) {
-        const res = await enviarRecordatorioTurno(turno);
-      }
-      // const fechaTurno = formatoFecha(turno.desde, true, false, false, true);
-      
-      // const mensaje = `Hola ${turno.nombre}, te recordamos tu turno de ${turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'} con el Dr. ${turno.doctor} para el día ${fechaTurno}. Por favor confirma tu asistencia respondiendo a este mensaje. Gracias!`;
-      
-      // const resultado = await enviarMensaje(turno.celular, mensaje);
-      
-      // if (resultado.ok) {
-      //   setSuccess('Recordatorio enviado correctamente');
-      // } else {
-      //   throw new Error(resultado.error || 'Error al enviar recordatorio');
-      // }
+      const res = await enviarRecordatorioTurno(turno);
     } catch (error) {
       console.error('Error:', error);
       setError(error.message);

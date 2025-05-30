@@ -12,6 +12,7 @@ import TurnoNuevo from '@/components/TurnoNuevo';
 import TurnoDisponibilidad from '@/components/TurnoDisponibilidad';
 import Modal from '@/components/Modal';
 import CalendarioTurnos from '@/components/CalendarioTurno';
+import CalendarioMensual from '@/components/CalendarioMensual';
 
 // Memoizar los estados para evitar recálculos en cada renderizado
 const estados = obtenerEstados();
@@ -32,8 +33,7 @@ export default function TurnosPage() {
   const [modalTurnoDisponibilidad, setModalTurnoDisponibilidad] = useState(false);
   const [doctores, setDoctores] = useState([]);
   const [consultorios, setConsultorios] = useState([]);
-  const [tiposTurno, setTiposTurno] = useState([]);
-  const [coberturas, setCoberturas] = useState([]);
+  const [tiposTurno, setTiposTurno] = useState([]);  const [coberturas, setCoberturas] = useState([]);
   const [configuracion, setConfiguracion] = useState(null);
   const [forzarMostarGrilla, setForzarMostrarGrilla] = useState(false);
 
@@ -286,9 +286,7 @@ export default function TurnosPage() {
     
     cargarDatos();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Cambiar la fecha seleccionada
+  }, []);  // Cambiar la fecha seleccionada
   const cambiarFecha = useCallback((fecha) => {
     setFechaSeleccionada(fecha);
     cargarTurnos(fecha, false);
@@ -416,26 +414,109 @@ export default function TurnosPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row justify-between items-center md:items-start mb-6">
-        <h1 className="text-2xl font-bold ">Gestión de Turnos</h1>
+        {/* Contenedor flex para mostrar ambas vistas */}
+          <div className="flex flex-col lg:flex-row gap-10 items-start justify-center">
+            {/* Vista mensual */}
+            <div className="w-full lg:w-auto lg:flex-shrink-0">
+              <h3 className="text-center text-sm font-medium text-[var(--text-color)] mb-3">
+                <i className="fa-solid fa-calendar-alt mr-2"></i>
+                Calendario Mensual
+              </h3>
+              <div className="flex justify-center">
+                <div className="w-full max-w-md">
+                  <CalendarioMensual
+                    fechaInicial={fechaSeleccionada}
+                    onFechaClick={cambiarFecha}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col gap-10 w-full lg:w-auto lg:flex-1">
+              
+              <h1 className="text-2xl font-bold ">Gestión de Turnos</h1>
         
-        <div className="mt-4 md:mt-0 flex flex-wrap gap-2">
-          <button 
-            onClick={handleModalTurnoNuevo} 
-            className="bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2"
-          >
-            <i className="fa-solid fa-calendar-plus"></i>
-            <i className="fa-solid fa-plus"></i>
-            Turno
-          </button>
-          <button
-            onClick={handleModalTurnoDisponibilidad}
-            className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2 "
-          >
-            <i className="fa-solid fa-clock"></i>
-            <i className="fa-solid fa-plus"></i>
-            Turno Disponibilidad
-          </button>
-        </div>
+              <div className="mt-4 md:mt-0 flex flex-wrap gap-2">
+                <button 
+                  onClick={handleModalTurnoNuevo} 
+                  className="bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2"
+                >
+                  <i className="fa-solid fa-calendar-plus"></i>
+                  <i className="fa-solid fa-plus"></i>
+                  Turno
+                </button>
+                <button
+                  onClick={handleModalTurnoDisponibilidad}
+                  className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2 "
+                >
+                  <i className="fa-solid fa-clock"></i>
+                  <i className="fa-solid fa-plus"></i>
+                  Turno Disponibilidad
+                </button>
+              </div>
+
+              {/* Vista semanal (selector de días existente) */}
+              <div className="w-full lg:w-auto lg:flex-1 flex justify-center">
+                <div className="w-full max-w-4xl">
+                  <h3 className="text-center text-sm font-medium text-[var(--text-color)] mb-3">
+                    <i className="fa-solid fa-calendar-week mr-2"></i>
+                    Navegación Semanal
+                  </h3>
+                  <div className="flex items-center justify-center">
+                    <button 
+                      onClick={() => navegarDias(-1)}
+                      className="text-white bg-slate-500 px-1 min-h-42 md:min-h-20 rounded-l-md"
+                    >
+                      <i className="fa-solid fa-chevron-left fa-xl"></i>
+                    </button>
+                    
+                    <div className="flex overflow-visible flex-wrap gap-2">
+                      {diasCalendario.map((dia, index) => {
+                        // Obtener fecha formateada para buscar en el objeto de contadores (YYYY-MM-DD)
+                        const fechaFormateada = dia.fecha.toISOString().split('T')[0];
+                        // Obtener contador para esta fecha (si existe)
+                        const contador = turnosPorDia[fechaFormateada] || 0;
+                        
+                        return (
+                          <button
+                            key={dia.fecha.toISOString()}
+                            onClick={() => cambiarFecha(dia.fecha)}
+                            className={`flex-shrink-0 px-4 py-2 pb-0 border relative min-h-20 ${
+                              dia.fecha.toDateString() === fechaSeleccionada.toDateString()
+                                ? 'bg-slate-500 text-white border-slate-500 border-x-white'
+                                : 'border-gray-700 hover:bg-gray-50'}
+                              
+                            `}
+                          >
+                            <div className="text-xs font-medium">{dia.diaSemanaCorto}</div>
+                            <div className="font-bold text-xl">{dia.fecha.getDate()}</div>
+                            <div className="font-semibold text-xs p-1">{dia.fecha.toLocaleDateString('es-AR', { month: 'short' }).charAt(0).toUpperCase() + dia.fecha.toLocaleDateString('es-AR', { month: 'short' }).slice(1)}</div>
+                            
+                            {/* Indicador de turnos estilo iOS */}
+                            {contador > 0 && (
+                              <span 
+                                key={`${fechaFormateada}-${contador}`} // Forzar recreación del componente cuando cambia
+                                className="absolute -top-3 -right-2 bg-red-500 text-white text-md font-bold rounded-full 
+                                  min-w-[24px] h-[24px] flex items-center justify-center p-1 animate-fadeIn"
+                              >
+                                
+                                {contador}
+                              </span>
+                              )}
+                          </button>                    
+                        );
+                      })}
+                    </div>              
+                    <button 
+                      onClick={() => navegarDias(1)}
+                      className="text-white bg-slate-500 px-1 min-h-42 md:min-h-20 rounded-r-md"
+                    >
+                      <i className="fa-solid fa-chevron-right fa-xl"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
       </div>
       
       {error && (
@@ -444,10 +525,7 @@ export default function TurnosPage() {
         </div>
       )}
       
-      {/* Filtros */}
-      <div className="shadow rounded-lg p-4 mb-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Navegación por días - se oculta cuando se muestran filtros avanzados */}
+      <div className="shadow rounded-lg p-4 mb-6">        
           <div 
             className={`col-span-3 mb-2 transition-all duration-300 ${
               mostrarFiltros 
@@ -455,59 +533,8 @@ export default function TurnosPage() {
                 : 'h-auto opacity-100'
             }`}
           >
-            <div className="flex items-center justify-center">
-              <button 
-                onClick={() => navegarDias(-1)}
-                className="text-white bg-slate-500 px-1 min-h-42 md:min-h-20 rounded-l-md"
-              >
-                <i className="fa-solid fa-chevron-left fa-xl"></i>
-              </button>
-              
-              <div className="flex overflow-visible flex-wrap gap-2">
-                {diasCalendario.map((dia, index) => {
-                  // Obtener fecha formateada para buscar en el objeto de contadores (YYYY-MM-DD)
-                  const fechaFormateada = dia.fecha.toISOString().split('T')[0];
-                  // Obtener contador para esta fecha (si existe)
-                  const contador = turnosPorDia[fechaFormateada] || 0;
-                  
-                  return (
-                    <button
-                      key={dia.fecha.toISOString()}
-                      onClick={() => cambiarFecha(dia.fecha)}
-                      className={`flex-shrink-0 px-4 py-2 pb-0 border relative min-h-20 ${
-                        dia.fecha.toDateString() === fechaSeleccionada.toDateString()
-                          ? 'bg-slate-500 text-white border-slate-500 border-x-white'
-                          : 'border-gray-700 hover:bg-gray-50'}
-                        
-                      `}
-                    >
-                      <div className="text-xs font-medium">{dia.diaSemanaCorto}</div>
-                      <div className="font-bold text-xl">{dia.fecha.getDate()}</div>
-                      <div className="font-semibold text-xs p-1">{dia.fecha.toLocaleDateString('es-AR', { month: 'short' }).charAt(0).toUpperCase() + dia.fecha.toLocaleDateString('es-AR', { month: 'short' }).slice(1)}</div>
-                      
-                      {/* Indicador de turnos estilo iOS */}
-                      {contador > 0 && (
-                        <span 
-                          key={`${fechaFormateada}-${contador}`} // Forzar recreación del componente cuando cambia
-                          className="absolute -top-3 -right-2 bg-red-500 text-white text-md font-bold rounded-full 
-                            min-w-[24px] h-[24px] flex items-center justify-center p-1 animate-fadeIn"
-                        >
-                          
-                          {contador}
-                        </span>
-                        )}
-                    </button>                    
-                  );
-                })}
-              </div>              
-              <button 
-                onClick={() => navegarDias(1)}
-                className="text-white bg-slate-500 px-1 min-h-42 md:min-h-20 rounded-r-md"
-              >
-                <i className="fa-solid fa-chevron-right fa-xl"></i>
-              </button>
-            </div>
-          </div>
+           
+      </div>          
           
           {/* Botón para mostrar/ocultar filtros avanzados */}
           <div className="col-span-3 flex justify-between items-center gap-4 border-b pb-2 ">
@@ -564,12 +591,12 @@ export default function TurnosPage() {
           <div
             className={`${
               mostrarFiltros 
-                ? 'max-h-[1000px] opacity-100 ' 
+                ? 'flex flex-row items-centerflex-wrap gap-4 p-4' 
                 : 'hidden'
             }`}
           >
             {/* Filtros simples  (Doctor y Consultorio) */}
-            <div className="col-span-3 md:col-span-1">
+            <div className="">
               <label className="block text-sm font-medium mb-1">Doctor</label>
               <select
                 value={filtroDoctor}
@@ -585,7 +612,7 @@ export default function TurnosPage() {
               </select>
             </div>
 
-            <div className="col-span-3 md:col-span-1">
+            <div className="">
               <label className="block text-sm font-medium mb-1">Consultorio</label>
               <select
                 value={filtroConsultorio}
@@ -599,15 +626,14 @@ export default function TurnosPage() {
                   </option>
                 ))}
               </select>
-            </div>
-            
-            <div className="col-span-3 md:col-span-1 flex items-end">
+            </div>            
+            <div className="flex items-end gap-2">
               <button
                 onClick={() => {
                   cargarTurnos(fechaSeleccionada, mostrarFiltros);
                   cargarContadoresTurnos(diasCalendario);
                 }}
-                className="ml-2 px-3 py-2 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary-dark)] flex items-center gap-2"
+                className="px-3 py-2 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary-dark)] flex items-center gap-2"
                 title="Actualizar datos de turnos"
               >
                 <i className="fas fa-sync-alt"></i>
@@ -627,13 +653,11 @@ export default function TurnosPage() {
             </div>
           </div>
           
-          
-          
           {/* Filtros avanzados (ocultos por defecto) */}
           <div 
             className={`col-span-3 flex flex-wrap gap-4 overflow-hidden transition-all duration-300 ${
               mostrarFiltros 
-                ? 'max-h-[1000px] opacity-100 mt-4' 
+                ? 'max-h-[1000px] opacity-100 p-4' 
                 : 'max-h-0 opacity-0'
             }`}
           >
@@ -755,7 +779,6 @@ export default function TurnosPage() {
             </div>
           </div>
         </div>
-      </div>
            
       {/* Listado de turnos */}
       {(mostrarFiltros || forzarMostarGrilla) &&
@@ -787,8 +810,8 @@ export default function TurnosPage() {
           title={tituloModal}
         >
           {modalTurnoNuevo 
-          ? <TurnoNuevo />
-          : modalTurnoDisponibilidad && <TurnoDisponibilidad />  
+          ? <TurnoNuevo onClose={cerrarModal}/>
+          : modalTurnoDisponibilidad && <TurnoDisponibilidad onClose={cerrarModal}/>  
           }
         </Modal>       
     </div>    
