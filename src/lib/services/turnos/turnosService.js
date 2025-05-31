@@ -232,8 +232,8 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
             let dia = hoy.getUTCDay();
             const aten = { ...agenda.find(d => d.dia === dia) };
             const esFeriado = feriados.some(f => sonMismaFecha(f, fechaFer));
-            const diasNoAitende = agregarFeriados([], doctor.feriados);
-            const noAtiende = diasNoAitende.some(f => sonMismaFecha(f, fechaFer));
+            const diasNoAtiende = agregarFeriados([], doctor.feriados);
+            const noAtiende = diasNoAtiende.some(f => sonMismaFecha(f, fecha));
             if (noAtiende) {
               aten.atencion = false;
             } else if (atenEnFeriado && esFeriado) {

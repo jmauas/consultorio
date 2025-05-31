@@ -489,15 +489,14 @@ export default function DetalleTurno({
                 </div>
                 <div>
                   <p className="text-sm">Cobertura Médica</p>
-                  <p className="font-bold">{turno.paciente.cobertura || 'No especificada'}</p>
-                  <span 
+                  <p className="font-bold">{turno.paciente.cobertura || 'No especificada'}</p>                  <span 
                     className="text-xs font-bold p-2 rounded-lg"
                     style={{ 
                       backgroundColor: turno.paciente.coberturaMedica?.color || '#CCCCCC',
                       color: isColorLight(turno.paciente.coberturaMedica?.color || '#CCCCCC') ? '#000000' : '#FFFFFF'
                     }}
                   >
-                    {turno.paciente.coberturaMedica.codigo ? turno.paciente.coberturaMedica.codigo.toUpperCase() : 'No asignado'}
+                    {turno.paciente.coberturaMedica?.codigo ? turno.paciente.coberturaMedica.codigo.toUpperCase() : 'No asignado'}
                   </span>
                 </div>
               </div>
@@ -537,15 +536,14 @@ export default function DetalleTurno({
                     <p className="font-bold">{formatoFecha(turno.desde, true, false, false, true)}</p>
                   </div>
                   <div>
-                    <p className="text-sm">Cobertura Médica</p>
-                    <span 
+                    <p className="text-sm">Cobertura Médica</p>                    <span 
                       className="text-xs font-bold p-2 rounded-lg"
                       style={{ 
                         backgroundColor: turno.coberturaMedica?.color || '#CCCCCC',
                         color: isColorLight(turno.coberturaMedica?.color || '#CCCCCC') ? '#000000' : '#FFFFFF'
                       }}
                     >
-                      {turno.coberturaMedica.codigo ? turno.coberturaMedica.codigo.toUpperCase() : 'No asignado'}
+                      {turno.coberturaMedica?.codigo ? turno.coberturaMedica.codigo.toUpperCase() : 'No asignado'}
                     </span>
                   </div>
                   {turno.penal && (

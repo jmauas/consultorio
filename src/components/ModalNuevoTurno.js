@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Modal from '@/components/Modal';
 import TurnoNuevo from '@/components/TurnoNuevo';
-import TurnoDisponibilidad from '@/components/TurnoDisponibilidad';
+import TurnoDisponibilidad from '@/components/TurnoDisponibilidadDirecta';
 
 export default function ModalNuevoTurno({ 
     modalNuevoTurnoAbierto, 

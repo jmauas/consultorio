@@ -17,16 +17,33 @@ import { obtenerEstados } from '@/lib/utils/estadosUtils';
 
 const estados = obtenerEstados();
 
-const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doctores, consultorios, setForzarMostrarGrilla}) => {
-    const [agendaConsul, setAgendaConsul] = useState([]);
+const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doctores, consultorios, setForzarMostrarGrilla, navegarDias, cambiarFecha}) => {    const [agendaConsul, setAgendaConsul] = useState([]);
     const [modalAbierto, setModalAbierto] = useState(false);
     const [turnoSeleccionado, setTurnoSeleccionado] = useState(null);
     const [modalTurnoNuevo, setModalTurnoNuevo] = useState(false);
+
+    // Función para detectar si un turno es un evento
+    const esEvento = (turno) => {
+        return turno?.paciente?.dni === 'EVENTO' && 
+               turno?.paciente?.nombre === 'EVENTO ESPECIAL' &&
+               turno?.servicio === 'EVENTO';
+    };// Debug: verificar datos de turnos al cargar
+    useEffect(() => {
+        // Verificar datos de turnos al cargar el componente
+    }, [agendaConsul, fecha]);
   
     // Estado para el modal de nuevo turno
     const [modalNuevoTurnoAbierto, setModalNuevoTurnoAbierto] = useState(false);
     const [pacienteSeleccionado, setPacienteSeleccionado] = useState(null);
-    const [turnoParaNuevoTurno, setTurnoParaNuevoTurno] = useState(null); 
+    const [turnoParaNuevoTurno, setTurnoParaNuevoTurno] = useState(null);
+      // Estado para manejar el popover de observaciones
+    const [observacionesPopover, setObservacionesPopover] = useState({ 
+        visible: false, 
+        turnoId: null, 
+        observaciones: '',
+        x: 0, 
+        y: 0 
+    });
 
     // Abrir modal con detalle de turno
     const abrirDetalleTurno = (turno) => {
@@ -47,16 +64,48 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
             setTurnoSeleccionado(null);
         }, 1500);
     };
-      // Abrir modal para nuevo turno
+    
+    
+    // Abrir modal para nuevo turno
     const abrirModalNuevoTurno = (paciente) => {
         setPacienteSeleccionado(paciente);
         setModalNuevoTurnoAbierto(true);
-    };
-
+    };    
+    
     const abrirModalNuevoTurnoDispo = (turno) => {
       setTurnoParaNuevoTurno(turno);
       setModalTurnoNuevo(true);
-    }
+    }        // Funciones para manejar el popover de observaciones
+    const mostrarObservaciones = (turno, event) => {
+        if (!turno || !turno.observaciones) {
+            return;
+        }
+        
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const rect = event.currentTarget.getBoundingClientRect();
+        const scrollY = window.scrollY || window.pageYOffset;
+        const scrollX = window.scrollX || window.pageXOffset;
+        
+        const newState = {
+            visible: true,
+            turnoId: turno.id,
+            observaciones: turno.observaciones,
+            x: rect.left + scrollX + (rect.width / 2),
+            y: rect.top + scrollY - 10
+        };
+        
+        setObservacionesPopover(newState);
+    };      const ocultarObservaciones = (event) => {
+        setObservacionesPopover({ 
+            visible: false, 
+            turnoId: null, 
+            observaciones: '', 
+            x: 0, 
+            y: 0 
+        });
+    };
 
     // Función para enviar recordatorio por WhatsApp e EMail
     const enviarRecordatorio = async (id) => {
@@ -99,27 +148,68 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
     const obtenerColorEstado = (estado) => {
         const estadoEncontrado = estados.find(e => e.id === estado);
         return estadoEncontrado ? estadoEncontrado.color : 'bg-gray-100 border-gray-500 text-gray-700';
-    };
-
-    const obtenerNombreEstado = (estado) => {
+    };    const obtenerNombreEstado = (estado) => {
         const estadoEncontrado = estados.find(e => e.id === estado);
         return estadoEncontrado ? estadoEncontrado.nombre : estado;
-    };
+    };    // Componente para el botón de observaciones
+    const BotonObservaciones = ({ turno, className = "" }) => {
+        if (!turno) {
+            return null;
+        }
+        
+        if (!turno.observaciones) {
+            return null;
+        }
+        
+        if (turno.observaciones.trim() === '') {
+            return null;
+        }
 
-    useEffect(() => {
+        const handleMouseEnter = (e) => {
+            mostrarObservaciones(turno, e);
+        };
+
+        const handleMouseLeave = (e) => {
+            // Solo ocultar si no estamos sobre el popover
+            const popoverElement = document.querySelector('.observaciones-popover');
+            if (!popoverElement || !popoverElement.contains(e.relatedTarget)) {
+                ocultarObservaciones(e);
+            }
+        };
+
+        const handleClick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (observacionesPopover.visible && observacionesPopover.turnoId === turno.id) {
+                ocultarObservaciones(e);
+            } else {
+                mostrarObservaciones(turno, e);
+            }
+        };return (
+            <button
+                data-turno-id={turno.id}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                onClick={handleClick}
+                className={`boton-observaciones relative rounded-md bg-red-100 p-1 text-red-600 hover:bg-red-200 border border-red-600 animate-pulse ${className}`}
+                title="Ver observaciones"
+            >
+                <i className="fa fa-exclamation-triangle text-red-600"></i>
+            </button>
+        );
+    };
+      useEffect(() => {        
         const fetchData = async () => {
             setLoading(true);
             try {
+            // Procesar turnos recibidos
+            
             const diaSemana = fecha.getDay();
             const feriados = agregarFeriados([], configuracion.feriados);
             const agendas = []
             let esFeriado = false;
             if (feriados && feriados.length > 0) {
-                esFeriado = feriados.some(f =>
-                    f.getDate() === fecha.getDate() &&
-                    f.getMonth() === fecha.getMonth() &&
-                    f.getFullYear() === fecha.getFullYear()
-                );
+                esFeriado = feriados.some(f => sonMismaFecha(f, fecha));
             } 
             consultorios.forEach(consultorio => {
                 const agenda = {
@@ -137,11 +227,7 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                     if (esFeriado) noLaborable = true;
                     const noLaborablesDoctor = agregarFeriados([], doctor.feriados);
                     if (noLaborablesDoctor && noLaborablesDoctor.length > 0) {
-                        const esNoLaborable = noLaborablesDoctor.some(f =>
-                            f.getDate() === fecha.getDate() &&
-                            f.getMonth() === fecha.getMonth() &&
-                            f.getFullYear() === fecha.getFullYear()
-                        );
+                        const esNoLaborable = noLaborablesDoctor.some(f => sonMismaFecha(f, fecha));
                         if (esNoLaborable) noLaborable = true;
                     }
                     if (!atencionHoy) {
@@ -151,7 +237,6 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                             age.dia === 99 &&
                             sonMismaFecha(new Date(age.fecha), fecha)
                         );
-                        console.log('agendaFecha', agendaFecha);
                         if (agendaFecha) {
                             atencionHoy = agendaFecha;
                             noLaborable = false;
@@ -186,6 +271,29 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [turnos, fecha, configuracion.feriados, consultorios, doctores]);
 
+    // useEffect para cerrar el popover al hacer click fuera
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (observacionesPopover.visible) {
+                const popoverElement = document.querySelector('.observaciones-popover');
+                const buttonElement = document.querySelector(`button[data-turno-id="${observacionesPopover.turnoId}"]`);
+                
+                if (popoverElement && !popoverElement.contains(event.target) && 
+                    buttonElement && !buttonElement.contains(event.target)) {
+                    ocultarObservaciones(event);
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };    }, [observacionesPopover.visible, observacionesPopover.turnoId]);
+      // useEffect para monitorear cambios en el estado del popover
+    useEffect(() => {
+        // Estado popover cambió
+    }, [observacionesPopover]);
+    
     useEffect(() => {
         if (agendaConsul && agendaConsul.length === 0) {
             setForzarMostrarGrilla(true);
@@ -197,10 +305,40 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
 
     if (loading) {
         return <Loader />;
-    }
+    }    return (
+        <section className="relative">
+            
+            {/* Botones de navegación sticky */}
+            {cambiarFecha && (
+                <>                    
+                    {/* Botón navegación izquierda (día anterior) */}
+                    <button 
+                        onClick={() => {
+                            const nuevaFecha = new Date(fecha);
+                            nuevaFecha.setDate(nuevaFecha.getDate() - 1);
+                            cambiarFecha(nuevaFecha);
+                        }}
+                        className="fixed left-2 top-1/2 transform -translate-y-1/2 z-50 text-slate-600 md:text-white bg-transparent md:bg-slate-500 hover:bg-slate-500 hover:text-white active:bg-slate-600 min-h-42 md:min-h-32 px-3 py-6 rounded-r-lg border-2 border-slate-400 md:border-none shadow-lg transition-all duration-200 flex items-center justify-center group hover:px-4"
+                        title="Día anterior"
+                    >
+                        <i className="fa-solid fa-chevron-left fa-lg group-hover:scale-110 transition-transform"></i>
+                    </button>
 
-    return (
-        <section>
+                    {/* Botón navegación derecha (día siguiente) */}
+                    <button 
+                        onClick={() => {
+                            const nuevaFecha = new Date(fecha);
+                            nuevaFecha.setDate(nuevaFecha.getDate() + 1);
+                            cambiarFecha(nuevaFecha);
+                        }}
+                        className="fixed right-2 top-1/2 transform -translate-y-1/2 z-50 text-slate-600 md:text-white bg-transparent md:bg-slate-500 hover:bg-slate-500 hover:text-white active:bg-slate-600 min-h-42 md:min-h-32 rounded-l-lg px-3 py-6 border-2 border-slate-400 md:border-none shadow-lg transition-all duration-200 flex items-center justify-center group hover:px-4"
+                        title="Día siguiente"
+                    >
+                        <i className="fa-solid fa-chevron-right fa-lg group-hover:scale-110 transition-transform"></i>
+                    </button>
+                </>
+            )}
+
             {!consultorios || consultorios.length === 0 || !agendaConsul || agendaConsul.length === 0 && (
                 <div className="flex items-center justify-center flex-wrap gap-5 w-full h-full p-5 mt-5 font-bold bg-[var(--card-bg)] border border-amber-200 rounded-md">
                     <i className="fa-solid fa-calendar-xmark fa-2xl text-amber-500"></i>
@@ -394,9 +532,8 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                                 ❌
                                                             </div>
                                                         }
-                                                        <div className="flex flex-wrap items-start justify-start gap-2 w-full">
-                                                            {consultorio.turnos && consultorio.turnos.length > 0 && (                                                    
-                                                                consultorio.turnos.map(turno => (
+                                                        <div className="flex flex-wrap items-start justify-start gap-2 w-full">                                                        {consultorio.turnos && consultorio.turnos.length > 0 && (                                                    
+                                                            consultorio.turnos.map(turno => (
                                                                 <div 
                                                                         key={turno.id} 
                                                                         className="text-xs p-2 rounded-md flex flex-col items-center justify-start gap-1 flex-wrap"
@@ -406,19 +543,17 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                                         }}
                                                                     >
                                                                         <div className="flex items-center gap-2 font-bold flex-wrap">
-                                                                            {formatoFecha(turno.desde, true, false, false, false, true, false)}
-                                                                            {turno.estado !== 'cancelado' && (  
+                                                                            {formatoFecha(turno.desde, true, false, false, false, true, false)}                                                                            {turno.estado !== 'cancelado' && turno.coberturaMedica && (  
                                                                                 <div 
                                                                                     className="text-xs font-normal p-1 rounded-md"
                                                                                     style={{
-                                                                                        backgroundColor: turno.coberturaMedica.color,
-                                                                                        color: isColorLight(turno.coberturaMedica.color) ? '#000' : '#fff',
+                                                                                        backgroundColor: turno.coberturaMedica?.color || '#CCCCCC',
+                                                                                        color: isColorLight(turno.coberturaMedica?.color || '#CCCCCC') ? '#000' : '#fff',
                                                                                     }}
                                                                                 >
-                                                                                    {turno.coberturaMedica.codigo.toUpperCase()}
+                                                                                    {turno.coberturaMedica?.codigo ? turno.coberturaMedica.codigo.toUpperCase() : 'No asignado'}
                                                                                 </div>
-                                                                            )}
-                                                                            <div className="flex items-center gap-2 flex-wrap">
+                                                                            )}                                                                            <div className="flex items-center gap-2 flex-wrap">
                                                                                 <button
                                                                                     onClick={() => abrirDetalleTurno(turno)}
                                                                                     className="rounded-md bg-blue-50 p-1 text-blue-600 hover:bg-blue-100 border border-blue-600"
@@ -426,44 +561,50 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                                                 >
                                                                                     <i className="fa fa-eye text-blue-600 "></i>
                                                                                 </button>
-                                                                                    {turno.estado !== 'cancelado' && (<>
-                                                                                    <Link 
-                                                                                        href={`https://wa.me/${turno.paciente.celular}`} 
-                                                                                        target="_blank"
-                                                                                        title="Escribir por Whatsapp"
-                                                                                        className="rounded-md bg-green-100 p-1 text-green-600 hover:bg-green-100 border border-green-600"
+                                                                                {turno.estado !== 'cancelado' && !esEvento(turno) && (<>
+                                                                                <Link 
+                                                                                    href={`https://wa.me/${turno.paciente.celular}`} 
+                                                                                    target="_blank"
+                                                                                    title="Escribir por Whatsapp"
+                                                                                    className="rounded-md bg-green-100 p-1 text-green-600 hover:bg-green-100 border border-green-600"
+                                                                                >
+                                                                                    <i className="fab fa-whatsapp text-green-600 "></i>
+                                                                                </Link>
+                                                                                <button
+                                                                                    onClick={() => enviarRecordatorio(turno.id)}
+                                                                                    className="rounded-md bg-green-50 p-1 text-green-700 hover:bg-green-100 border border-green-700"
+                                                                                    title="Enviar Recordatorios"
                                                                                     >
-                                                                                        <i className="fab fa-whatsapp text-green-600 "></i>
-                                                                                    </Link>
-                                                                                    <button
-                                                                                        onClick={() => enviarRecordatorio(turno.id)}
-                                                                                        className="rounded-md bg-green-50 p-1 text-green-700 hover:bg-green-100 border border-green-700"
-                                                                                        title="Enviar Recordatorios"
-                                                                                        >
-                                                                                        <i className="fa fa-solid fa-bell text-green-600 "></i>
-                                                                                    </button>
-                                                                                    <button
-                                                                                        onClick={() => abrirModalNuevoTurno(turno.paciente)}
-                                                                                        className="rounded-md bg-orange-50 p-1 text-[var(--color-primary)] hover:bg-orange-100 border border-[var(--color-primary)]"
-                                                                                        title="Nuevo turno"
-                                                                                        >
-                                                                                        <i className="fa-solid fa-plus"></i>
-                                                                                    </button>
-                                                                                    </>)}                                                                            
+                                                                                    <i className="fa fa-solid fa-bell text-green-600 "></i>
+                                                                                </button>                                                                                    <button
+                                                                                    onClick={() => abrirModalNuevoTurno(turno.paciente)}
+                                                                                    className="rounded-md bg-orange-50 p-1 text-[var(--color-primary)] hover:bg-orange-100 border border-[var(--color-primary)]"
+                                                                                    title="Nuevo turno"
+                                                                                    >
+                                                                                    <i className="fa-solid fa-plus"></i>
+                                                                                </button>
+                                                                                </>)}
                                                                                 <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${obtenerColorEstado(turno.estado || 'sin confirmar')}`}>
                                                                                     {obtenerNombreEstado(turno.estado) || 'sin confirmar'}
                                                                                 </span>
                                                                             </div>
-                                                                        </div>
-                                                                        {turno.estado !== 'cancelado' && (
+                                                                        </div>                                                                        {turno.estado !== 'cancelado' && (
                                                                             <div 
                                                                                 key={`${turno.id}-paciente-${turno.paciente.id}`}
                                                                                 className="flex items-center justify-start gap-4 w-full flex-wrap"
                                                                             >
-                                                                                <div className="font-bold">{turno.paciente.nombre} {turno.paciente.apellido}</div>
+                                                                                <div className="font-bold">
+                                                                                    {esEvento(turno) 
+                                                                                        ? (turno.observaciones || 'Evento') 
+                                                                                        : `${turno.paciente.nombre} ${turno.paciente.apellido}`
+                                                                                    }
+                                                                                </div>
                                                                                 <i className="fa-solid fa-calendar-check fa-lg"></i>
-                                                                                <div className="font-bold p-1 rounded-full bg-[var(--color-primary)] text-white">
-                                                                                    {formatoDuracion(turno.duracion)}
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <div className="font-bold p-1 rounded-full bg-[var(--color-primary)] text-white">
+                                                                                        {formatoDuracion(turno.duracion)}
+                                                                                    </div>
+                                                                                    <BotonObservaciones turno={turno} />
                                                                                 </div>
                                                                                 {/* {turno.tipoDeTurno.nombre.substring(0, 14).toUpperCase()} */}
                                                                             </div>
@@ -568,12 +709,10 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                         if (blockingConsultorios.includes(consultorioIndex)) {
                                                             return null;
                                                         }
-                                                        
-                                                        // Skip if no doctor is attending or no appointments
+                                                          // Skip if no doctor is attending or no appointments
                                                         const doctoresAtendiendo = consultorio.doctores.filter(d => d.atencion===true);
                                                         const hasTurnos = consultorio.turnos && consultorio.turnos.length > 0;
                                                         if (doctoresAtendiendo.length === 0 && !hasTurnos) {
-                                                            console.log('No hay atención en consultorio');
                                                             return null;
                                                         }
                                                         
@@ -659,16 +798,15 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                                                     <div className="font-bold text-xs p-1 border rounded-md">
                                                                                         {formatoFecha(turno.desde, true, false, false, false, true, false)}
                                                                                     </div>
-                                                                                    
-                                                                                    {turno.estado !== 'cancelado' && (
+                                                                                      {turno.estado !== 'cancelado' && turno.coberturaMedica && (
                                                                                         <div 
                                                                                             className="text-xs font-normal p-1 rounded-md"
                                                                                             style={{
-                                                                                                backgroundColor: turno.coberturaMedica.color,
-                                                                                                color: isColorLight(turno.coberturaMedica.color) ? '#000' : '#fff',
+                                                                                                backgroundColor: turno.coberturaMedica?.color || '#CCCCCC',
+                                                                                                color: isColorLight(turno.coberturaMedica?.color || '#CCCCCC') ? '#000' : '#fff',
                                                                                             }}
                                                                                         >
-                                                                                            {turno.coberturaMedica.codigo.toUpperCase()}
+                                                                                            {turno.coberturaMedica?.codigo ? turno.coberturaMedica.codigo.toUpperCase() : 'No asignado'}
                                                                                         </div>
                                                                                     )}
                                                                                     
@@ -676,19 +814,22 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                                                         {obtenerNombreEstado(turno.estado) || 'sin confirmar'}
                                                                                     </span>
                                                                                 </div>
-                                                                                
-                                                                                {turno.estado !== 'cancelado' && (
+                                                                                  {turno.estado !== 'cancelado' && (
                                                                                     <>
                                                                                         <div className="font-bold text-sm mb-2">
-                                                                                            {turno.paciente.nombre} {turno.paciente.apellido}
+                                                                                            {esEvento(turno) 
+                                                                                                ? (turno.observaciones || 'Evento') 
+                                                                                                : `${turno.paciente.nombre} ${turno.paciente.apellido}`
+                                                                                            }
                                                                                         </div>
-                                                                                        
-                                                                                        <div className="flex items-center justify-between">
-                                                                                            <div className="bg-[var(--color-primary)] text-white rounded-full px-2 py-1 text-xs font-bold">
-                                                                                                {formatoDuracion(turno.duracion)}
+                                                                                          <div className="flex items-center justify-between">
+                                                                                            <div className="flex items-center gap-2">
+                                                                                                <div className="bg-[var(--color-primary)] text-white rounded-full px-2 py-1 text-xs font-bold">
+                                                                                                    {formatoDuracion(turno.duracion)}
+                                                                                                </div>
+                                                                                                <BotonObservaciones turno={turno} className="px-2" />
                                                                                             </div>
-                                                                                            
-                                                                                            <div className="flex gap-2">
+                                                                                              <div className="flex gap-2">
                                                                                                 <button
                                                                                                     onClick={() => abrirDetalleTurno(turno)}
                                                                                                     className="rounded-md bg-blue-50 p-1 px-2 text-blue-600 hover:bg-blue-100 border border-blue-600"
@@ -697,30 +838,32 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                                                                                     <i className="fa fa-eye"></i>
                                                                                                 </button>
                                                                                                 
-                                                                                                <Link 
-                                                                                                    href={`https://wa.me/${turno.paciente.celular}`} 
-                                                                                                    target="_blank"
-                                                                                                    title="Escribir por Whatsapp"
-                                                                                                    className="rounded-md bg-green-100 p-1 px-2 text-green-600 hover:bg-green-100 border border-green-600"
-                                                                                                >
-                                                                                                    <i className="fab fa-whatsapp"></i>
-                                                                                                </Link>
-                                                                                                
-                                                                                                <button
-                                                                                                    onClick={() => enviarRecordatorio(turno.id)}
-                                                                                                    className="rounded-md bg-green-50 p-1 px-2 text-green-700 hover:bg-green-100 border border-green-700"
-                                                                                                    title="Enviar Recordatorios"
-                                                                                                >
-                                                                                                    <i className="fa fa-solid fa-bell"></i>
-                                                                                                </button>
-                                                                                                
-                                                                                                <button
-                                                                                                    onClick={() => abrirModalNuevoTurno(turno.paciente)}
-                                                                                                    className="rounded-md bg-orange-50 p-1 px-2 text-[var(--color-primary)] hover:bg-orange-100 border border-[var(--color-primary)]"
-                                                                                                    title="Nuevo turno"
-                                                                                                >
-                                                                                                    <i className="fa-solid fa-plus"></i>
-                                                                                                </button>
+                                                                                                {!esEvento(turno) && (
+                                                                                                    <>
+                                                                                                        <Link 
+                                                                                                            href={`https://wa.me/${turno.paciente.celular}`} 
+                                                                                                            target="_blank"
+                                                                                                            title="Escribir por Whatsapp"
+                                                                                                            className="rounded-md bg-green-100 p-1 px-2 text-green-600 hover:bg-green-100 border border-green-600"
+                                                                                                        >
+                                                                                                            <i className="fab fa-whatsapp"></i>
+                                                                                                        </Link>
+                                                                                                        
+                                                                                                        <button
+                                                                                                            onClick={() => enviarRecordatorio(turno.id)}
+                                                                                                            className="rounded-md bg-green-50 p-1 px-2 text-green-700 hover:bg-green-100 border border-green-700"
+                                                                                                            title="Enviar Recordatorios"
+                                                                                                        >
+                                                                                                            <i className="fa fa-solid fa-bell"></i>
+                                                                                                        </button>                                                                                                <button
+                                                                                                            onClick={() => abrirModalNuevoTurno(turno.paciente)}
+                                                                                                            className="rounded-md bg-orange-50 p-1 px-2 text-[var(--color-primary)] hover:bg-orange-100 border border-[var(--color-primary)]"
+                                                                                                            title="Nuevo turno"
+                                                                                                        >
+                                                                                                            <i className="fa-solid fa-plus"></i>
+                                                                                                        </button>
+                                                                                                    </>
+                                                                                                )}
                                                                                             </div>
                                                                                         </div>
                                                                                     </>
@@ -740,9 +883,66 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                             );
                         })()}
                     </div>
+                </div>              
+            )}                  
+            {/* Popover para mostrar observaciones */}
+        {observacionesPopover.visible && (
+            <>
+                {/* Popover principal amarillo - POSICIÓN SIMPLIFICADA */}
+                <div 
+                    className="observaciones-popover"
+                    style={{
+                        position: 'fixed',
+                        zIndex: 999999,
+                        left: '50%',
+                        top: '50%',
+                        transform: 'translateX(-50%)',
+                        minWidth: '250px',
+                        maxWidth: '350px',
+                        backgroundColor: '#fefce8',
+                        border: '3px solid #ef4444',
+                        borderRadius: '12px',
+                        padding: '16px',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                        display: 'block',
+                        visibility: 'visible',
+                        opacity: '1',
+                        pointerEvents: 'auto'
+                    }}                    onMouseEnter={() => {
+                    // Mouse entró al popover
+                    }}
+                    onMouseLeave={(e) => {
+                        // Mouse salió del popover
+                        setTimeout(() => ocultarObservaciones(e), 100);
+                    }}
+                >
+                    <div className="flex items-center gap-2 mb-2 text-red-700">
+                        <i className="fa fa-exclamation-triangle fa-xl" ></i>
+                        <span className="font-bold">
+                            Observaciones:
+                        </span>
+                    </div>
+                    <p className="font-bold text-lg ">
+                        {observacionesPopover.observaciones}
+                    </p>
+                    {/* Flecha apuntando hacia abajo */}
+                    <div 
+                        style={{
+                            position: 'absolute',
+                            top: '100%',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            width: '0',
+                            height: '0',
+                            borderLeft: '8px solid transparent',
+                            borderRight: '8px solid transparent',
+                            borderTop: '8px solid #ef4444'
+                        }}
+                    ></div>                
                 </div>
-            )}
-            
+            </>
+        )}
+
             {/* Modal para detalle de turno */}
             <Modal
                 isOpen={modalAbierto}
@@ -767,9 +967,8 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                 setPacienteSeleccionado={setPacienteSeleccionado}
                 turnoParaNuevoTurno={turnoParaNuevoTurno}
                 modalTurnoNuevo={modalTurnoNuevo}
-                setModalTurnoNuevo={setModalTurnoNuevo}
-            />
-    </section>
-    ) 
+                setModalTurnoNuevo={setModalTurnoNuevo}            />
+        </section>
+    ); 
 }
 export default CalendarioTurno;

@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { encode } from "next-auth/jwt";
 
 export async function GET(request) {
   try {

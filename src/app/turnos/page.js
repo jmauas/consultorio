@@ -5,14 +5,17 @@ import { toast } from 'react-hot-toast';
 import { formatoFecha, calcularProximosDias } from '@/lib/utils/dateUtils';
 import { obtenerEstados } from '@/lib/utils/estadosUtils';
 import { obtenerCoberturasDesdeDB } from '@/lib/utils/coberturasUtils';
+import { calcularTurnosDisponiblesPorRango } from '@/lib/services/turnos/turnosServiceC';
 import GrillaTurnos from '@/components/GrillaTurnos';
 import { handleExcelTurnos } from '@/lib/services/excel';
 import Loader from '@/components/Loader';
 import TurnoNuevo from '@/components/TurnoNuevo';
-import TurnoDisponibilidad from '@/components/TurnoDisponibilidad';
+import TurnoDisponibilidad from '@/components/TurnoDisponibilidadDirecta';
+import EventoNuevo from '@/components/EventoNuevo';
 import Modal from '@/components/Modal';
 import CalendarioTurnos from '@/components/CalendarioTurno';
 import CalendarioMensual from '@/components/CalendarioMensual';
+import { config } from 'dotenv';
 
 // Memoizar los estados para evitar recálculos en cada renderizado
 const estados = obtenerEstados();
@@ -28,9 +31,9 @@ export default function TurnosPage() {
   const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date());
   const [diasCalendario, setDiasCalendario] = useState([]);
   const [filtroDoctor, setFiltroDoctor] = useState('todos');
-  const [tituloModal, setTituloModal] = useState('');
-  const [modalTurnoNuevo, setModalTurnoNuevo] = useState(false);
+  const [tituloModal, setTituloModal] = useState('');  const [modalTurnoNuevo, setModalTurnoNuevo] = useState(false);
   const [modalTurnoDisponibilidad, setModalTurnoDisponibilidad] = useState(false);
+  const [modalEventoNuevo, setModalEventoNuevo] = useState(false);
   const [doctores, setDoctores] = useState([]);
   const [consultorios, setConsultorios] = useState([]);
   const [tiposTurno, setTiposTurno] = useState([]);  const [coberturas, setCoberturas] = useState([]);
@@ -53,6 +56,9 @@ export default function TurnosPage() {
   // Estado para contadores de turnos por día
   const [turnosPorDia, setTurnosPorDia] = useState({});
   
+  // Estado para turnos disponibles por día (burbujas verdes)
+  const [turnosDisponiblesPorDia, setTurnosDisponiblesPorDia] = useState({});
+  
   // Nuevos estados para filtros adicionales
 
   const [filtroConsultorio, setFiltroConsultorio] = useState('todos');
@@ -68,16 +74,19 @@ export default function TurnosPage() {
     setTituloModal('Nuevo Turno');
     setModalTurnoNuevo(true);
   };
-
   const handleModalTurnoDisponibilidad = () => {
     setTituloModal('Turno Disponibilidad');
     setModalTurnoDisponibilidad(true);
   };
 
-    // Cerrar modal
+  const handleModalEventoNuevo = () => {
+    setTituloModal('Registrar Nuevo Evento');
+    setModalEventoNuevo(true);
+  };    // Cerrar modal
   const cerrarModal = () => {
     setModalTurnoNuevo(false);
     setModalTurnoDisponibilidad(false);
+    setModalEventoNuevo(false);
   };
   
   // Objeto de filtros memoizado para evitar recálculos innecesarios
@@ -95,6 +104,72 @@ export default function TurnosPage() {
     mostrarFiltrosAvanzados: mostrarFiltros
   }), [filtroDoctor, filtroConsultorio, filtroTipoTurno, filtroEstado, fechaDesde, fechaHasta, filtroPacienteNombre, filtroPacienteCelular, filtroPacienteDni, filtroCobertura, mostrarFiltros]);
   
+  // Cargar los contadores de turnos para los días mostrados (memoizado)
+  const cargarContadoresTurnos = useCallback(async (dias) => {
+    try {
+      // Crear fechas para consulta (formato YYYY-MM-DD)
+      const fechasParaConsulta = dias.map(dia => 
+        dia.fecha.toISOString().split('T')[0]
+      );
+      
+      // Crear un string de fechas separadas por comas
+      const fechasString = fechasParaConsulta.join(',');
+      
+      // Realizar una consulta a la API para obtener contadores de turnos existentes
+      const response = await fetch(`/api/turnos/contadores?fechas=${fechasString}&estado=activo`);
+      
+      if (!response.ok) {
+        throw new Error('Error al cargar contadores de turnos');
+      }
+      
+      const data = await response.json();
+      
+      // Actualizar el estado con los contadores de turnos existentes
+      setTurnosPorDia(data.contadores || {});
+
+      // Calcular turnos disponibles usando la nueva función
+      if (configuracion && doctores && consultorios && dias.length > 0) {
+        try {
+          // Obtener turnos existentes para el rango de días
+          const fechaDesde = dias[0].fecha;
+          const fechaHasta = dias[dias.length - 1].fecha;
+          
+          // Consultar turnos existentes
+          const turnosResponse = await fetch(`/api/turnos?fechaDesde=${fechaDesde.toISOString().split('T')[0]}&fechaHasta=${fechaHasta.toISOString().split('T')[0]}`);
+          const turnosData = turnosResponse.ok ? await turnosResponse.json() : { turnos: [] };
+          
+          // Calcular disponibilidad
+          const disponibilidad = calcularTurnosDisponiblesPorRango(
+            fechaDesde,
+            fechaHasta,
+            configuracion,
+            doctores,
+            consultorios,
+            turnosData.turnos || []
+          );
+
+         
+          // Convertir resultado a formato compatible con el estado
+          const disponibilidadPorDia = {};
+          disponibilidad.forEach(dia => {
+            const fechaFormateada = dia.fecha.toISOString().split('T')[0];
+            disponibilidadPorDia[fechaFormateada] = dia.turnosDisponibles;
+          });
+          
+          setTurnosDisponiblesPorDia(disponibilidadPorDia);
+        } catch (dispError) {
+          console.error('Error al calcular turnos disponibles:', dispError);
+          // En caso de error, limpiar los datos disponibles
+          setTurnosDisponiblesPorDia({});
+        }
+      }
+    } catch (err) {
+      console.error('Error al cargar contadores de turnos:', err);
+      // En caso de error, no actualizamos los contadores
+    }
+  }, [configuracion, doctores, consultorios]);
+
+
   // Cargar turnos para una fecha específica y aplicar filtros (memoizado)
   const cargarTurnos = useCallback(async (fecha, usarFiltroAvanzado = false) => {
     try {
@@ -158,34 +233,6 @@ export default function TurnosPage() {
       setLoading(false);
     }
   }, [filtrosActuales]);
-  
-  // Cargar los contadores de turnos para los días mostrados (memoizado)
-  const cargarContadoresTurnos = useCallback(async (dias) => {
-    try {
-      // Crear fechas para consulta (formato YYYY-MM-DD)
-      const fechasParaConsulta = dias.map(dia => 
-        dia.fecha.toISOString().split('T')[0]
-      );
-      
-      // Crear un string de fechas separadas por comas
-      const fechasString = fechasParaConsulta.join(',');
-      
-      // Realizar una consulta a la API para obtener contadores
-      const response = await fetch(`/api/turnos/contadores?fechas=${fechasString}&estado=activo`);
-      
-      if (!response.ok) {
-        throw new Error('Error al cargar contadores de turnos');
-      }
-      
-      const data = await response.json();
-      
-      // Actualizar el estado con los contadores
-      setTurnosPorDia(data.contadores || {});
-    } catch (err) {
-      console.error('Error al cargar contadores de turnos:', err);
-      // En caso de error, no actualizamos los contadores
-    }
-  }, []);
 
   // Cancelar turno
   const cancelarTurno = useCallback(async (turnoId) => {
@@ -221,72 +268,8 @@ export default function TurnosPage() {
       cargarContadoresTurnos(diasCalendario);
     }
   }, [cargarTurnos, fechaSeleccionada, mostrarFiltros, cargarContadoresTurnos, diasCalendario]);
-  
-  useEffect(() => {
-    const cargarDatos = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // Obtener configuración (doctores, consultorios, tipos de turno)
-        const configResponse = await fetch('/api/configuracion');
-        if (!configResponse.ok) {
-          throw new Error('Error al cargar la configuración');
-        }
-        const configData = await configResponse.json();
-        
-        // Asegurarse de que los datos estén disponibles antes de configurar los estados
-        if (configData) {
-          setDoctores(configData.doctores || []);
-          setConsultorios(configData.consultorios || []);
-          setConfiguracion(configData);
-          
-          // Obtener los tipos de turno disponibles (unificados de todos los doctores)
-          const tiposUnificados = [];
-          if (configData.doctores && Array.isArray(configData.doctores)) {
-            configData.doctores.forEach(doctor => {
-              if (doctor.tiposTurno && Array.isArray(doctor.tiposTurno)) {
-                doctor.tiposTurno.forEach(tipo => {
-                  // Evitar duplicados
-                  if (!tiposUnificados.find(t => t.nombre === tipo.nombre)) {
-                    tiposUnificados.push({
-                      id: tipo.id,
-                      nombre: tipo.nombre,
-                      duracion: tipo.duracion
-                    });
-                  }
-                });
-              }
-            });
-          }
-          setTiposTurno(tiposUnificados);
-        }
 
-        // Obtener coberturas médicas
-        const coberturasData = await obtenerCoberturasDesdeDB();
-        setCoberturas(coberturasData || []);
-        
-        // Calcular los próximos días para el selector de fechas
-        const proximos7Dias = calcularProximosDias(new Date(), 7);
-        setDiasCalendario(proximos7Dias);
-
-        // Cargar turnos sólo después de tener toda la configuración
-        await cargarTurnos(new Date(), false);
-        
-        // Cargar contadores para los días iniciales
-        await cargarContadoresTurnos(proximos7Dias);
-        
-      } catch (err) {
-        console.error('Error al cargar datos iniciales:', err);
-        setError('Error al cargar los datos iniciales. Por favor, recargue la página.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    cargarDatos();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);  // Cambiar la fecha seleccionada
+   // Cambiar la fecha seleccionada
   const cambiarFecha = useCallback((fecha) => {
     setFechaSeleccionada(fecha);
     cargarTurnos(fecha, false);
@@ -377,9 +360,76 @@ export default function TurnosPage() {
 
   const handleFiltroCobertura = useCallback((value) => {
     setFiltroCobertura(value);
+  }, []);    
+  
+  useEffect(() => {
+    const cargarDatos = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Obtener configuración (doctores, consultorios, tipos de turno)
+        const configResponse = await fetch('/api/configuracion');
+        if (!configResponse.ok) {
+          throw new Error('Error al cargar la configuración');
+        }
+        const configData = await configResponse.json();
+        
+        // Asegurarse de que los datos estén disponibles antes de configurar los estados
+        if (configData) {
+          setDoctores(configData.doctores || []);
+          setConsultorios(configData.consultorios || []);
+          setConfiguracion(configData);
+          
+          // Obtener los tipos de turno disponibles (unificados de todos los doctores)
+          const tiposUnificados = [];
+          if (configData.doctores && Array.isArray(configData.doctores)) {
+            configData.doctores.forEach(doctor => {
+              if (doctor.tiposTurno && Array.isArray(doctor.tiposTurno)) {
+                doctor.tiposTurno.forEach(tipo => {
+                  // Evitar duplicados
+                  if (!tiposUnificados.find(t => t.nombre === tipo.nombre)) {
+                    tiposUnificados.push({
+                      id: tipo.id,
+                      nombre: tipo.nombre,
+                      duracion: tipo.duracion
+                    });
+                  }
+                });
+              }
+            });
+          }
+          setTiposTurno(tiposUnificados);
+        }
+
+        // Obtener coberturas médicas
+        const coberturasData = await obtenerCoberturasDesdeDB();
+        setCoberturas(coberturasData || []);
+        
+        // Calcular los próximos días para el selector de fechas
+        const proximos7Dias = calcularProximosDias(new Date(), 7);
+        setDiasCalendario(proximos7Dias);
+
+        // Cargar turnos sólo después de tener toda la configuración
+        await cargarTurnos(new Date(), false);
+        
+        // Cargar contadores para los días iniciales
+        await cargarContadoresTurnos(proximos7Dias);
+        
+      } catch (err) {
+        console.error('Error al cargar datos iniciales:', err);
+        setError('Error al cargar los datos iniciales. Por favor, recargue la página.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    cargarDatos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
+  
+   useEffect(() => {
     // Ignorar el primer renderizado
     if (isFirstRender.current) {
       isFirstRender.current = false;
@@ -404,6 +454,12 @@ export default function TurnosPage() {
     };
   }, [filtroDoctor, filtroConsultorio, filtroTipoTurno, filtroEstado, filtroCobertura, aplicarFiltros]);
   
+  useEffect(() => {
+    if (loading || !configuracion || !doctores || !consultorios) return;
+    cargarContadoresTurnos(diasCalendario);
+
+  }, [configuracion, doctores, consultorios, loading]);
+
   // Renderizado condicional para estado de carga
   if (loading && turnos.length === 0) {
     return (
@@ -412,111 +468,153 @@ export default function TurnosPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row justify-between items-center md:items-start mb-6">
-        {/* Contenedor flex para mostrar ambas vistas */}
-          <div className="flex flex-col lg:flex-row gap-10 items-start justify-center">
-            {/* Vista mensual */}
-            <div className="w-full lg:w-auto lg:flex-shrink-0">
-              <h3 className="text-center text-sm font-medium text-[var(--text-color)] mb-3">
-                <i className="fa-solid fa-calendar-alt mr-2"></i>
-                Calendario Mensual
-              </h3>
-              <div className="flex justify-center">
-                <div className="w-full max-w-md">
-                  <CalendarioMensual
-                    fechaInicial={fechaSeleccionada}
-                    onFechaClick={cambiarFecha}
-                  />
+    <div className="container mx-auto px-4 mt-4">
+      <div 
+        className={`col-span-3 mb-2 transition-all duration-300 ${
+          mostrarFiltros 
+            ? 'h-0 opacity-0 overflow-hidden' 
+            : 'h-auto opacity-100'
+        }`}
+      >
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-start mb-6">
+          {/* Contenedor flex para mostrar ambas vistas */}
+            <div className="flex flex-col lg:flex-row gap-10 items-start justify-center">
+              {/* Vista mensual */}
+              <div className="w-full lg:w-auto lg:flex-shrink-0">
+                  <div className="w-full max-w-md">
+                    <CalendarioMensual
+                      fechaInicial={fechaSeleccionada}
+                      onFechaClick={cambiarFecha}
+                    />
+                  </div>
+              </div>
+              <div className="flex flex-col gap-10 w-full lg:w-auto lg:flex-1">
+                
+                <h1 className="text-2xl font-bold ">Gestión de Turnos</h1>                
+                <div className="mt-4 md:mt-0 flex flex-wrap gap-2">
+                  <button 
+                    onClick={handleModalTurnoNuevo} 
+                    className="bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2"
+                  >
+                    <i className="fa-solid fa-calendar-plus"></i>
+                    <i className="fa-solid fa-plus"></i>
+                    Turno
+                  </button>
+                  <button
+                    onClick={handleModalTurnoDisponibilidad}
+                    className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2 "
+                  >
+                    <i className="fa-solid fa-clock"></i>
+                    <i className="fa-solid fa-plus"></i>
+                    Turno Disponibilidad
+                  </button>
+                  <button
+                    onClick={handleModalEventoNuevo}
+                    className="bg-purple-500 hover:bg-purple-600 text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2"
+                  >
+                    <i className="fa-solid fa-star"></i>
+                    <i className="fa-solid fa-plus"></i>
+                    Evento
+                  </button>
                 </div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-10 w-full lg:w-auto lg:flex-1">
-              
-              <h1 className="text-2xl font-bold ">Gestión de Turnos</h1>
-        
-              <div className="mt-4 md:mt-0 flex flex-wrap gap-2">
-                <button 
-                  onClick={handleModalTurnoNuevo} 
-                  className="bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2"
-                >
-                  <i className="fa-solid fa-calendar-plus"></i>
-                  <i className="fa-solid fa-plus"></i>
-                  Turno
-                </button>
-                <button
-                  onClick={handleModalTurnoDisponibilidad}
-                  className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2 "
-                >
-                  <i className="fa-solid fa-clock"></i>
-                  <i className="fa-solid fa-plus"></i>
-                  Turno Disponibilidad
-                </button>
-              </div>
 
-              {/* Vista semanal (selector de días existente) */}
-              <div className="w-full lg:w-auto lg:flex-1 flex justify-center">
-                <div className="w-full max-w-4xl">
-                  <h3 className="text-center text-sm font-medium text-[var(--text-color)] mb-3">
-                    <i className="fa-solid fa-calendar-week mr-2"></i>
-                    Navegación Semanal
-                  </h3>
-                  <div className="flex items-center justify-center">
-                    <button 
-                      onClick={() => navegarDias(-1)}
-                      className="text-white bg-slate-500 px-1 min-h-42 md:min-h-20 rounded-l-md"
-                    >
-                      <i className="fa-solid fa-chevron-left fa-xl"></i>
-                    </button>
-                    
-                    <div className="flex overflow-visible flex-wrap gap-2">
-                      {diasCalendario.map((dia, index) => {
-                        // Obtener fecha formateada para buscar en el objeto de contadores (YYYY-MM-DD)
-                        const fechaFormateada = dia.fecha.toISOString().split('T')[0];
-                        // Obtener contador para esta fecha (si existe)
-                        const contador = turnosPorDia[fechaFormateada] || 0;
-                        
-                        return (
-                          <button
-                            key={dia.fecha.toISOString()}
-                            onClick={() => cambiarFecha(dia.fecha)}
-                            className={`flex-shrink-0 px-4 py-2 pb-0 border relative min-h-20 ${
-                              dia.fecha.toDateString() === fechaSeleccionada.toDateString()
-                                ? 'bg-slate-500 text-white border-slate-500 border-x-white'
-                                : 'border-gray-700 hover:bg-gray-50'}
-                              
-                            `}
-                          >
-                            <div className="text-xs font-medium">{dia.diaSemanaCorto}</div>
-                            <div className="font-bold text-xl">{dia.fecha.getDate()}</div>
-                            <div className="font-semibold text-xs p-1">{dia.fecha.toLocaleDateString('es-AR', { month: 'short' }).charAt(0).toUpperCase() + dia.fecha.toLocaleDateString('es-AR', { month: 'short' }).slice(1)}</div>
-                            
-                            {/* Indicador de turnos estilo iOS */}
-                            {contador > 0 && (
-                              <span 
-                                key={`${fechaFormateada}-${contador}`} // Forzar recreación del componente cuando cambia
-                                className="absolute -top-3 -right-2 bg-red-500 text-white text-md font-bold rounded-full 
-                                  min-w-[24px] h-[24px] flex items-center justify-center p-1 animate-fadeIn"
-                              >
+                {/* Vista semanal (selector de días existente) */}
+                <div className="w-full lg:w-auto lg:flex-1 flex justify-center">
+                  <div className="w-full max-w-4xl">
+                    <h3 className="text-center text-sm font-medium text-[var(--text-color)] mb-3">
+                      <i className="fa-solid fa-calendar-week mr-2"></i>
+                      Navegación Semanal
+                    </h3>
+                    <div className="flex items-center justify-center">
+                      <button 
+                        onClick={() => navegarDias(-1)}
+                        className="text-white bg-slate-500 px-1 min-h-42 md:min-h-20 rounded-l-md"
+                      >
+                        <i className="fa-solid fa-chevron-left fa-xl"></i>
+                      </button>
+                      
+                      <div className="flex overflow-visible flex-wrap gap-2">                        
+                        {diasCalendario.map((dia, index) => {
+                          // Obtener fecha formateada para buscar en el objeto de contadores (YYYY-MM-DD)
+                          const fechaFormateada = dia.fecha.toISOString().split('T')[0];
+                          // Obtener contador para esta fecha (si existe)
+                          const contador = turnosPorDia[fechaFormateada] || 0;
+                          // Obtener contador de turnos disponibles
+                          const contadorDisponibles = turnosDisponiblesPorDia[fechaFormateada] || 0;
+                          
+                          return (
+                            <button
+                              key={dia.fecha.toISOString()}
+                              onClick={() => cambiarFecha(dia.fecha)}
+                              className={`flex-shrink-0 px-4 py-2 pb-0 border relative min-h-20 ${
+                                dia.fecha.toDateString() === fechaSeleccionada.toDateString()
+                                  ? 'bg-slate-500 text-white border-slate-500 border-x-white'
+                                  : 'border-gray-700 hover:bg-gray-50'}
                                 
-                                {contador}
-                              </span>
+                              `}
+                            >
+                              <div className="text-xs font-medium">{dia.diaSemanaCorto}</div>
+                              <div className="font-bold text-xl">{dia.fecha.getDate()}</div>
+                              <div className="font-semibold text-xs p-1">{dia.fecha.toLocaleDateString('es-AR', { month: 'short' }).charAt(0).toUpperCase() + dia.fecha.toLocaleDateString('es-AR', { month: 'short' }).slice(1)}</div>
+                                {/* Indicador de turnos agendados (burbuja roja) */}
+                              {contador > 0 && (
+                                <span 
+                                  key={`ocupado-${fechaFormateada}-${contador}`}
+                                  className="absolute -top-3 -right-2 bg-red-500 text-white text-sm font-bold rounded-full 
+                                    min-w-[24px] h-[24px] flex items-center justify-center p-1 animate-fadeIn"
+                                >
+                                  {contador}
+                                </span>
                               )}
-                          </button>                    
-                        );
-                      })}
-                    </div>              
-                    <button 
-                      onClick={() => navegarDias(1)}
-                      className="text-white bg-slate-500 px-1 min-h-42 md:min-h-20 rounded-r-md"
-                    >
-                      <i className="fa-solid fa-chevron-right fa-xl"></i>
-                    </button>
+                              
+                              {/* Indicador de turnos disponibles (burbuja verde) */}
+                              {contadorDisponibles > 0 && (
+                                <span 
+                                  key={`disponible-${fechaFormateada}-${contadorDisponibles}`}
+                                  className="absolute top-4 -right-2 bg-green-500 text-white text-sm font-bold rounded-full 
+                                    min-w-[24px] h-[24px] flex items-center justify-center p-1 animate-fadeIn"
+                                  title={`${contadorDisponibles} turnos disponibles`}
+                                >
+                                  {contadorDisponibles}
+                                </span>
+                              )}
+                            </button>                    
+                          );
+                        })}
+                      </div>              
+                      <button 
+                        onClick={() => navegarDias(1)}
+                        className="text-white bg-slate-500 px-1 min-h-42 md:min-h-20 rounded-r-md"
+                      >
+                        <i className="fa-solid fa-chevron-right fa-xl"></i>
+                      </button>
+                    </div>
                   </div>
                 </div>
+                <div className="flex justify-between items-center gap-4">
+                  <button
+                    onClick={toggleFiltrosAvanzados}
+                    className="text-blue-600 hover:text-blue-800 flex items-center focus:outline-none transition-colors border border-blue-500 rounded-md px-4 py-2"
+                  >
+                    <i className={`fas fa-${mostrarFiltros ? 'minus' : 'plus'} mr-2`}></i>
+                    {mostrarFiltros ? 'Ocultar filtros' : 'Mostrar Filtros Avanzados'}
+                  </button>
+                  
+                  <button
+                      onClick={() => {
+                        cargarTurnos(fechaSeleccionada, mostrarFiltros);
+                        cargarContadoresTurnos(diasCalendario);
+                      }}
+                      className="ml-2 px-3 py-2 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary-dark)] flex items-center gap-2"
+                      title="Actualizar datos de turnos"
+                    >
+                      <i className="fas fa-sync-alt"></i>
+                      <span className="hidden sm:inline">Actualizar</span>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+        </div>
       </div>
       
       {error && (
@@ -525,19 +623,16 @@ export default function TurnosPage() {
         </div>
       )}
       
-      <div className="shadow rounded-lg p-4 mb-6">        
-          <div 
-            className={`col-span-3 mb-2 transition-all duration-300 ${
-              mostrarFiltros 
-                ? 'h-0 opacity-0 overflow-hidden' 
-                : 'h-auto opacity-100'
-            }`}
-          >
-           
-      </div>          
-          
+      <div className="shadow rounded-lg px-4">        
+        <div
+          className={`${
+            mostrarFiltros 
+              ? 'flex flex-col' 
+              : 'hidden'
+          }`}
+        >
           {/* Botón para mostrar/ocultar filtros avanzados */}
-          <div className="col-span-3 flex justify-between items-center gap-4 border-b pb-2 ">
+          <div className="flex justify-between items-center gap-4 border-b pb-2 ">
             <button
               onClick={toggleFiltrosAvanzados}
               className="text-blue-600 hover:text-blue-800 flex items-center focus:outline-none transition-colors border border-blue-500 rounded-md px-4 py-2"
@@ -545,6 +640,7 @@ export default function TurnosPage() {
               <i className={`fas fa-${mostrarFiltros ? 'minus' : 'plus'} mr-2`}></i>
               {mostrarFiltros ? 'Ocultar filtros' : 'Mostrar Filtros Avanzados'}
             </button>
+            
             <button
                 onClick={() => {
                   cargarTurnos(fechaSeleccionada, mostrarFiltros);
@@ -556,45 +652,9 @@ export default function TurnosPage() {
                 <i className="fas fa-sync-alt"></i>
                 <span className="hidden sm:inline">Actualizar</span>
             </button>
-
-            <div className={`lg:col-span-2 lg:text-right transition-all duration-300 ${
-                mostrarFiltros ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100'
-            }`}>
-              <div className="inline-flex items-center justify-center">
-                <div className="calendar-icon border border-red-500 rounded-lg shadow-sm overflow-hidden w-14 h-14 flex flex-col">
-                  <div className="bg-red-600 text-xs font-bold text-center py-1">
-                    {fechaSeleccionada.toLocaleDateString('es-AR', { month: 'short' }).toUpperCase()}
-                  </div>
-                  <div className="flex-grow flex items-center justify-center">
-                    <span className="font-bold text-xl">
-                      {fechaSeleccionada.getDate()}
-                    </span>
-                  </div>
-                </div>
-                <div className="ml-2 flex flex-col items-start">
-                  <span className="text-lg font-bold ">
-                    {fechaSeleccionada.toLocaleDateString('es-AR', {
-                      weekday: 'long',
-                    })}
-                  </span>
-                  <span className="text-sm">
-                    {fechaSeleccionada.toLocaleDateString('es-AR', {
-                      month: 'long',
-                      year: 'numeric'
-                    })}
-                  </span>
-                </div>
-              </div>
-            </div>
           </div>
-          
-          <div
-            className={`${
-              mostrarFiltros 
-                ? 'flex flex-row items-centerflex-wrap gap-4 p-4' 
-                : 'hidden'
-            }`}
-          >
+          <div className="flex flex-row items-centerflex-wrap gap-4 p-4">
+
             {/* Filtros simples  (Doctor y Consultorio) */}
             <div className="">
               <label className="block text-sm font-medium mb-1">Doctor</label>
@@ -779,6 +839,7 @@ export default function TurnosPage() {
             </div>
           </div>
         </div>
+      </div>
            
       {/* Listado de turnos */}
       {(mostrarFiltros || forzarMostarGrilla) &&
@@ -790,9 +851,8 @@ export default function TurnosPage() {
           onTurnoActualizado={handleTurnoActualizado}
         />
       </div>
-      }
-      {!mostrarFiltros && configuracion && doctores && consultorios &&
-        <CalendarioTurnos 
+      }      {!mostrarFiltros && configuracion && doctores && consultorios &&        
+      <CalendarioTurnos 
           fecha={fechaSeleccionada}
           turnos={turnos}
           loading={loading}
@@ -801,17 +861,33 @@ export default function TurnosPage() {
           doctores={doctores}
           consultorios={consultorios}
           setForzarMostrarGrilla={setForzarMostrarGrilla}
-        />}
-       {/* Modal para nuevo Turno */}
+          navegarDias={navegarDias}
+          cambiarFecha={cambiarFecha}
+        />}       
+        {/* Modal para nuevo Turno */}
         <Modal
-          isOpen={modalTurnoNuevo || modalTurnoDisponibilidad}
+          isOpen={modalTurnoNuevo || modalTurnoDisponibilidad || modalEventoNuevo}
           onClose={cerrarModal}
           size="large"
           title={tituloModal}
         >
           {modalTurnoNuevo 
           ? <TurnoNuevo onClose={cerrarModal}/>
-          : modalTurnoDisponibilidad && <TurnoDisponibilidad onClose={cerrarModal}/>  
+          : modalTurnoDisponibilidad 
+          ? <TurnoDisponibilidad onClose={cerrarModal}/>
+          : modalEventoNuevo 
+          ? <EventoNuevo 
+              doctores={doctores} 
+              consultorios={consultorios} 
+              onEventoCreado={() => {
+                // Recargar turnos después de crear un evento
+                cargarTurnos(fechaSeleccionada, mostrarFiltros);
+                cargarContadoresTurnos(diasCalendario);
+                cerrarModal();
+              }}
+              onCancelar={cerrarModal}
+            />
+          : null
           }
         </Modal>       
     </div>    

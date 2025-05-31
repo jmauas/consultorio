@@ -30,10 +30,10 @@ const TurnoNuevo = ({
    const [consultorios, setConsultorios] = useState([]);
    const [tiposTurnosDisponibles, setTiposTurnosDisponibles] = useState([]);
    const [buscandoPaciente, setBuscandoPaciente] = useState(false);
-   const [coberturas, setCoberturas] = useState([]);
-   const [conflictoHorario, setConflictoHorario] = useState(null);
+   const [coberturas, setCoberturas] = useState([]);   const [conflictoHorario, setConflictoHorario] = useState(null);
    const [turnosDisponibles, setTurnosDisponibles] = useState([]);
    const [turnosPaciente, setTurnosPaciente] = useState([]);
+   const [pacienteData, setPacienteData] = useState(null);
    const [turno, setTurno] = useState({
      nombre: '',
      apellido: '',
@@ -65,9 +65,9 @@ const TurnoNuevo = ({
        if (!response.ok) {
          throw new Error('Error al buscar paciente');
        }      
-       const data = await response.json();      
-       if (data.ok && data.pacientes && data.pacientes.length > 0) {
+       const data = await response.json();        if (data.ok && data.pacientes && data.pacientes.length > 0) {
          setPacienteData(data.pacientes[0])
+         cargarDatosPaciente(data.pacientes[0])
          if (data.pacientes[0].turnos && data.pacientes[0].turnos.length > 0) {
          const proximosTurnos = data.pacientes[0].turnos.filter(turno => {
            const fechaTurno = new Date(turno.desde);
@@ -87,8 +87,7 @@ const TurnoNuevo = ({
        setBuscandoPaciente(false);
      }
    };
- 
-   const setPacienteData = (paciente) => {
+   const cargarDatosPaciente = (paciente) => {
      setTurno(prev => ({
        ...prev,
        nombre: paciente.nombre || '',
@@ -484,14 +483,15 @@ const TurnoNuevo = ({
   ]);
 
   return (
-   <div className="container mx-auto px-4 py-8">
-      <div className="max-w-3xl mx-auto">
+   <div className="container mx-auto px-4 py-8">      <div className="max-w-3xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">Nuevo Turno</h1>
 
         {/* Mensaje de éxito */}
         {success && (
-          <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6">
-            <p><i className="fas fa-check-circle mr-2"></i> Turno Creado Exitosamente</p>
+          <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm transition-opacity duration-300" style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }}>
+            <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-6 rounded-lg shadow-xl max-w-md">
+              <p><i className="fas fa-check-circle mr-2"></i> Turno Creado Exitosamente</p>
+            </div>
           </div>
         )}
 
@@ -667,10 +667,9 @@ const TurnoNuevo = ({
               <select
                 name="doctor"
                 value={turno.doctor}
-                onChange={handleChange}
-                className={`px-3 py-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='light' ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-200'}`}
+                onChange={handleChange}              className={`px-3 py-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='light' ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-200'}`}
               >
-                {doctores.length > 1 && (<option value="">Seleccione doctor</option>)}
+                <option value="">Seleccione doctor</option>
                 {doctores.map((doctor) => (
                   <option key={doctor.nombre} value={doctor.id}>
                     {doctor.emoji} {doctor.nombre}
@@ -742,8 +741,7 @@ const TurnoNuevo = ({
               />
             </div>
 
-            {/* Observaciones */}
-            <div>
+            {/* Observaciones */}            <div>
               <label className="block text-sm font-medium  mb-1">Observaciones</label>
               <textarea
                 name="observaciones"
@@ -756,12 +754,29 @@ const TurnoNuevo = ({
             </div>
           </div>
 
-           {/* Mensaje de éxito */}
-          {success && (
-            <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6">
-              <p><i className="fas fa-check-circle mr-2"></i> Turno Creado Exitosamente</p>
-            </div>
-          )}
+          {/* Alerta de turnos futuros del paciente */}
+          {pacienteData && turnosPaciente && turnosPaciente.length > 0 && (
+            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6">
+              <p className="font-medium"><i className="fas fa-calendar-check mr-2"></i> Turnos Futuros del Paciente:</p>
+              <div className="mt-2 space-y-2">
+                {turnosPaciente.map((t, i) => (
+                  <div key={i} className="bg-yellow-50 border border-yellow-200 rounded-md p-3 flex items-center justify-between">
+                    <div className="flex items-center">
+                      <i className="fas fa-calendar-check text-yellow-600 mr-3"></i>
+                      <div>
+                        <span className="font-bold text-yellow-800">{t.consultorio.nombre}</span>
+                        <span className="mx-2">•</span>
+                        <span className="text-yellow-700">{formatoFecha(t.desde, true, false, false, true, false, false)}</span>
+                        <span className="mx-2">•</span>
+                        <span className="text-yellow-700">{t.servicio}</span>
+                        <span className="mx-2">•</span>
+                        <span className="text-yellow-700">{t.duracion} min</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>          )}
 
           {/* Mensaje de error */}
           {error && (

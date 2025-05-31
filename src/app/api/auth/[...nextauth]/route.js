@@ -40,12 +40,15 @@ export const authOptions = {
       async authorize(credentials) {
         // Si viene un token de email validado (autenticación desde la página complete-signin)
         if (credentials?.emailToken && credentials?.email && credentials?.userId) {
-          try {
+          try {            
             // Verificar que el usuario existe con ese ID y email
             const user = await prisma.user.findFirst({
               where: { 
                 id: credentials.userId,
-                email: credentials.email
+                email: {
+                  equals: credentials.email,
+                  mode: 'insensitive'
+                }
               },
               include: {
                 doctores: true,
@@ -84,10 +87,14 @@ export const authOptions = {
           return null;
         }
         
-        try {
-          // Buscar usuario por email
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email },
+        try {          // Buscar usuario por email (case insensitive)
+          const user = await prisma.user.findFirst({
+            where: { 
+              email: {
+                equals: credentials.email,
+                mode: 'insensitive'
+              }
+            },
               include: {
                 doctores: true,
               }

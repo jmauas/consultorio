@@ -29,6 +29,13 @@ export default function GrillaTurnos({
   const [turnoSeleccionado, setTurnoSeleccionado] = useState(null);
 
   const { theme, setTheme } = useTheme();
+
+  // Función para detectar si un turno es un evento
+  const esEvento = (turno) => {
+    return turno?.paciente?.dni === 'EVENTO' && 
+           turno?.paciente?.nombre === 'EVENTO ESPECIAL' &&
+           turno?.servicio === 'EVENTO';
+  };
   
   // Estado para el modal de nuevo turno
   const [modalNuevoTurnoAbierto, setModalNuevoTurnoAbierto] = useState(false);
@@ -64,22 +71,6 @@ export default function GrillaTurnos({
       if (celular.length >= 8) {
           const res = await enviarRecordatorioTurno(turno);
       }
-      
-      // if (celular.length >= 10) {
-      //   // URL para web y dispositivos móviles
-      //   const url = `https://api.whatsapp.com/send?phone=${celular}&text=${encodeURIComponent(msg)}`;
-        
-      //   // Intentar abrir en una nueva pestaña/ventana
-      //   const opened = window.open(url, '_blank');
-        
-      //   // Si no se pudo abrir en nueva pestaña (común en móviles)
-      //   if (!opened || opened.closed || typeof opened.closed === 'undefined') {
-      //     // Intentar abrir en la misma ventana
-      //     window.location.href = url;
-      //   }
-      // }
-
-      //await enviarMailConfTurno(turno);
       
       toast.success('Iniciando envío de confirmación');
     } catch (error) {
@@ -246,15 +237,22 @@ const cardLibre = (turno, anterior, color, index) => {
                         {formatoFecha(turno.desde, true, false, false, false, true)}
                       </span>
                     </div>
-                  </td>
+                  </td>                  
                   <td className="px-6 py-4 whitespace-nowrap text-sm ">
-                    <div className="font-medium">{turno.paciente.nombre} {turno.paciente.apellido}</div>
-                    <div className="flex items-center space-x-2 mt-1">
-                      <div className="text-xs">{turno.paciente.celular || 'Sin contacto'}</div>
-                      <Link href={`https://wa.me/${turno.paciente.celular}`} target="_blank">
-                        <i className="fab fa-whatsapp text-green-600 fa-xl"></i>
-                      </Link>
+                    <div className="font-medium">
+                      {esEvento(turno) 
+                        ? (turno.observaciones || 'Evento') 
+                        : `${turno.paciente.nombre} ${turno.paciente.apellido}`
+                      }
                     </div>
+                    {!esEvento(turno) && (
+                      <div className="flex items-center space-x-2 mt-1">
+                        <div className="text-xs">{turno.paciente.celular || 'Sin contacto'}</div>
+                        <Link href={`https://wa.me/${turno.paciente.celular}`} target="_blank">
+                          <i className="fab fa-whatsapp text-green-600 fa-xl"></i>
+                        </Link>
+                      </div>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm ">
                     <span 
@@ -264,7 +262,7 @@ const cardLibre = (turno, anterior, color, index) => {
                         color: isColorLight(turno.coberturaMedica?.color || '#CCCCCC') ? '#000000' : '#FFFFFF'
                       }}
                     >
-                      {turno.coberturaMedica.codigo ? turno.coberturaMedica.codigo.toUpperCase() : 'No asignado'}
+                      {turno.coberturaMedica?.codigo ? turno.coberturaMedica.codigo.toUpperCase() : 'No asignado'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap ">
@@ -296,7 +294,7 @@ const cardLibre = (turno, anterior, color, index) => {
                     <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${obtenerColorEstado(turno.estado || 'sin confirmar')}`}>
                       {obtenerNombreEstado(turno.estado) || 'sin confirmar'}
                     </span>
-                  </td>                  
+                  </td>                    
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-1">
                       <button
@@ -306,20 +304,24 @@ const cardLibre = (turno, anterior, color, index) => {
                       >
                         <i className="fas fa-eye"></i>
                       </button>
-                      <button
-                        onClick={() => enviarRecordatorio(turno.id)}
-                        className="text-green-600 hover:text-green-900 dark:text-green-500 dark:hover:text-green-400 bg-green-50 dark:bg-green-900 border border-green-600 rounded-md p-2"
-                        title="Enviar recordatorio"
-                      >
-                        <i className="fa fa-solid fa-bell text-green-600 "></i>
-                      </button>
-                      <button
-                        onClick={() => abrirModalNuevoTurno(turno.paciente)}
-                        className="text-[var(--color-primary)] hover:text-[var(--color-primary)] dark:text-[var(--color-primary)] dark:hover:text-orange-300 bg-orange-50 dark:bg-irange-900 border border-[var(--color-primary)]or-primary)] rounded-md p-2"
-                        title="Nuevo turno"
-                      >
-                        <i className="fas fa-plus fa-lg"></i>
-                      </button>
+                      {!esEvento(turno) && (
+                        <>
+                          <button
+                            onClick={() => enviarRecordatorio(turno.id)}
+                            className="text-green-600 hover:text-green-900 dark:text-green-500 dark:hover:text-green-400 bg-green-50 dark:bg-green-900 border border-green-600 rounded-md p-2"
+                            title="Enviar recordatorio"
+                          >
+                            <i className="fa fa-solid fa-bell text-green-600 "></i>
+                          </button>
+                          <button
+                            onClick={() => abrirModalNuevoTurno(turno.paciente)}
+                            className="text-[var(--color-primary)] hover:text-[var(--color-primary)] dark:text-[var(--color-primary)] dark:hover:text-orange-300 bg-orange-50 dark:bg-irange-900 border border-[var(--color-primary)]or-primary)] rounded-md p-2"
+                            title="Nuevo turno"
+                          >
+                            <i className="fas fa-plus fa-lg"></i>
+                          </button>
+                        </>
+                      )}
                       {onCancelarTurno && (
                       <button
                         onClick={() => cancelarTurno(turno.id)}
@@ -381,16 +383,23 @@ const cardLibre = (turno, anterior, color, index) => {
             </div>
             
             <div className="p-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4">                
                 <div>
                   <p className="text-sm font-medium ">Paciente</p>
-                  <p className="mt-1 text-sm font-bold">{turno.paciente.nombre} {turno.paciente.apellido}</p>
-                  <div className="flex items-center space-x-2 mt-1">
-                    <p className="text-xs">{turno.paciente.celular || 'Sin contacto'}</p>
-                    <Link href={`https://wa.me/${turno.paciente.celular}`} target="_blank">
-                      <i className="fab fa-whatsapp text-green-600 fa-xl"></i>
-                    </Link>
-                  </div>
+                  <p className="mt-1 text-sm font-bold">
+                    {esEvento(turno) 
+                      ? (turno.observaciones || 'Evento') 
+                      : `${turno.paciente.nombre} ${turno.paciente.apellido}`
+                    }
+                  </p>
+                  {!esEvento(turno) && (
+                    <div className="flex items-center space-x-2 mt-1">
+                      <p className="text-xs">{turno.paciente.celular || 'Sin contacto'}</p>
+                      <Link href={`https://wa.me/${turno.paciente.celular}`} target="_blank">
+                        <i className="fab fa-whatsapp text-green-600 fa-xl"></i>
+                      </Link>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <p className="text-sm font-medium mb-2">Doctor</p>
@@ -415,7 +424,7 @@ const cardLibre = (turno, anterior, color, index) => {
                     >
                       {turno.consultorio?.nombre || (typeof turno.consultorio === 'string' ? turno.consultorio : 'No especificado')}
                     </span>
-                </div>
+                </div>                
                 <div>
                   <p className="text-sm font-medium mb-2">Cobertura</p>
                   <span 
@@ -425,7 +434,7 @@ const cardLibre = (turno, anterior, color, index) => {
                       color: isColorLight(turno.coberturaMedica?.color || '#CCCCCC') ? '#000000' : '#FFFFFF'
                     }}
                   >
-                    {turno.coberturaMedica.codigo ? turno.coberturaMedica.codigo.toUpperCase() : 'No asignado'}
+                    {turno.coberturaMedica?.codigo ? turno.coberturaMedica.codigo.toUpperCase() : 'No asignado'}
                   </span>
                 </div>
                 <div className="col-span-2">
@@ -434,8 +443,7 @@ const cardLibre = (turno, anterior, color, index) => {
                 </div>
               </div>
             </div>
-            
-            <div className={`flex justify-between px-4 py-3 ${theme==='light' ? 'bg-slate-200' : 'bg-slate-800'}`}>
+              <div className={`flex justify-between px-4 py-3 ${theme==='light' ? 'bg-slate-200' : 'bg-slate-800'}`}>
               <button
                 onClick={() => abrirDetalleTurno(turno)}
                 className="inline-flex rounded-md bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 border border-blue-600"
@@ -443,20 +451,24 @@ const cardLibre = (turno, anterior, color, index) => {
                 >
                  <div><i className="fa fa-eye text-blue-600 "></i></div>
               </button>
-              <button
-                onClick={() => enviarRecordatorio(turno.id)}
-                className="inline-flex rounded-md bg-green-50 p-2 text-green-700 hover:bg-green-100 border border-green-700"
-                title="Recordar"
-              >
-                <div><i className="fa fa-solid fa-bell text-green-600 "></i></div>
-              </button>
-              <button
-                onClick={() => abrirModalNuevoTurno(turno.paciente)}
-                className="inline-flex rounded-md bg-orange-50 p-2 text-[var(--color-primary)] hover:bg-orange-100 border border-[var(--color-primary)]"
-                title="Nuevo turno"
-              >
-                <div><i className="fas fa-plus fa-lg"></i></div>
-              </button>
+              {!esEvento(turno) && (
+                <>
+                  <button
+                    onClick={() => enviarRecordatorio(turno.id)}
+                    className="inline-flex rounded-md bg-green-50 p-2 text-green-700 hover:bg-green-100 border border-green-700"
+                    title="Recordar"
+                  >
+                    <div><i className="fa fa-solid fa-bell text-green-600 "></i></div>
+                  </button>
+                  <button
+                    onClick={() => abrirModalNuevoTurno(turno.paciente)}
+                    className="inline-flex rounded-md bg-orange-50 p-2 text-[var(--color-primary)] hover:bg-orange-100 border border-[var(--color-primary)]"
+                    title="Nuevo turno"
+                  >
+                    <div><i className="fas fa-plus fa-lg"></i></div>
+                  </button>
+                </>
+              )}
               <button
                 onClick={() => cancelarTurno(turno.id)}
                 className="inline-flex rounded-md bg-red-50 p-2 text-red-700 hover:bg-red-100 border border-red-700"

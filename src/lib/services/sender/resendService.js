@@ -121,6 +121,10 @@ export const htmlMensajeConfTurno = async (turno, cambioEstado) => {
         ? `${urlApp}/turnos/cancelar/${turno.token}`
         : '';
 
+    const enlaceConfirmacion = turno.token
+        ? `${urlApp}/turnos/confirmar/${turno.token}`
+        : '';
+
     const htmlMsg = `
         <!DOCTYPE html>
         <html lang="es">
@@ -285,10 +289,15 @@ export const htmlMensajeConfTurno = async (turno, cambioEstado) => {
             ? `<div class="reminder">
             <span class="emoji">⏰</span> Recordá llegar 5 minutos antes de tu turno
             </div>
-            
+
+             ${turno.token ? `
             <div class="info-box">
-            <strong>Por favor confirma tu asistencia respondiendo a este mensaje</strong>
+                <strong>Por favor, confirmá tu asistencia haciendo clic en el siguiente enláce</strong>
             </div>
+            <a href="${enlaceConfirmacion}" class="cancel-button">
+                <span class="emoji">❌</span> Cancelar Turno
+            </a>
+            ` : ''}
 
             <div class="info-box">
                 <span class="emoji">📅</span> <strong>Podes agregar este turno a tu calendario abriendo el archivo adjunto "turno.ics"</strong>
@@ -299,7 +308,7 @@ export const htmlMensajeConfTurno = async (turno, cambioEstado) => {
                 <p>Si necesitas cancelar tu turno, por favor utiliza el siguiente enlace:</p>
             </div>
             <a href="${enlaceCancelacion}" class="cancel-button">
-                <span class="emoji">❌</span> Cancelar Turno
+                <span class="emoji">✅</span> Confirmar Turno
             </a>
             ` : ''}
 
@@ -319,6 +328,9 @@ export const htmlMensajeConfTurno = async (turno, cambioEstado) => {
 export const textoMailConfTurno = async (turno, cambioEstado) => {
     const enlaceCancelacion = turno.token 
         ? `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/cancelar-turno/${turno.token}`
+        : '';
+    const enlaceConfirmacion = turno.token
+        ? `${urlApp}/turnos/confirmar/${turno.token}`
         : '';
 
     const textoMsg = `👋 Hola ${turno.paciente.nombre}!
@@ -348,12 +360,12 @@ export const textoMailConfTurno = async (turno, cambioEstado) => {
   -----------------------------------------
   ${!cambioEstado
     ? `⏰ RECORDÁ LLEGAR 5 MINUTOS ANTES DE TU TURNO
-  
-    ❗ POR FAVOR CONFIRMA TU ASISTENCIA RESPONDIENDO A ESTE MENSAJE ❗
+
+      ${turno.token && `❗ POR FAVOR CONFIRMA TU ASISTENCIA HACIENDO CLIC EN LE SIGUIENTE ENLACE ❗: ${enlaceConfirmacion}`}    
   
     📅 Podes agregar este turno a tu calendario abriendo el archivo adjunto "turno.ics"
   
-      ${turno.token ? `❌ Si necesitas cancelar tu turno, por favor utiliza el siguiente enlace: ${enlaceCancelacion}` : ''}`
+      ${turno.token && `❌ Si necesitas cancelar tu turno, por favor utiliza el siguiente enlace: ${enlaceCancelacion}`}`
     : ``
   }  
   

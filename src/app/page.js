@@ -8,7 +8,8 @@ import GrillaTurnos from '@/components/GrillaTurnos';
 import Loader from '@/components/Loader';
 import Modal from '@/components/Modal';
 import TurnoNuevo from '@/components/TurnoNuevo';
-import TurnoDisponibilidad from '@/components/TurnoDisponibilidad';
+import TurnoDisponibilidad from '@/components/TurnoDisponibilidadDirecta';
+import EventoNuevo from '@/components/EventoNuevo';
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -17,6 +18,9 @@ export default function Home() {
   const [tituloModal, setTituloModal] = useState('');
   const [modalTurnoNuevo, setModalTurnoNuevo] = useState(false);
   const [modalTurnoDisponibilidad, setModalTurnoDisponibilidad] = useState(false);
+  const [modalEventoNuevo, setModalEventoNuevo] = useState(false);
+  const [doctores, setDoctores] = useState([]);
+  const [consultorios, setConsultorios] = useState([]);
   const [stats, setStats] = useState({
     turnosHoy: 0,
     turnosProximos: 0,
@@ -29,6 +33,7 @@ export default function Home() {
   const cerrarModal = () => {
     setModalTurnoNuevo(false);
     setModalTurnoDisponibilidad(false);
+    setModalEventoNuevo(false);
   };
 
   // Función para actualizar la lista de turnos después de una acción
@@ -60,7 +65,8 @@ export default function Home() {
         try {
           await Promise.all([
             cargarTodosLosDatos(),
-            cargarPacientes()
+            cargarPacientes(),
+            cargarConfiguracion()
           ]);
         } catch (error) {
           console.error('Error al cargar datos:', error);
@@ -164,6 +170,25 @@ export default function Home() {
     }
   };
 
+  const cargarConfiguracion = async () => {
+    try {
+      // Obtener configuración (doctores, consultorios, tipos de turno)
+      const configResponse = await fetch('/api/configuracion');
+      if (!configResponse.ok) {
+        throw new Error('Error al cargar la configuración');
+      }
+      const configData = await configResponse.json();
+      
+      // Asegurarse de que los datos estén disponibles antes de configurar los estados
+      if (configData) {
+        setDoctores(configData.doctores || []);
+        setConsultorios(configData.consultorios || []);
+      }
+    } catch (error) {
+      console.error('Error al cargar configuración:', error);
+    }
+  };
+
   const handleModalTurnoNuevo = () => {
     setTituloModal('Nuevo Turno');
     setModalTurnoNuevo(true);
@@ -173,6 +198,11 @@ export default function Home() {
   const handleModalTurnoDisponibilidad = () => {
     setTituloModal('Turno Disponibilidad');
     setModalTurnoDisponibilidad(true);
+  };
+
+  const handleModalEventoNuevo = () => {
+    setTituloModal('Registrar Nuevo Evento');
+    setModalEventoNuevo(true);
   };
 
   if (loading) {
@@ -328,6 +358,14 @@ export default function Home() {
             <i className="fa-solid fa-plus"></i>
             Turno Disponibilidad
           </button>
+          <button
+            onClick={handleModalEventoNuevo}
+            className="bg-purple-500 hover:bg-purple-600 text-white text-center py-2 px-2 rounded-md transition duration-200 flex items-center justify-center gap-2 text-xs md:text-base"
+          >
+            <i className="fa-solid fa-star"></i>
+            <i className="fa-solid fa-plus"></i>
+            Evento
+          </button>
           <Link 
             href="/turnos" 
             className="bg-green-500 hover:bg-green-600 text-white text-center py-3 px-4 rounded-md transition duration-200 flex items-center justify-center gap-2 text-xs md:text-base"
@@ -391,19 +429,31 @@ export default function Home() {
             </div>
           </>
         )}
-      </div>
-       {/* Modal para nuevo Turno */}
+      </div>        {/* Modal para nuevo Turno */}
         <Modal
-          isOpen={modalTurnoNuevo || modalTurnoDisponibilidad}
+          isOpen={modalTurnoNuevo || modalTurnoDisponibilidad || modalEventoNuevo}
           onClose={cerrarModal}
           size="large"
           title={tituloModal}
         >
           {modalTurnoNuevo 
-          ? <TurnoNuevo />
-          : modalTurnoDisponibilidad && <TurnoDisponibilidad />  
+          ? <TurnoNuevo onClose={cerrarModal} />
+          : modalTurnoDisponibilidad 
+          ? <TurnoDisponibilidad onClose={cerrarModal} />
+          : modalEventoNuevo 
+          ? <EventoNuevo 
+              doctores={doctores} 
+              consultorios={consultorios} 
+              onEventoCreado={() => {
+                // Recargar datos después de crear un evento
+                cargarTodosLosDatos();
+                cerrarModal();
+              }}
+              onClose={cerrarModal}
+            />
+          : null
           }
-        </Modal>   
+        </Modal>
     </div>
   );
 }

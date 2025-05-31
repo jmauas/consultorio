@@ -195,7 +195,7 @@ export const buscarPacientes = async (params) => {
       }
       
       where.OR = coberturaConditions;
-    }  
+    } 
     // Añadir otros filtros si existen
     if (dni) where.dni = { contains: dni, mode: 'insensitive' };
     if (celular) where.celular = { contains: celular, mode: 'insensitive' };

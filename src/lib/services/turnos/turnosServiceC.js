@@ -1,4 +1,7 @@
 
+// Duración estándar de cada turno en minutos (configurable)
+export const DURACION_TURNO_MINUTOS = 15;
+
 /**
  * Processes consultorio data to create time slots with doctor availability and assigned turnos
  * @param {Array} consultorios - Array of consultorios with doctor availability
@@ -9,7 +12,7 @@ export const procesarAgendaConsultorios = (consultorios, turnos = []) => {
   // Find earliest start time and latest end time across all doctors
   let horaInicio = "23:59";
   let horaFin = "00:00";
-  const slotDuration = 15; // minutes
+  const slotDuration = DURACION_TURNO_MINUTOS; // Use global configurable duration
   
   consultorios.forEach(consultorio => {
     consultorio.doctores.forEach(doctor => {
@@ -210,3 +213,177 @@ function isDoctorAvailable(doctor, hour, minute) {
   
   return true;
 }
+
+/**
+ * Calcula la cantidad de turnos disponibles entre dos fechas
+ * @param {Date} fechaDesde - Fecha de inicio del rango
+ * @param {Date} fechaHasta - Fecha de fin del rango
+ * @param {Array} configuracion - Configuración que incluye feriados
+ * @param {Array} doctores - Array de doctores con sus agendas
+ * @param {Array} consultorios - Array de consultorios
+ * @param {Array} turnosExistentes - Array de turnos ya programados (opcional)
+ * @returns {Array} - Array con información de turnos disponibles por día
+ */
+export const calcularTurnosDisponiblesPorRango = (fechaDesde, fechaHasta, configuracion, doctores, consultorios, turnosExistentes = []) => {
+  const resultado = [];
+  
+  // Agregar feriados de la configuración
+  const agregarFeriados = (actual, agregar) => {
+    if (!actual) actual = [];
+    if (!agregar || agregar.length === 0) return actual;
+    agregar.forEach(f => {
+        if (f.indexOf('|') >= 0) {
+            let fecha1 = new Date(f.split('|')[0]);
+            let fecha2 = new Date(f.split('|')[1]);
+            fecha1.setHours(fecha1.getHours() + 3);
+            fecha2.setHours(fecha2.getHours() + 3);
+            while (fecha1 <= fecha2) {
+                actual.push(new Date(fecha1));
+                fecha1.setDate(fecha1.getDate() + 1);
+            }
+        } else {
+          let fecha1 = new Date(f);
+          fecha1.setHours(fecha1.getHours() + 3);
+          actual.push(fecha1);
+        }
+    });
+    return actual;
+  };
+
+  // Función para verificar si dos fechas son la misma
+  const sonMismaFecha = (fecha1, fecha2) => {
+    return (
+        fecha1.getDate() === fecha2.getDate() &&
+        fecha1.getMonth() === fecha2.getMonth() &&
+        fecha1.getFullYear() === fecha2.getFullYear()
+    );
+  };
+
+  // Procesar cada día en el rango
+  const fechaActual = new Date(fechaDesde);
+  while (fechaActual <= fechaHasta) {
+    const diaSemana = fechaActual.getDay();
+    const feriados = agregarFeriados([], configuracion.feriados);
+    
+    let esFeriado = false;
+    if (feriados && feriados.length > 0) {
+        esFeriado = feriados.some(f => sonMismaFecha(f, fechaActual));
+    }
+
+    // Filtrar turnos existentes para este día
+    const turnosDelDia = turnosExistentes.filter(turno => {
+      const fechaTurno = new Date(turno.desde);
+      return sonMismaFecha(fechaTurno, fechaActual) && turno.estado !== 'cancelado';
+    });
+
+    // Crear agendas para este día siguiendo la misma lógica de fetchData
+    const agendas = [];
+    consultorios.forEach(consultorio => {
+        const agenda = {
+            consultorioId: consultorio.id,
+            diaSemana: diaSemana,
+            fecha: new Date(fechaActual),
+            doctores: [],
+            color: consultorio.color,
+            nombre: consultorio.nombre,
+        };
+        
+        doctores.forEach(doctor => {
+            let atencionHoy = doctor.agenda.find(age => age.dia == diaSemana && age.consultorioId === consultorio.id && age.atencion === true);
+
+            let noLaborable = false;            
+            if (esFeriado) noLaborable = true;
+            
+            const noLaborablesDoctor = agregarFeriados([], doctor.feriados);
+            if (noLaborablesDoctor && noLaborablesDoctor.length > 0) {
+                const esNoLaborable = noLaborablesDoctor.some(f => sonMismaFecha(f, fechaActual));
+                if (esNoLaborable) noLaborable = true;
+            }
+            
+            if (!atencionHoy) {
+                const agendaFecha = doctor.agenda.find(age =>
+                    age.consultorioId === consultorio.id &&
+                    age.atencion === true &&
+                    age.dia === 99 &&
+                    sonMismaFecha(new Date(age.fecha), fechaActual)
+                );
+                if (agendaFecha) {
+                    atencionHoy = agendaFecha;
+                    noLaborable = false;
+                }
+            }
+            if (atencionHoy) {
+                agenda.doctores.push({
+                    id: doctor.id,
+                    nombre: doctor.nombre,
+                    emoji: doctor.emoji,
+                    color: doctor.color,
+                    desde: atencionHoy.desde,
+                    hasta: atencionHoy.hasta,
+                    corteDesde: atencionHoy.corteDesde,
+                    corteHasta: atencionHoy.corteHasta,
+                    noLaborable: noLaborable,
+                });
+            } 
+        });
+        agendas.push(agenda);
+    });    
+    // Procesar agenda usando la función existente
+    const agendaDelDia = procesarAgendaConsultorios(agendas, turnosDelDia);
+    
+    // Calcular turnos disponibles
+    let turnosDisponibles = 0;
+    let turnosOcupados = 0;
+    let totalSlots = 0;
+
+    agendaDelDia.forEach(franjaHoraria => {
+      franjaHoraria.consultorios.forEach(consultorio => {
+        // Contar doctores disponibles en esta franja
+        const doctoresDisponibles = consultorio.doctores.filter(doctor => doctor.atencion === true);
+        
+        if (doctoresDisponibles.length > 0) {
+          // Cada slot de 15 minutos puede tener un turno por doctor disponible
+          const slotsDisponiblesEnFranja = doctoresDisponibles.length;
+          totalSlots += slotsDisponiblesEnFranja;
+          
+          // Contar turnos ocupados en esta franja (cada turno puede ocupar múltiples slots)
+          let slotsOcupados = 0;
+          if (consultorio.turnos && consultorio.turnos.length > 0) {
+            consultorio.turnos.forEach(turno => {
+              // Calcular cuántos slots de 15 minutos ocupa este turno
+              const duracionTurno = turno.duracion || DURACION_TURNO_MINUTOS;
+              const slotsQueOcupa = Math.ceil(duracionTurno / DURACION_TURNO_MINUTOS);
+              slotsOcupados += slotsQueOcupa;
+            });
+          }
+          
+          // Los slots ocupados no pueden exceder los slots disponibles en esta franja
+          slotsOcupados = Math.min(slotsOcupados, slotsDisponiblesEnFranja);
+          turnosOcupados += slotsOcupados;
+          
+          // Los slots restantes están disponibles para nuevos turnos
+          const slotsLibresEnFranja = slotsDisponiblesEnFranja - slotsOcupados;
+          turnosDisponibles += Math.max(0, slotsLibresEnFranja);
+        }
+      });
+    });
+
+    // Agregar resultado para este día
+    resultado.push({
+      fecha: new Date(fechaActual),
+      fechaFormateada: fechaActual.toLocaleDateString('es-AR'),
+      diaSemana: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][diaSemana],
+      diaSemanaCorto: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][diaSemana],
+      esFeriado,
+      turnosDisponibles,
+      turnosOcupados,
+      totalSlots,
+      porcentajeOcupacion: totalSlots > 0 ? Math.round((turnosOcupados / totalSlots) * 100) : 0
+    });
+
+    // Avanzar al siguiente día
+    fechaActual.setDate(fechaActual.getDate() + 1);
+  }
+
+  return resultado;
+};
