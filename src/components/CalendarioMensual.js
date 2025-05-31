@@ -1,10 +1,13 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { formatoFecha } from '@/lib/utils/dateUtils';
+import { useTheme } from 'next-themes';
 
 const CalendarioMensual = ({ fechaInicial, onFechaClick }) => {
+    
     const [fechaActual, setFechaActual] = useState(fechaInicial || new Date());
+    const { theme, setTheme } = useTheme();
     
     // Nombres de los meses
     const nombresMeses = [
@@ -98,12 +101,12 @@ const CalendarioMensual = ({ fechaInicial, onFechaClick }) => {
     
     const dias = obtenerDiasDelMes();
       return (
-        <div className="bg-white dark:bg-[var(--card-bg)] border border-[var(--card-border)] rounded-lg shadow-lg p-2 sm:p-4">
+        <div className={`${theme==='light' ? 'bg-white' : 'bg-[var(--card-bg)]'} border border-[var(--card-border)] rounded-lg shadow-lg p-2 sm:p-4 transition-all duration-200`}>
             {/* Header del calendario */}
-            <div className="flex items-center justify-between mb-2 sm:mb-4">
+            <div className="flex items-center justify-between mb-2 sm:mb-4">                
                 <button
                     onClick={mesAnterior}
-                    className="p-1 sm:p-2 rounded-lg border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-secondary)] dark:hover:bg-gray-700 transition-colors text-sm"
+                    className="p-1 sm:p-2 rounded-lg border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-secondary)] transition-colors text-sm"
                     title="Mes anterior"
                 >
                     <i className="fa-solid fa-chevron-left"></i>
@@ -115,19 +118,18 @@ const CalendarioMensual = ({ fechaInicial, onFechaClick }) => {
                 
                 <button
                     onClick={mesSiguiente}
-                    className="p-1 sm:p-2 rounded-lg border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-secondary)] dark:hover:bg-gray-700 transition-colors text-sm"
+                    className="p-1 sm:p-2 rounded-lg border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-secondary)] transition-colors text-sm"
                     title="Mes siguiente"
                 >
                     <i className="fa-solid fa-chevron-right"></i>
                 </button>
             </div>
-            
-            {/* Días de la semana */}
-            <div className="grid grid-cols-7 gap-1 ">
+              {/* Días de la semana */}
+            <div className="grid grid-cols-7 gap-1">
                 {nombresDias.map((dia) => (
                     <div
                         key={dia}
-                        className="p-1 sm:p-2 text-center font-semibold text-[var(--color-primary)] text-xs sm:text-sm"
+                        className="p-1 sm:p-2 text-center font-semibold text-[var(--color-primary)] dark:text-[var(--color-primary)] text-xs sm:text-sm"
                     >
                         {dia}
                     </div>
@@ -143,20 +145,20 @@ const CalendarioMensual = ({ fechaInicial, onFechaClick }) => {
                     return (
                         <button
                             key={index}
-                            onClick={() => manejarClickFecha(diaObj)}
+                            onClick={() => manejarClickFecha(diaObj)}                            
                             className={`
                                 p-1 sm:p-2 h-6 sm:h-8 text-center text-xs sm:text-sm rounded-lg transition-all duration-200
-                                hover:scale-105 hover:shadow-md
+                                hover:scale-105 hover:shadow-md border
                                 ${diaObj.esDelMesActual 
-                                    ? 'text-[var(--text-color)] hover:bg-[var(--color-primary)] hover:text-white' 
-                                    : 'text-gray-400 dark:text-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700'
+                                    ? theme==='light' ? 'text-[var(--text-color)] hover:bg-[var(--color-primary)] hover:text-white border-gray-300' : 'hover:bg-[var(--color-primary)] hover:text-white border-gray-600'
+                                    : 'text-gray-400 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 border-gray-200 dark:border-gray-700'
                                 }
                                 ${esHoyDia 
-                                    ? 'bg-[var(--color-primary)] text-white font-bold ring-2 ring-[var(--color-primary)] ring-opacity-50' 
+                                    ? 'bg-[var(--color-primary)] text-white font-bold ring-2 ring-[var(--color-primary)] ring-opacity-50 border-[var(--color-primary)]' 
                                     : ''
                                 }
                                 ${esFinSemana && diaObj.esDelMesActual 
-                                    ? 'bg-red-50 dark:bg-red-900 dark:bg-opacity-20' 
+                                    ? theme==='light' ? 'bg-red-50 border-red-200' : 'bg-slate-600 border-slate-300 text-slate-400'
                                     : ''
                                 }
                                 ${!diaObj.esDelMesActual 
@@ -171,15 +173,14 @@ const CalendarioMensual = ({ fechaInicial, onFechaClick }) => {
                     );
                 })}
             </div>
-            
-            {/* Leyenda */}
-            <div className="mt-2 sm:mt-4 text-xs text-gray-600 dark:text-gray-400 flex flex-wrap gap-2 sm:gap-4 justify-center">
+              {/* Leyenda */}
+            <div className="mt-2 sm:mt-4 text-xs text-gray-600 dark:text-gray-300 flex flex-wrap gap-2 sm:gap-4 justify-center">
                 <div className="flex items-center gap-1">
                     <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[var(--color-primary)] rounded"></div>
                     <span>Hoy</span>
                 </div>
                 <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-red-200 dark:bg-red-900 rounded"></div>
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-red-200 dark:bg-red-800 rounded"></div>
                     <span>Fin de semana</span>
                 </div>
             </div>

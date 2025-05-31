@@ -7,7 +7,6 @@ import { formatoFecha } from '@/lib/utils/dateUtils';
 import { obtenerEstados } from '@/lib/utils/estadosUtils';
 import DetalleTurno from '@/components/DetalleTurno';
 import Modal from '@/components/Modal';
-import { enviarMailConfTurno } from "@/lib/services/sender/resendService";
 import { textoMensajeConfTurno } from '@/lib/services/sender/whatsappService';
 import { enviarRecordatorioTurno } from '@/lib/services/sender/whatsappService';
 import Loader from '@/components/Loader';
