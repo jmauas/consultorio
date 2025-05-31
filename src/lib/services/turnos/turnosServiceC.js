@@ -330,7 +330,7 @@ export const calcularTurnosDisponiblesPorRango = (fechaDesde, fechaHasta, config
     });    
     // Procesar agenda usando la función existente
     const agendaDelDia = procesarAgendaConsultorios(agendas, turnosDelDia);
-    
+  
     // Calcular turnos disponibles
     let turnosDisponibles = 0;
     let turnosOcupados = 0;
@@ -356,14 +356,12 @@ export const calcularTurnosDisponiblesPorRango = (fechaDesde, fechaHasta, config
               slotsOcupados += slotsQueOcupa;
             });
           }
-          
-          // Los slots ocupados no pueden exceder los slots disponibles en esta franja
-          slotsOcupados = Math.min(slotsOcupados, slotsDisponiblesEnFranja);
+          // Sumar los slots ocupados
           turnosOcupados += slotsOcupados;
           
           // Los slots restantes están disponibles para nuevos turnos
           const slotsLibresEnFranja = slotsDisponiblesEnFranja - slotsOcupados;
-          turnosDisponibles += Math.max(0, slotsLibresEnFranja);
+          turnosDisponibles += slotsLibresEnFranja;
         }
       });
     });
