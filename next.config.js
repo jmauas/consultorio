@@ -13,6 +13,21 @@ const nextConfig = {
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
+  
+  // Configuración específica para Prisma en Vercel
+  experimental: {
+    serverComponentsExternalPackages: ['@prisma/client', 'prisma']
+  },
+  
+  // Configuración del webpack para incluir archivos binarios de Prisma
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals.push({
+        '@prisma/client': '@prisma/client',
+      });
+    }
+    return config;
+  },
 };
 
 module.exports = nextConfig;
