@@ -153,7 +153,7 @@ export default function ConsultorioPage() {
     try {
       setGuardando(true);
       
-      const rspa = fetch('/api/configuracion/empresa')
+      const rspa = await fetch('/api/configuracion/empresa')
       const data = await rspa.json();
       const configActual = data.config;
       console.log(config.doctores)
@@ -247,7 +247,7 @@ export default function ConsultorioPage() {
     async function cargarConfiguracion() {
       try {
         setLoading(true);
-        const rspa = fetch('/api/configuracion/empresa')
+        const rspa = await fetch('/api/configuracion/empresa')
         const data = await rspa.json();
         const configData = data.config;
         

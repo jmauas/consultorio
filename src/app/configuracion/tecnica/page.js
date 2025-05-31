@@ -16,7 +16,7 @@ export default function TecnicaPage() {
     async function cargarDatos() {
       try {
         setLoading(true);
-        const rspa = fetch('/api/configuracion/empresa')
+        const rspa = await fetch('/api/configuracion/empresa')
         const data = await rspa.json();
         const config = data.config;
         

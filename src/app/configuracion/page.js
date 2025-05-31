@@ -13,7 +13,7 @@ export default function ConfiguracionPage() {
     async function cargarConfig() {
       try {
         setLoading(true);
-        const rspa = fetch('/api/configuracion/empresa')
+        const rspa = await fetch('/api/configuracion/empresa')
         const data = await rspa.json();
         const configData = data.config;
         setConfig(configData);
