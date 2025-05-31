@@ -2,8 +2,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma.js';
 
-const prisma = new PrismaClient();
-
 // GET - Obtener todas las coberturas médicas
 export async function GET() {
   try {
