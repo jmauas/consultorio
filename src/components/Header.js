@@ -4,7 +4,6 @@ import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
-import { obtenerUrlApp } from '@/lib/services/configService.js';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
@@ -41,7 +40,12 @@ export default function Header() {
     // Cargar la URL de la app desde la configuración del consultorio
     const fetchAppUrl = async () => {
       try {
-        const url = await obtenerUrlApp();
+        const response = await fetch('/api/configuracion/consultorio');
+        if (!response.ok) {
+          throw new Error('Error al obtener la configuración del consultorio');
+        }
+        const data = await response.json();
+        const url = data.config?.urlApp || data.config?.urlAppDev || '';
         if (url) {
           setLinkTurnos(url);
         } else {
