@@ -153,7 +153,9 @@ export default function ConsultorioPage() {
     try {
       setGuardando(true);
       
-      const configActual = await obtenerConfig();
+      const rspa = fetch('/api/configuracion/empresa')
+      const data = await rspa.json();
+      const configActual = data.config;
       console.log(config.doctores)
       const doctoresParaGuardar = config.doctores.map(doctor => {
         // Ensure each doctor has agenda items for all days in each consultorio
@@ -245,7 +247,9 @@ export default function ConsultorioPage() {
     async function cargarConfiguracion() {
       try {
         setLoading(true);
-        const configData = await obtenerConfig();
+        const rspa = fetch('/api/configuracion/empresa')
+        const data = await rspa.json();
+        const configData = data.config;
         
         let doctoresData = { doctores: [] };
         try {

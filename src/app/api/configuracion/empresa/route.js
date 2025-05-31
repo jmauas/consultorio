@@ -31,7 +31,8 @@ export async function GET(request) {
       horarioAtencion: config.horarioAtencion || '',
       descripcion: config.descripcion || '',
       logoUrl: config.logoUrl || '',
-      coberturas: config.coberturas || ''
+      coberturas: config.coberturas || '',
+      config: config || {},
     };
     
     return NextResponse.json(empresaConfig);
