@@ -1,9 +1,7 @@
-import { PrismaClient } from '../generated/prisma/index.js';
+import { prisma } from '@/lib/prisma.js';
 import { hashSync } from 'bcryptjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-
-const prisma = new PrismaClient();
 
 
 async function readJsonFile(filePath) {

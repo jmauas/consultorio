@@ -1,7 +1,7 @@
 // Use server-only APIs
 'use server';
 
-import { prisma } from '../prisma';
+import { prisma } from '@/lib/prisma.js';
 
 /**
  * Obtiene la configuración global del sistema desde la base de datos

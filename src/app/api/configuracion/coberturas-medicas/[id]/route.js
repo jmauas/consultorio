@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '../../../../../generated/prisma';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma.js';
 
 // GET - Obtener una cobertura médica por ID
 export async function GET(request, { params }) {

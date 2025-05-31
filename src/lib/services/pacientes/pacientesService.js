@@ -1,4 +1,4 @@
-import { prisma } from '../../prisma';
+import { prisma } from '@/lib/prisma.js';
 
 /**
  * Busca un paciente por un filtro específico
