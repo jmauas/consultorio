@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { obtenerConfig } from '@/lib/services/configService.js';
 import Loader from '@/components/Loader';
 
 
@@ -14,7 +13,9 @@ export default function ConfiguracionPage() {
     async function cargarConfig() {
       try {
         setLoading(true);
-        const configData = await obtenerConfig();
+        const rspa = fetch('/api/configuracion/empresa')
+        const data = await rspa.json();
+        const configData = data.config;
         setConfig(configData);
       } catch (error) {
         console.error('Error al cargar configuración:', error);

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Tab } from '@headlessui/react';
 import toast from 'react-hot-toast';
 import { obtenerCoberturasDesdeDB } from '@/lib/utils/coberturasUtils';
-import { obtenerConfig, registrarConfig } from '@/lib/services/configService.js';
+import { registrarConfig } from '@/lib/services/configService.js';
 import Loader from '@/components/Loader';
 import { useTheme } from 'next-themes';
 

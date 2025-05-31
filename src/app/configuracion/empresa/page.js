@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { obtenerConfig, registrarConfig } from '@/lib/services/configService.js';
+import { registrarConfig } from '@/lib/services/configService.js';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import Loader from '@/components/Loader';
@@ -36,7 +36,9 @@ export default function EmpresaPage() {
     async function cargarDatos() {
       try {
         setLoading(true);
-        const config = await obtenerConfig();
+        const rspa = fetch('/api/configuracion/empresa')
+        const data = await rspa.json();
+        const config = data.config;
         setDatos({
           nombreConsultorio: config.nombreConsultorio || '',
           domicilio: config.domicilio || '',
