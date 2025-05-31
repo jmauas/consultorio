@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "copy-env": "node scripts/copy-env.js",
-    "dev": "npm run copy-env && next dev --turbopack",
+    "dev": "npm run copy-env && npm run prisma:generate && next dev --turbopack",
+    "dev:fast": "npm run copy-env && next dev --turbopack",
     "build": "next build",
     "build2": "npm run copy-env && next build",
     "start2": "npm run copy-env && next start",
@@ -15,7 +16,7 @@
     "pm2-stop": "pm2 stop \"Consultorio App\"",
     "pm2-start": "pm2 start \"Consultorio App\"",
     "okBuild": "node ./src/test/envioWA.mjs",
-    "postinstall": "prisma generate"
+    "prisma:generate": "prisma generate"
   },
   "prisma": {
     "seed": "node src/lib/seed.mjs"
