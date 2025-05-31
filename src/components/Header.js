@@ -40,7 +40,7 @@ export default function Header() {
     // Cargar la URL de la app desde la configuración del consultorio
     const fetchAppUrl = async () => {
       try {
-        const response = await fetch('/api/configuracion/consultorio');
+        const response = await fetch('/api/configuracion/empresa');
         if (!response.ok) {
           throw new Error('Error al obtener la configuración del consultorio');
         }
