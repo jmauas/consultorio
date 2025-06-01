@@ -14,13 +14,19 @@ const nextConfig = {
   },
   
   // Configuración específica para Prisma en Vercel (actualizada para Next.js 15+)
-  serverExternalPackages: ['@prisma/client', 'prisma'],
+  experimental: {
+    serverComponentsExternalPackages: ['@prisma/client', 'prisma'],
+  },
   
   // Configuración del webpack para incluir archivos binarios de Prisma
   webpack: (config, { isServer }) => {
     if (isServer) {
-      config.externals.push({
-        '@prisma/client': '@prisma/client',
+      config.externals.push('@prisma/client');
+      
+      // Configuración adicional para Prisma en Vercel
+      config.module.rules.push({
+        test: /\.node$/,
+        use: 'raw-loader',
       });
     }
     return config;

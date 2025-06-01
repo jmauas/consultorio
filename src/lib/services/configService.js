@@ -120,6 +120,8 @@ export const registrarConfig = async (datos, seccion = 'completo') => {
       // Solo actualizar si hay datos para guardar
       if (Object.keys(dataToSave).length > 0) {
         // Actualizar la configuración existente
+        console.log('Actualizando configuración existente:', configExistente);
+        console.log('NUEVA:', dataToSave);
         await prisma.configuracionConsultorio.update({
           where: { id: configExistente.id },
           data: dataToSave

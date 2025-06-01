@@ -16,7 +16,8 @@
     "pm2-stop": "pm2 stop \"Consultorio App\"",
     "pm2-start": "pm2 start \"Consultorio App\"",
     "okBuild": "node ./src/test/envioWA.mjs",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "node src/lib/seed.mjs"
