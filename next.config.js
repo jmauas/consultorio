@@ -14,16 +14,26 @@ const nextConfig = {
   },
   
   // Configuración específica para Prisma en Vercel
+  serverExternalPackages: ['@prisma/client', 'prisma'],
+  
+  // Excluir paquetes de desarrollo de la compilación
   experimental: {
-    serverComponentsExternalPackages: ['@prisma/client', 'prisma'],
-    // Optimización para cold starts
-    instrumentationHook: true,
+    outputFileTracingExcludes: {
+      '*': [
+        'node_modules/supabase/**/*',
+      ],
+    },
   },
   
   // Configuración del webpack para incluir archivos binarios de Prisma
   webpack: (config, { isServer, dev }) => {
     if (isServer) {
       config.externals.push('@prisma/client');
+      
+      // Excluir Supabase de la compilación de producción
+      if (!dev) {
+        config.externals.push('supabase');
+      }
       
       // Configuración adicional para Prisma en Vercel
       config.module.rules.push({

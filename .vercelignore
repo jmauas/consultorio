@@ -1,0 +1,8 @@
+# Ignore development dependencies that aren't needed for production
+node_modules/supabase
+.env.local
+test/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
