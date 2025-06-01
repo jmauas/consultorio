@@ -58,3 +58,14 @@ body {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
+
+/* Asegurar scroll en páginas largas */
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+/* Mejorar el scroll en contenedores flex */
+.min-h-screen {
+  min-height: 100vh;
+}

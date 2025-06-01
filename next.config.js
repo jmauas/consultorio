@@ -4,9 +4,9 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   
-  // Permitir imágenes desde el dominio propio
+  // Permitir imágenes desde el dominio propio y Cloudinary
   images: {
-    domains: ['localhost'],
+    domains: ['localhost', 'res.cloudinary.com'],
     // Permitir imágenes locales
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',

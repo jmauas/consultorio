@@ -47,12 +47,11 @@ export default function ConfiguracionLayout({ children }) {
     }
     return pathname.startsWith(path);
   };
-  
   return (
     <div className="flex flex-col md:flex-row gap-6 mx-6 my-2">
       {/* Barra lateral con navegación */}
       <aside className="w-full md:w-64 flex-shrink-0">
-        <div className="rounded-lg shadow-sm overflow-hidden">
+        <div className="rounded-lg shadow-sm overflow-hidden sticky top-6">
           <div className="px-4 py-3 bg-[var(--color-primary)] text-white">
             <h2 className="text-xl font-semibold">Configuración</h2>
             <p className="text-orange-100 text-sm">Ajustes del sistema</p>
@@ -99,8 +98,7 @@ export default function ConfiguracionLayout({ children }) {
             Los cambios se guardan automáticamente al hacer clic en los botones de guardar.
           </p>
         </div>
-      </aside>
-      
+      </aside>      
       {/* Contenido principal */}
       <main className="flex-1">
         {children}

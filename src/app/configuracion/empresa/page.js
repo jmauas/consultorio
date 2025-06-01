@@ -6,6 +6,7 @@ import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import Loader from '@/components/Loader';
 import { useTheme } from 'next-themes';
+import UploadClouddinary from '@/components/UploadClouddinary';
 
 export default function EmpresaPage() {
   const [datos, setDatos] = useState({
@@ -15,7 +16,6 @@ export default function EmpresaPage() {
     email: '',
     web: '',
     horarioAtencion: '',
-    logo: null,
     logoUrl: '',
     coberturas: '',
     limite: '',
@@ -46,7 +46,6 @@ export default function EmpresaPage() {
           email: config.mail || '',
           web: config.web || '',
           horarioAtencion: config.horarioAtencion || '',
-          logo: null,
           logoUrl: config.logoUrl || '',
           coberturas: config.coberturas || '',
           limite: config.limite ? new Date(config.limite).toISOString().split('T')[0] : '',
@@ -76,47 +75,16 @@ export default function EmpresaPage() {
     });
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setDatos({ ...datos, logo: file });
-      
-      // Preview de la imagen
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setDatos(prev => ({ ...prev, logoUrl: e.target.result }));
-      };
-      reader.readAsDataURL(file);
+  const handleFileChange = (url) => {
+    if (url) {
+      setDatos({ ...datos, logoUrl: url });
     }
-  };
-
-  const triggerFileInput = () => {
-    fileInputRef.current.click();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setGuardando(true);
-      
-      // Si hay un logo nuevo, subir primero
-      let logoUrl = datos.logoUrl;
-      if (datos.logo) {
-        const formData = new FormData();
-        formData.append('logo', datos.logo);
-        
-        const uploadResponse = await fetch('/api/config/upload-logo', {
-          method: 'POST',
-          body: formData
-        });
-        
-        const uploadResult = await uploadResponse.json();
-        if (uploadResult.success) {
-          logoUrl = uploadResult.logoUrl;
-        } else {
-          throw new Error(uploadResult.error || 'Error al subir el logo');
-        }
-      }
       
       // Preparar los datos de empresa para actualizar solo los campos de esta sección
       // Solo incluir campos que existen en el modelo ConfiguracionConsultorio
@@ -128,7 +96,7 @@ export default function EmpresaPage() {
         horarioAtencion: datos.horarioAtencion,
         web: datos.web || '',
         coberturas: datos.coberturas,
-        logoUrl: logoUrl, // Añadimos la URL del logo a los datos a guardar
+        logoUrl: datos.logoUrl, 
         limite: datos.limite ? new Date(datos.limite) : null,
         envio: datos.envio,
         horaEnvio: datos.horaEnvio,
@@ -152,9 +120,8 @@ export default function EmpresaPage() {
   if (loading) {
     return <Loader />;
   }
-
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto pb-8">
       <h2 className="text-2xl font-bold mb-6">Datos de la Empresa</h2>
       
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -199,45 +166,16 @@ export default function EmpresaPage() {
                   Logo
                 </label>
                 <div className="flex items-center space-x-4">
-                  <div 
-                    className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden"
-                    onClick={triggerFileInput}
-                  >
-                    {datos.logoUrl ? (
-                      <Image
-                        src={datos.logoUrl} 
-                        alt="Logo preview"
-                        width={96}
-                        height={96}
-                        className="max-w-full max-h-full object-contain"
-                      />
-                    ) : (
-                      <div className="text-center">
-                        <i className="fas fa-image text-2xl"></i>
-                        <p className="text-xs mt-1">Subir logo</p>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      ref={fileInputRef}
-                      onChange={handleFileChange}
-                      className="hidden"
+                  <UploadClouddinary onImgUpload={handleFileChange} texto={'Click para Subir Logo'} />                 
+                  {datos.logoUrl && (
+                    <Image
+                      src={datos.logoUrl} 
+                      alt="Logo preview"
+                      width={140}
+                      height={140}
+                      className="max-w-full max-h-full rounded-md shadow-sm border-3"
                     />
-                    <button
-                      type="button"
-                      onClick={triggerFileInput}
-                      className="px-3 py-1 rounded hover:bg-gray-300 text-sm"
-                    >
-                      Seleccionar archivo
-                    </button>
-                    <p className="text-xs mt-1">
-                      Formatos: JPG, PNG, SVG
-                    </p>
-                  </div>
+                  )}                  
                 </div>
               </div>
             </div>
@@ -472,13 +410,12 @@ export default function EmpresaPage() {
               )}
             </div>
           </div>
-        </div>
-        
-        <div className="flex justify-end mt-6">
+        </div>        
+        <div className="flex justify-end mt-8 pt-6 border-t border-gray-200 dark:border-gray-600">
           <button
             type="submit"
             disabled={guardando}
-            className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 transition-colors disabled:opacity-50"
+            className="px-6 py-3 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 transition-colors disabled:opacity-50 font-medium shadow-md"
           >
             {guardando ? (
               <>

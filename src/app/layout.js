@@ -70,7 +70,7 @@ export default function RootLayout({ children }) {
         <ThemeProvider attribute={"class"} enableSystem={true} defaultTheme="system">
         <AuthProvider>
             <Header />
-            <div className="flex-grow">{children}</div>
+            <div className="flex-grow overflow-y-auto">{children}</div>
             <Footer />
             <Toaster
               position="top-right"
