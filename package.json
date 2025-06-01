@@ -43,11 +43,11 @@
     "react-hot-toast": "^2.5.2",
     "react-icons": "^5.5.0",
     "resend": "^4.5.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "@tailwindcss/postcss": "^4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "15.3.1",
     "supabase": "^2.23.4",

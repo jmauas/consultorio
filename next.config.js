@@ -17,12 +17,10 @@ const nextConfig = {
   serverExternalPackages: ['@prisma/client', 'prisma'],
   
   // Excluir paquetes de desarrollo de la compilación
-  experimental: {
-    outputFileTracingExcludes: {
-      '*': [
-        'node_modules/supabase/**/*',
-      ],
-    },
+  outputFileTracingExcludes: {
+    '*': [
+      'node_modules/supabase/**/*',
+    ],
   },
   
   // Configuración del webpack para incluir archivos binarios de Prisma
