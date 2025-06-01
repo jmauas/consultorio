@@ -12,8 +12,6 @@ const createPrismaClient = () => {
         url: process.env.DATABASE_URL,
       },
     },
-    // Configuración del engine para Vercel
-    engineType: 'binary',
   });
 };
 

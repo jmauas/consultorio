@@ -13,13 +13,15 @@ const nextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   
-  // Configuración específica para Prisma en Vercel (actualizada para Next.js 15+)
+  // Configuración específica para Prisma en Vercel
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client', 'prisma'],
+    // Optimización para cold starts
+    instrumentationHook: true,
   },
   
   // Configuración del webpack para incluir archivos binarios de Prisma
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, dev }) => {
     if (isServer) {
       config.externals.push('@prisma/client');
       
@@ -28,9 +30,20 @@ const nextConfig = {
         test: /\.node$/,
         use: 'raw-loader',
       });
+      
+      // Optimización para producción
+      if (!dev) {
+        config.resolve.alias = {
+          ...config.resolve.alias,
+          '@prisma/client': '@prisma/client',
+        };
+      }
     }
     return config;
   },
+  
+  // Configuración específica para serverless
+  output: 'standalone',
 };
 
 module.exports = nextConfig;

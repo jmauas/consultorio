@@ -4,6 +4,9 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { obtenerConfig, registrarConfig } from '@/lib/services/configService.js';
 import { revalidatePath } from 'next/cache';
 
+// Configure runtime for Vercel
+export const runtime = 'nodejs';
+
 /**
  * GET - Obtiene la configuración específica de la empresa
  */

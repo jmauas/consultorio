@@ -1,11 +1,19 @@
 {
   "functions": {
     "app/api/**/*.js": {
-      "maxDuration": 30,
-      "includeFiles": "src/generated/prisma/**"
+      "maxDuration": 30
+    },
+    "src/app/api/**/*.js": {
+      "maxDuration": 30
     }
   },
   "regions": ["iad1"],
+  "build": {
+    "env": {
+      "PRISMA_CLI_QUERY_ENGINE_TYPE": "binary",
+      "PRISMA_CLIENT_ENGINE_TYPE": "binary"
+    }
+  },
   "env": {
     "PRISMA_CLI_QUERY_ENGINE_TYPE": "binary",
     "PRISMA_CLIENT_ENGINE_TYPE": "binary"
