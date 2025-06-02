@@ -317,7 +317,7 @@ export default function UsersAdmin() {
   const cardsView = (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {filteredUsers.map((user) => (
-        <div key={user.id} className="bg-white rounded-lg shadow p-4 border border-gray-200">
+        <div key={user.id} className="rounded-lg shadow p-4 border border-gray-200">
           <div className="flex items-center mb-3">
             <div className="h-12 w-12 flex-shrink-0 mr-3">
               {user.image ? (
@@ -335,7 +335,7 @@ export default function UsersAdmin() {
               )}
             </div>
             <div>
-              <div className="font-medium text-gray-900">{user.name || 'Usuario sin nombre'}</div>
+              <div className="font-medium ">{user.name || 'Usuario sin nombre'}</div>
               <div className="text-sm text-gray-500">{user.email}</div>
             </div>
           </div>
@@ -414,9 +414,9 @@ export default function UsersAdmin() {
   );
 
   const tableView = (
-    <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow">
+    <div className="overflow-hidden rounded-lg border border-gray-200 shadow">
       <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+        <thead className="">
           <tr>
             <th scope="col" className="py-3 text-center text-xs font-medium uppercase tracking-wider">
               Usuario
@@ -441,7 +441,7 @@ export default function UsersAdmin() {
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200 bg-white">
+        <tbody className="divide-y divide-gray-200">
           {loading ? (
             <tr>
               <td colSpan="7" className="px-6 py-4 text-center">
@@ -451,7 +451,7 @@ export default function UsersAdmin() {
             </tr>
           ) : filteredUsers.length === 0 ? (
             <tr>
-              <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
+              <td colSpan="7" className="px-6 py-4 text-center">
                 {searchTerm ? 'No se encontraron usuarios que coincidan con la búsqueda.' : 'No hay usuarios registrados.'}
               </td>
             </tr>
@@ -470,12 +470,12 @@ export default function UsersAdmin() {
                       )}
                     </div>
                     <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900">{user.name || 'Usuario sin nombre'}</div>
+                      <div className="text-sm font-medium ">{user.name || 'Usuario sin nombre'}</div>
                     </div>
                   </div>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4">
-                  <div className="text-sm text-gray-900">{user.email}</div>
+                  <div className="text-sm ">{user.email}</div>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4">
                   {perfiles.find(p => p.id === user.perfil) ? (
@@ -492,7 +492,7 @@ export default function UsersAdmin() {
                       user.doctores.map(doctor => (
                         <span 
                           key={doctor.id} 
-                          className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800" 
+                          className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium" 
                           title={doctor.nombre}
                           style={doctor.color ? { backgroundColor: doctor.color + '40' } : {}}
                         >
@@ -500,7 +500,7 @@ export default function UsersAdmin() {
                         </span>
                       ))
                     ) : (
-                      <span className="text-sm text-gray-500">Ninguno</span>
+                      <span className="text-sm ">Ninguno</span>
                     )}
                   </div>
                 </td>
@@ -555,14 +555,15 @@ export default function UsersAdmin() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+    <div className="min-h-screen p-4 md:p-6">
       <div className="mx-auto max-w-7xl">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold ">
             <i className="fa-solid fa-users text-[var(--color-primary)] mr-2"></i>
             Administración de Usuarios
           </h1>
-          <button            onClick={() => {
+          <button            
+            onClick={() => {
               setFormData({
                 name: '',
                 email: '',
@@ -602,7 +603,7 @@ export default function UsersAdmin() {
               placeholder="Buscar usuarios..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="block w-full rounded-md border-0 py-2 pl-10 pr-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[var(--color-primary)]"
+              className="block w-full rounded-md border-0 py-2 pl-10 pr-4  ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[var(--color-primary)]"
             />
           </div>
         </div>
@@ -728,7 +729,7 @@ export default function UsersAdmin() {
                       onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
                       className="h-4 w-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)] border-gray-300 rounded"
                     />
-                    <label htmlFor="enabled" className="ml-2 block text-sm text-gray-900">
+                    <label htmlFor="enabled" className="ml-2 block text-sm ">
                       Usuario habilitado
                     </label>
                   </div>
@@ -869,7 +870,7 @@ export default function UsersAdmin() {
                       onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
                       className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                     />
-                    <label htmlFor="edit-enabled" className="ml-2 block text-sm text-gray-900">
+                    <label htmlFor="edit-enabled" className="ml-2 block text-sm ">
                       Usuario habilitado
                     </label>
                   </div>

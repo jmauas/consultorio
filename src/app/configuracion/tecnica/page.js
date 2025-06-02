@@ -87,10 +87,10 @@ export default function TecnicaPage() {
       <h2 className="text-2xl font-bold mb-6">Opciones Técnicas</h2>
       
       <form onSubmit={handleSubmit} className="space-y-8">
-        <section className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">          
+        <section className="p-6 rounded-lg shadow-sm border border-gray-200">          
           <div className="space-y-4">
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
+              <label className="block font-medium mb-2">
                 URL de la aplicación
               </label>
               <input
@@ -102,7 +102,7 @@ export default function TecnicaPage() {
               />
             </div>
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
+              <label className="block font-medium mb-2">
                 URL de la aplicación en desarrollo
               </label>
               <input

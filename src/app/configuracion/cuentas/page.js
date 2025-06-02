@@ -164,7 +164,7 @@ export default function CuentasPage() {
   const cardsView = (
     <div className="grid grid-cols-1 gap-4 mt-4">
       {cuentas.map((cuenta) => (
-        <div key={cuenta.id} className="bg-white rounded-lg shadow p-4 border border-gray-200">
+        <div key={cuenta.id} className="rounded-lg shadow p-4 border border-gray-200">
           <div className="flex justify-between items-start mb-3">
             <div className="font-medium text-lg text-gray-900">{cuenta.nombre}</div>
             <div className="flex space-x-2">
@@ -189,14 +189,14 @@ export default function CuentasPage() {
           
           <div className="space-y-2">
             <div>
-              <span className="text-gray-600 text-sm font-medium">URL:</span>
+              <span className="text-sm font-medium">URL:</span>
               <div className="truncate text-gray-800" title={cuenta.url}>
                 {cuenta.url}
               </div>
             </div>
             
             <div>
-              <span className="text-gray-600 text-sm font-medium">Token:</span>
+              <span className="text-sm font-medium">Token:</span>
               <div className="truncate text-gray-800" title={cuenta.token}>
                 {cuenta.token.substring(0, 15)}...
               </div>
@@ -210,7 +210,7 @@ export default function CuentasPage() {
   // Renderizar tabla para pantallas grandes
   const tableView = (
     <div className="space-y-4 mt-4">
-      <div className="grid grid-cols-12 gap-4 font-medium text-gray-700 p-2 border-b">
+      <div className="grid grid-cols-12 gap-4 font-medium p-2 border-b">
         <div className="col-span-3">Nombre</div>
         <div className="col-span-4">URL</div>
         <div className="col-span-4">Token</div>
@@ -292,7 +292,7 @@ export default function CuentasPage() {
           </button>
         </div>
         
-        <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-200">
+        <div className="p-4 rounded-lg shadow-lg border border-gray-200">
           {cuentas.length === 0 ? (
             emptyContent
           ) : (
@@ -351,7 +351,7 @@ export default function CuentasPage() {
             </div>
             
             <div className="space-y-2">
-              <label htmlFor="token" className="block text-gray-700 font-medium">
+              <label htmlFor="token" className="block font-medium">
                 Token <span className="text-red-500">*</span>
               </label>
               <input
@@ -400,7 +400,7 @@ export default function CuentasPage() {
         title="Confirmar eliminación"
       >
         <div className="p-4">
-          <p className="text-gray-700">
+          <p className="">
             ¿Estás seguro de que deseas eliminar esta cuenta de WhatsApp? Esta acción no se puede deshacer.
           </p>
         </div>
