@@ -8,6 +8,29 @@ import { useTheme } from 'next-themes';
 import { formatoFecha, zfill } from '@/lib/utils/dateUtils';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
+import { 
+  FaUser, 
+  FaIdCard, 
+  FaPhone, 
+  FaEnvelope, 
+  FaUserMd, 
+  FaHospital, 
+  FaCalendarPlus, 
+  FaClock, 
+  FaStethoscope, 
+  FaStickyNote, 
+  FaSearch, 
+  FaSpinner, 
+  FaCheckCircle, 
+  FaExclamationCircle, 
+  FaCalendarTimes, 
+  FaCalendarCheck, 
+  FaEye, 
+  FaTimes, 
+  FaSave,
+  FaMobileAlt,
+  FaShieldAlt
+} from 'react-icons/fa';
 
 const TurnoNuevo = ({
     desdeParam,
@@ -484,28 +507,23 @@ const TurnoNuevo = ({
 
   return (
    <div className="container mx-auto px-4 py-8">      <div className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">Nuevo Turno</h1>
-
-        {/* Mensaje de éxito */}
+        <h1 className="text-2xl font-bold mb-6">Nuevo Turno</h1>        {/* Mensaje de éxito */}
         {success && (
           <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm transition-opacity duration-300" style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }}>
             <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-6 rounded-lg shadow-xl max-w-md">
-              <p><i className="fas fa-check-circle mr-2"></i> Turno Creado Exitosamente</p>
-            </div>
-          </div>
+              <p><FaCheckCircle className="inline mr-2" /> Turno Creado Exitosamente</p>
+            </div>        </div>
         )}
 
         {/* Mensaje de error */}
         {error && (
           <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6">
-            <p><i className="fas fa-exclamation-circle mr-2"></i> {error}</p>
+            <p><FaExclamationCircle className="inline mr-2" /> {error}</p>
           </div>
-        )}
-
-        {/* Alerta de conflicto de horario */}
+        )}        {/* Alerta de conflicto de horario */}
         {conflictoHorario && (
           <div className="bg-red-200 border-l-4 border-red-500 text-red-800 p-4 mb-6 font-bold rounded-lg">
-            <p className="font-medium"><i className="fas fa-calendar-times mr-2"></i> {conflictoHorario.mensaje}</p>
+            <p className="font-medium"><FaCalendarTimes className="inline mr-2" /> {conflictoHorario.mensaje}</p>
             {conflictoHorario.detalle && <p className="text-sm mt-1">{conflictoHorario.detalle}</p>}
           </div>
         )}
@@ -513,11 +531,13 @@ const TurnoNuevo = ({
         <form onSubmit={handleSubmit} className="shadow-md rounded-lg p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <h2 className="text-lg font-medium md:col-span-2">Datos del Paciente</h2>
-            
-            {/* DNI con búsqueda */}
+              {/* DNI con búsqueda */}
             <div className="md:col-span-2 flex items-end space-x-2">
               <div className="flex-grow">
-                <label className="block text-sm font-medium mb-1">DNI *</label>
+                <label className="block text-sm font-medium mb-1">
+                  <FaIdCard className="inline mr-1" />
+                  DNI *
+                </label>
                 <input
                   type="number"
                   inputMode="tel"
@@ -536,13 +556,15 @@ const TurnoNuevo = ({
                 disabled={buscandoPaciente || !turno.dni}
                 className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded disabled:bg-gray-300"
               >
-                {buscandoPaciente ? <><i className="fas fa-spinner fa-spin mr-2"></i>Buscando...</> : <><i className="fas fa-search mr-2"></i>Buscar por DNI</>}
+                {buscandoPaciente ? <><FaSpinner className="inline mr-2 animate-spin" />Buscando...</> : <><FaSearch className="inline mr-2" />Buscar por DNI</>}
               </button>
             </div>
-            
-            {/* Nombre */}
+              {/* Nombre */}
             <div>
-              <label className="block text-sm font-medium  mb-1">Nombre *</label>
+              <label className="block text-sm font-medium  mb-1">
+                <FaUser className="inline mr-1" />
+                Nombre *
+              </label>
               <input
                 type="text"
                 name="nombre"
@@ -553,10 +575,12 @@ const TurnoNuevo = ({
                 placeholder="Nombre"
               />
             </div>
-            
-            {/* Apellido */}
+              {/* Apellido */}
             <div>
-              <label className="block text-sm font-medium  mb-1">Apellido</label>
+              <label className="block text-sm font-medium  mb-1">
+                <FaUser className="inline mr-1" />
+                Apellido
+              </label>
               <input
                 type="text"
                 name="apellido"
@@ -567,11 +591,13 @@ const TurnoNuevo = ({
                 placeholder="Apellido"
               />
             </div>
-            
-            {/* Celular con búsqueda */}
+              {/* Celular con búsqueda */}
             <div className="md:col-span-2 flex items-end space-x-2">
               <div className="flex-grow">
-                <label className="block text-sm font-medium  mb-1">Celular *</label>
+                <label className="block text-sm font-medium  mb-1">
+                  <FaMobileAlt className="inline mr-1" />
+                  Celular *
+                </label>
                 <input
                   type="number"
                   inputMode="tel"
@@ -590,13 +616,15 @@ const TurnoNuevo = ({
                 disabled={buscandoPaciente || !turno.celular}
                 className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded disabled:bg-gray-300"
               >
-                {buscandoPaciente ? <><i className="fas fa-spinner fa-spin mr-2"></i>Buscando...</> : <><i className="fas fa-mobile-alt mr-2"></i>Buscar por Celular</>}
+                {buscandoPaciente ? <><FaSpinner className="inline mr-2 animate-spin" />Buscando...</> : <><FaMobileAlt className="inline mr-2" />Buscar por Celular</>}
               </button>
             </div>
-            
-            {/* Email */}
+              {/* Email */}
             <div>
-              <label className="block text-sm font-medium  mb-1">Email</label>
+              <label className="block text-sm font-medium  mb-1">
+                <FaEnvelope className="inline mr-1" />
+                Email
+              </label>
               <input
                 type="text"
                 inputMode="email"
@@ -608,10 +636,12 @@ const TurnoNuevo = ({
                 placeholder="Email"
               />
             </div>
-            
-            {/* Cobertura Médica (Select) utilizando la nueva tabla */}
+              {/* Cobertura Médica (Select) utilizando la nueva tabla */}
             <div>
-              <label className="block text-sm font-medium  dark:text-gray-300 mb-1">Cobertura Médica *</label>
+              <label className="block text-sm font-medium  dark:text-gray-300 mb-1">
+                <FaShieldAlt className="inline mr-1" />
+                Cobertura Médica *
+              </label>
               <select
                 name="coberturaMedicaId"
                 value={turno.coberturaMedicaId}
@@ -627,16 +657,14 @@ const TurnoNuevo = ({
                 ))}
               </select>
             </div>
-          </div>
-
-          {
+          </div>          {
             turnosPaciente.length > 0 && (
               <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-6">
-                <p className="font-medium"><i className="fas fa-calendar-check mr-2"></i> Turnos Próximos del Paciente:</p>
+                <p className="font-medium"><FaCalendarCheck className="inline mr-2" /> Turnos Próximos del Paciente:</p>
                 <div className="p-2 m-4 flex flex-wrap gap-3">
                   {turnosPaciente.map((t, i) => (
                     <div className="grid grid-cols-12 border rounded-md p-4 items-center" key={i}>
-                      <i className="fas fa-calendar-check text-blue-500 fa-2xl col-span-2"></i>
+                      <FaCalendarCheck className="text-blue-500 text-2xl col-span-2" />
                       <div className="font-bold p-2 col-span-10 flex flex-col" key={i}>                      
                         <span>{t.consultorio.nombre}</span>
                         <span>{formatoFecha(t.desde, true, false, false, true, false, false)}</span>
@@ -647,7 +675,7 @@ const TurnoNuevo = ({
                           href={`/turnos/${t.id}`} 
                           target='_blank'
                           className="text-blue-500 text-sm p-3 rounded-md flex items-center bg-blue-200 border border-blue-500 hover:bg-blue-500 hover:text-white">
-                            <i className="fas fa-eye mr-2"></i> 
+                            <FaEye className="mr-2" /> 
                             Ver Detalle
                         </Link>
                       </div>
@@ -660,10 +688,12 @@ const TurnoNuevo = ({
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <h2 className="text-lg font-medium md:col-span-2 dark:text-gray-200">Datos del Turno</h2>
-            
-            {/* Doctor - Primero */}
+              {/* Doctor - Primero */}
             <div>
-              <label className="block text-sm font-medium  dark:text-gray-300 mb-1">Doctor *</label>
+              <label className="block text-sm font-medium  dark:text-gray-300 mb-1">
+                <FaUserMd className="inline mr-1" />
+                Doctor *
+              </label>
               <select
                 name="doctor"
                 value={turno.doctor}
@@ -676,11 +706,12 @@ const TurnoNuevo = ({
                   </option>
                 ))}
               </select>
-            </div>
-
-            {/* Consultorios */}
+            </div>            {/* Consultorios */}
             <div>
-              <label className="block text-sm font-medium  mb-1">Consultorio *</label>
+              <label className="block text-sm font-medium  mb-1">
+                <FaHospital className="inline mr-1" />
+                Consultorio *
+              </label>
               <select
                 name="consultorioId"
                 value={turno.consultorioId}
@@ -695,11 +726,12 @@ const TurnoNuevo = ({
                   </option>
                 ))}
               </select>
-            </div>
-
-            {/* Tipo de turno - Segundo */}
+            </div>            {/* Tipo de turno - Segundo */}
             <div>
-              <label className="block text-sm font-medium  dark:text-gray-300 mb-1">Tipo de turno *</label>
+              <label className="block text-sm font-medium  dark:text-gray-300 mb-1">
+                <FaStethoscope className="inline mr-1" />
+                Tipo de turno *
+              </label>
               <select
                 name="servicio"
                 value={turno.tipoDeTurnoId}
@@ -716,10 +748,12 @@ const TurnoNuevo = ({
               </select>
             </div>
             
-            
-            {/* Duración */}
+              {/* Duración */}
             <div>
-              <label className="block text-sm font-medium  mb-1">Duración (minutos)</label>
+              <label className="block text-sm font-medium  mb-1">
+                <FaClock className="inline mr-1" />
+                Duración (minutos)
+              </label>
               <input
                 type="number"
                 name="duracion"
@@ -728,10 +762,12 @@ const TurnoNuevo = ({
                 className="w-full border border-gray-300 rounded px-3 py-2 text-lg"
               />
             </div>
-            
-            {/* Fecha y hora */}
+              {/* Fecha y hora */}
             <div>
-              <label className="block text-sm font-medium  mb-1">Fecha y hora *</label>
+              <label className="block text-sm font-medium  mb-1">
+                <FaCalendarPlus className="inline mr-1" />
+                Fecha y hora *
+              </label>
               <input
                 type="datetime-local"
                 name="desde"
@@ -739,10 +775,11 @@ const TurnoNuevo = ({
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded px-3 py-2 text-lg font-bold"
               />
-            </div>
-
-            {/* Observaciones */}            <div>
-              <label className="block text-sm font-medium  mb-1">Observaciones</label>
+            </div>            {/* Observaciones */}            <div>
+              <label className="block text-sm font-medium  mb-1">
+                <FaStickyNote className="inline mr-1" />
+                Observaciones
+              </label>
               <textarea
                 name="observaciones"
                 value={turno.observaciones}
@@ -752,17 +789,15 @@ const TurnoNuevo = ({
                 placeholder="Observaciones adicionales"
               ></textarea>
             </div>
-          </div>
-
-          {/* Alerta de turnos futuros del paciente */}
+          </div>          {/* Alerta de turnos futuros del paciente */}
           {pacienteData && turnosPaciente && turnosPaciente.length > 0 && (
             <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6">
-              <p className="font-medium"><i className="fas fa-calendar-check mr-2"></i> Turnos Futuros del Paciente:</p>
+              <p className="font-medium"><FaCalendarCheck className="inline mr-2" /> Turnos Futuros del Paciente:</p>
               <div className="mt-2 space-y-2">
                 {turnosPaciente.map((t, i) => (
                   <div key={i} className="bg-yellow-50 border border-yellow-200 rounded-md p-3 flex items-center justify-between">
                     <div className="flex items-center">
-                      <i className="fas fa-calendar-check text-yellow-600 mr-3"></i>
+                      <FaCalendarCheck className="text-yellow-600 mr-3" />
                       <div>
                         <span className="font-bold text-yellow-800">{t.consultorio.nombre}</span>
                         <span className="mx-2">•</span>
@@ -776,27 +811,22 @@ const TurnoNuevo = ({
                   </div>
                 ))}
               </div>
-            </div>          )}
-
-          {/* Mensaje de error */}
+            </div>          )}          {/* Mensaje de error */}
           {error && (
             <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6">
-              <p><i className="fas fa-exclamation-circle mr-2"></i> {error}</p>
+              <p><FaExclamationCircle className="inline mr-2" /> {error}</p>
             </div>
           )}
-          
-          {/* Alerta de conflicto de horario */}
+            {/* Alerta de conflicto de horario */}
           {conflictoHorario && (
             <div className="bg-red-200 border-l-4 border-red-500 text-red-800 p-4 mb-6 font-bold rounded-lg">
               <p className="font-medium">{conflictoHorario.mensaje}</p>
               {conflictoHorario.detalle && <p className="text-sm mt-1">{conflictoHorario.detalle}</p>}
             </div>
-          )}
-
-           {/* Detalle de Turnos Alternativos Disponibles */}
+          )}           {/* Detalle de Turnos Alternativos Disponibles */}
           {turnosDisponibles && turnosDisponibles.length > 0 && (
           <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6">
-              <p className="font-medium"><i className="fas fa-calendar-check mr-2"></i> Turnos Alternativos del Día Disponibles:</p>
+              <p className="font-medium"><FaCalendarCheck className="inline mr-2" /> Turnos Alternativos del Día Disponibles:</p>
               <div className="p-2 m-4 flex flex-wrap gap-3">
                 {turnosDisponibles.map((t, i) => (
                   <div
@@ -823,14 +853,13 @@ const TurnoNuevo = ({
                       verificarConflictoHorario(fechaInicio, fechaFin, turno.consultorioId, turno.doctor);                      
                     }}
                   >
-                    {zfill(t.hora, 2)}:{zfill(t.min, 2)} <i className="fas fa-clock ml-2"></i>
+                    {zfill(t.hora, 2)}:{zfill(t.min, 2)} <FaClock className="inline ml-2" />
                   </div>
                 ))}
               </div>
             </div>        
           )}
-          
-          {error && (
+            {error && (
           <div className="bg-red-200 border-l-4 border-red-500 text-red-800 p-4 mb-6 font-bold rounded-lg">
             <p className="font-medium">{error}</p>
             <p className="text-sm mt-1"></p>
@@ -843,14 +872,14 @@ const TurnoNuevo = ({
               onClick={() => onClose()}
               className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded"
             >
-              <i className="fas fa-times mr-2"></i>Cancelar
+              <FaTimes className="inline mr-2" />Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
               className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded disabled:bg-blue-300"
             >
-              {loading ? <><i className="fas fa-spinner fa-spin mr-2"></i>Guardando...</> : <><i className="fas fa-save mr-2"></i>Guardar Turno</>}
+              {loading ? <><FaSpinner className="inline mr-2 animate-spin" />Guardando...</> : <><FaSave className="inline mr-2" />Guardar Turno</>}
             </button>
           </div>
         </form>

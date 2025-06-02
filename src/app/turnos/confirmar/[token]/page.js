@@ -9,7 +9,8 @@ import { formatoFecha } from '@/lib/utils/dateUtils';
 export default function ConfirmarTurnoPage({ }) {
   const params = useParams();
   const router = useRouter();
-  const token = params.token;  const [turno, setTurno] = useState(null);
+  const token = params.token;  
+  const [turno, setTurno] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [confirmed, setConfirmed] = useState(false);
@@ -17,6 +18,9 @@ export default function ConfirmarTurnoPage({ }) {
   // Verificar el token y confirmar automáticamente si es posible
   useEffect(() => {
     const verificarYConfirmar = async () => {
+      if (!token) {
+        return;
+      }
       try {
         setLoading(true);
         
@@ -70,7 +74,9 @@ export default function ConfirmarTurnoPage({ }) {
     };
     
     verificarYConfirmar();
-  }, [token]);  // Función para navegar a la página de disponibilidad de turnos
+  }, [token]); 
+  
+  
   const irADisponibilidad = () => {
     if (turno && turno.paciente && turno.paciente.id) {
       router.push(`/turnos/disponibilidad?pacienteId=${turno.paciente.id}`);
@@ -161,7 +167,5 @@ export default function ConfirmarTurnoPage({ }) {
     );
   }
 
-  // Si llegamos aquí es porque no se pudo confirmar o hay algún problema
-  // Esta situación no debería ocurrir normalmente ya que se maneja en el useEffect
   return null;
 }

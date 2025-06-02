@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { obtenerConfig, obtenerUrlApp } from '@/lib/services/configService.js';
 import { updateTurnoService } from '@/lib/services/turnos/turnosService.js'; 
    
 // Ruta para manejar la confirmación de turnos mediante token

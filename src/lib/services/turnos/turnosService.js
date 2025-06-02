@@ -10,12 +10,9 @@ import { sonMismaFecha } from  '@/lib/utils/dateUtils';
 
 export const getTurnoById = async (id) => {
     try {
-        console.log('🔍 [Vercel Debug] Iniciando getTurnoById, ID:', id);
-        console.log('🔍 [Vercel Debug] Prisma client status:', typeof prisma);
-        
+      
         // Test básico de conexión
         await prisma.$connect();
-        console.log('🔍 [Vercel Debug] Prisma conectado exitosamente');
         
         const turno = await prisma.turno.findUnique({
         where: { id },
@@ -31,7 +28,6 @@ export const getTurnoById = async (id) => {
         },
         });
         
-        console.log('🔍 [Vercel Debug] Turno obtenido exitosamente');
         return turno;
     } catch (error) {
         console.error('❌ [Vercel Debug] Error al obtener el turno:', error);
@@ -100,7 +96,7 @@ export const updateTurnoService = async (id, datos) => {
           doctor: true,
           consultorio: true,
           coberturaMedica: true,
-          tipoDeTurno: true // Incluir el tipo de turno en la respuesta
+          tipoDeTurno: true
         }
       });
   
@@ -113,14 +109,14 @@ export const updateTurnoService = async (id, datos) => {
       }
       return {
         ok: true,
-        message: 'Turno cancelado exitosamente',
+        message: 'Turno Actualizado Exitosamente',
         turno: turnoActualizado
       };
     } catch (error) {
-      console.error('Error al cancelar el turno:', error);
+      console.error('Error al Actualizar el turno:', error);
       return {
         ok: false,
-        message: 'Error al cancelar el turno',
+        message: 'Error al Actualizar el turno',
         error: error.message
       };
     }

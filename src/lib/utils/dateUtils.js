@@ -87,6 +87,8 @@ export const formatoFecha = (sfecha, hs = false, sec = false, americana = false,
       let fhtxt = '';
       
       // Crear el formato de fecha manualmente para evitar problemas de plataforma
+      // Obtener la hora en zona horaria -3 (America/Argentina/Buenos_Aires)
+      fh = new Date(fh.toLocaleString("en-US", {timeZone: "America/Argentina/Buenos_Aires"}));
       if (soloHora) {
         fhtxt = zfill(fh.getHours(), 2) + ':' + zfill(fh.getMinutes(), 2);
         if (sec) {
