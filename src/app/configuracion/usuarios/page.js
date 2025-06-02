@@ -19,8 +19,7 @@ export default function UsersAdmin() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [formData, setFormData] = useState({
+  const [selectedUser, setSelectedUser] = useState(null);  const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
@@ -28,6 +27,8 @@ export default function UsersAdmin() {
     perfil: 1,
     doctoresIds: []
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showEditPassword, setShowEditPassword] = useState(false);
 
   // Comprobar autenticación
   useEffect(() => {
@@ -145,9 +146,7 @@ export default function UsersAdmin() {
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
-
-      if (data.ok) {
+      const data = await response.json();      if (data.ok) {
         loadUsers();
         setShowCreateModal(false);
         setFormData({
@@ -158,6 +157,8 @@ export default function UsersAdmin() {
           perfil: 1,
           doctoresIds: []
         });
+        setShowPassword(false);
+        setShowEditPassword(false);
       } else {
         setError(data.message || 'Error al crear usuario');
       }
@@ -561,8 +562,7 @@ export default function UsersAdmin() {
             <i className="fa-solid fa-users text-[var(--color-primary)] mr-2"></i>
             Administración de Usuarios
           </h1>
-          <button
-            onClick={() => {
+          <button            onClick={() => {
               setFormData({
                 name: '',
                 email: '',
@@ -571,6 +571,8 @@ export default function UsersAdmin() {
                 perfil: 1,
                 doctoresIds: []
               });
+              setShowPassword(false);
+              setShowEditPassword(false);
               setShowCreateModal(true);
             }}
             className="flex items-center rounded-md bg-[var(--color-primary)] px-4 py-2 text-white hover:bg-[var(--color-primary)]"
@@ -616,7 +618,11 @@ export default function UsersAdmin() {
 
       <Modal 
         isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
+        onClose={() => {
+          setShowCreateModal(false);
+          setShowPassword(false);
+          setShowEditPassword(false);
+        }}
         title="Crear nuevo usuario"
         size="medium"
       >
@@ -656,20 +662,28 @@ export default function UsersAdmin() {
                       placeholder="correo@ejemplo.com"
                       required
                     />
-                  </div>
-                  <div>
+                  </div>                  <div>
                     <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                       Contraseña
                     </label>
-                    <input
-                      type="password"
-                      name="password"
-                      id="password"
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)] p-2 border"
-                      placeholder="Contraseña"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        id="password"
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)] p-2 pr-10 border"
+                        placeholder="Contraseña"
+                      />
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-[var(--color-primary)] hover:text-orange-600 mt-1"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                      </button>
+                    </div>
                     {!formData.password && (
                       <p className="mt-1 text-xs text-gray-500">
                         Si no se proporciona una contraseña, el usuario tendrá que usar el método de enlace por email para acceder.
@@ -791,20 +805,28 @@ export default function UsersAdmin() {
                       placeholder="correo@ejemplo.com"
                       required
                     />
-                  </div>
-                  <div>
+                  </div>                  <div>
                     <label htmlFor="edit-password" className="block text-sm font-medium text-gray-700">
                       Nueva contraseña
                     </label>
-                    <input
-                      type="password"
-                      name="password"
-                      id="edit-password"
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border"
-                      placeholder="Dejar en blanco para no cambiar"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showEditPassword ? "text" : "password"}
+                        name="password"
+                        id="edit-password"
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 pr-10 border"
+                        placeholder="Dejar en blanco para no cambiar"
+                      />
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-indigo-600 hover:text-indigo-800 mt-1"
+                        onClick={() => setShowEditPassword(!showEditPassword)}
+                      >
+                        <i className={`fa-solid ${showEditPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                      </button>
+                    </div>
                     <p className="mt-1 text-xs text-gray-500">
                       Deja en blanco para mantener la contraseña actual.
                     </p>

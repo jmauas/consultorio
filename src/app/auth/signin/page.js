@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense  } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { enviarMail } from "@/lib/services/sender/resendService";
 import Loader from '@/components/Loader';
 
 const SignIn = () => {
@@ -13,10 +12,10 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [emailLinkSent, setEmailLinkSent] = useState(false);
-  const [authMethod, setAuthMethod] = useState("credentials"); // "credentials" o "email"
+  const [emailLinkSent, setEmailLinkSent] = useState(false);  const [authMethod, setAuthMethod] = useState("credentials"); // "credentials" o "email"
   const [forgotPassword, setForgotPassword] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Manejar errores de URL
   useEffect(() => {
@@ -302,8 +301,7 @@ const SignIn = () => {
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
-                
-                {authMethod === "credentials" && (
+                  {authMethod === "credentials" && (
                   <div className="relative">
                     <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[var(--color-primary)]">
                       <i className="fa-solid fa-lock"></i>
@@ -314,14 +312,21 @@ const SignIn = () => {
                     <input
                       id="password"
                       name="password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       autoComplete="current-password"
                       required
-                      className="relative block w-full rounded-b-md border-0 p-2 pl-10 ring-1 ring-inset ring-gray-300 focus:z-10 focus:ring-2 focus:ring-[var(--color-primary)] sm:text-sm sm:leading-6"
+                      className="relative block w-full rounded-b-md border-0 p-2 pl-10 pr-10 ring-1 ring-inset ring-gray-300 focus:z-10 focus:ring-2 focus:ring-[var(--color-primary)] sm:text-sm sm:leading-6"
                       placeholder="Contraseña"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-[var(--color-primary)] hover:text-orange-600"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                    </button>
                   </div>
                 )}
               </div>

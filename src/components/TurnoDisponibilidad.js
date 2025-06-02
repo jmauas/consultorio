@@ -1119,9 +1119,8 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                         </div>
                       </div>
                       
-                      <div className="border border-slate-200  rounded-lg p-3 flex justify-between items-center">
-                        <div className="flex items-center gap-2 ">
-                          <i className="fa-solid fa-list-check text-[var(--color-primary)]"></i> Tipo Turno:
+                      <div className="border border-slate-200  rounded-lg p-3 flex justify-between items-center">                        <div className="flex items-center gap-2 ">
+                          <FaListAlt className="text-[var(--color-primary)]" /> Tipo Turno:
                         </div>
                         <div className=" px-3 py-2 rounded border border-gray-300 font-medium">
                           {turno.servicio || 'No especificado'}
