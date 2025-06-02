@@ -9,6 +9,35 @@ import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 import Loader from '@/components/Loader';
+import { 
+  FaCalendarPlus, 
+  FaUserMd, 
+  FaStethoscope, 
+  FaSearch, 
+  FaCheck, 
+  FaUser, 
+  FaIdCard, 
+  FaMobileAlt, 
+  FaEnvelope, 
+  FaShieldAlt, 
+  FaCalendarAlt, 
+  FaCalendarDay, 
+  FaChevronDown, 
+  FaClock, 
+  FaArrowLeft, 
+  FaTimes, 
+  FaExclamationTriangle, 
+  FaBell, 
+  FaExclamationCircle, 
+  FaSadTear, 
+  FaCheckCircle, 
+  FaListAlt, 
+  FaMobile, 
+  FaComments, 
+  FaCalendarCheck, 
+  FaEdit,
+  FaSpinner
+} from 'react-icons/fa';
 
 
 const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
@@ -727,11 +756,10 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
 
 
   return (
-    <div className="min-h-screen ">
-      <div className="flex justify-evenly items-center p-5 md:p-8  shadow-md">
+    <div className="min-h-screen ">      <div className="flex justify-evenly items-center p-5 md:p-8  shadow-md">
         <div className="flex flex-col md:flex-row items-center justify-center gap-4">
           <h1 className="text-3xl font-bold">Nuevo Turno</h1>
-          <i className="fa-solid fa-calendar-plus fa-2xl text-[var(--color-primary)]"></i>
+          <FaCalendarPlus className="text-4xl text-[var(--color-primary)]" />
         </div>
         {configuracion.logoUrl ? (         
           <Image
@@ -758,9 +786,11 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
       <div className="container mx-auto rounded-xl p-5 m-5  shadow-lg md:max-w-3xl">
         {/* Part 1: Doctor and patient selection */}
         {showParte1 && (
-          <div className="space-y-6">
-            <div className="flex flex-wrap items-center gap-4">
-              <label htmlFor="doctor" className="font-medium ">Doctor:</label>
+          <div className="space-y-6">            <div className="flex flex-wrap items-center gap-4">
+              <label htmlFor="doctor" className="font-medium flex items-center gap-2">
+                <FaUserMd className="text-[var(--color-primary)]" />
+                Doctor:
+              </label>
               <select
                 id="doctor"
                 className={`flex-1 p-2 border border-gray-300 rounded-lg bg-[var(--background)] text-[var(--text-color)] focus:outline-none focus:ring-2 focus:ring-blue-500`}
@@ -789,9 +819,11 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
               </select>
             </div>
 
-            {showTipoTurno && (
-              <div className="flex flex-wrap items-center gap-4">                
-                <label htmlFor="servicio" className="font-medium  dark:text-gray-300">Tipo de Turno:</label>
+            {showTipoTurno && (              <div className="flex flex-wrap items-center gap-4">                
+                <label htmlFor="servicio" className="font-medium dark:text-gray-300 flex items-center gap-2">
+                  <FaStethoscope className="text-[var(--color-primary)]" />
+                  Tipo de Turno:
+                </label>
                 <select
                   id="servicio"
                   className={`flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='light' ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-200'}
@@ -823,9 +855,11 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
               </div>
             )}
 
-            {showDNI && (
-              <div className="flex flex-wrap items-center gap-4">                
-                <label htmlFor="dni" className="font-medium">DNI:</label>
+            {showDNI && (              <div className="flex flex-wrap items-center gap-4">                
+                <label htmlFor="dni" className="font-medium flex items-center gap-2">
+                  <FaIdCard className="text-[var(--color-primary)]" />
+                  DNI:
+                </label>
                 <div className="flex-1 flex items-center relative">
                   <input
                     type="number"
@@ -838,13 +872,13 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                     onChange={handleInputChange}
                     onKeyPress={handleDniKeyPress}
                   />
-                  <i className="fa-brands fa-searchengin fa-xl absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400"></i>
+                  <FaSearch className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400" />
                 </div>
                 <button 
                   className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white font-medium py-2 px-4 rounded-lg flex items-center gap-2 transition duration-300" 
                   onClick={validateDni}
                 >
-                  <i className="fa fa-check fa-lg"></i>
+                  <FaCheck className="text-lg" />
                   Validar DNI
                 </button>
               </div>
@@ -854,10 +888,12 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
              <Loader titulo={'Buscando Datos del Paciente ...'}/>
             )}
 
-            {showPacienteForm && dniValidado && !showLoadingPaciente && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {showPacienteForm && dniValidado && !showLoadingPaciente && (              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
-                  <label htmlFor="nombre" className="font-medium  w-24">Nombre:</label>
+                  <label htmlFor="nombre" className="font-medium w-24 flex items-center gap-2">
+                    <FaUser className="text-[var(--color-primary)] text-sm" />
+                    Nombre:
+                  </label>
                   <input
                     type="text"
                     id="nombre"
@@ -869,7 +905,10 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                   />
                 </div>
                 <div className="flex items-center gap-3">
-                  <label htmlFor="apellido" className="font-medium  w-24">Apellido:</label>
+                  <label htmlFor="apellido" className="font-medium w-24 flex items-center gap-2">
+                    <FaUser className="text-[var(--color-primary)] text-sm" />
+                    Apellido:
+                  </label>
                   <input
                     type="text"
                     id="apellido"
@@ -881,7 +920,10 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                   />
                 </div>
                 <div className="flex items-center gap-3">
-                  <label htmlFor="celular" className="font-medium  w-24">Celular:</label>
+                  <label htmlFor="celular" className="font-medium w-24 flex items-center gap-2">
+                    <FaMobileAlt className="text-[var(--color-primary)] text-sm" />
+                    Celular:
+                  </label>
                   <div className="flex-1 relative">
                     <input
                       type="number"
@@ -893,11 +935,14 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                       value={formData.celular}
                       onChange={handleInputChange}
                     />
-                    <i className="fa-brands fa-searchengin fa-xl absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                    <FaSearch className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500" />
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <label htmlFor="email" className="font-medium  w-24">Mail:</label>
+                  <label htmlFor="email" className="font-medium w-24 flex items-center gap-2">
+                    <FaEnvelope className="text-[var(--color-primary)] text-sm" />
+                    Mail:
+                  </label>
                   <input
                     type="text"
                     inputMode="email"
@@ -907,9 +952,11 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                     value={formData.email}
                     onChange={handleInputChange}
                   />
-                </div>
-                <div className="flex items-center gap-3 md:col-span-2">
-                  <label htmlFor="coberturaMedicaId" className="font-medium  w-32">Cobertura Médica:</label>
+                </div>                <div className="flex items-center gap-3 md:col-span-2">
+                  <label htmlFor="coberturaMedicaId" className="font-medium w-32 flex items-center gap-2">
+                    <FaShieldAlt className="text-[var(--color-primary)] text-sm" />
+                    Cobertura Médica:
+                  </label>
                   <select
                     id="coberturaMedicaId"
                     className={`flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='light' ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-200'}
@@ -926,23 +973,21 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                   </select>
                 </div>
                 {!existingTurno && allFieldsComplete && (
-                  <div className="md:col-span-2 flex justify-center mt-4">
-                    <button 
+                  <div className="md:col-span-2 flex justify-center mt-4">                    <button 
                       className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white font-medium py-3 px-6 rounded-lg flex items-center gap-2 transition duration-300" 
                       onClick={handleVerTurnos}
                     >
-                      <i className="fa-regular fa-calendar-days text-xl"></i>
+                      <FaCalendarAlt className="text-xl" />
                       Ver Turnos Disponibles
                     </button>
                   </div>
                 )}
                 
                 {existingTurno && formData && (
-                  <div className="md:col-span-2 bg-red-100 border border-red-400 rounded-lg p-4 my-4 shadow-md">                     
-                    <div className="flex gap-2 items-center justify-center mb-4 font-bold text-red-800">
-                      <i className="fa-solid fa-triangle-exclamation text-red-600 text-2xl"></i>
+                  <div className="md:col-span-2 bg-red-100 border border-red-400 rounded-lg p-4 my-4 shadow-md">                       <div className="flex gap-2 items-center justify-center mb-4 font-bold text-red-800">
+                      <FaExclamationTriangle className="text-red-600 text-2xl" />
                       Ya tenés un turno agendado
-                      <i className="fa-solid fa-triangle-exclamation text-red-600 text-2xl"></i>
+                      <FaExclamationTriangle className="text-red-600 text-2xl" />
                     </div>
                     
                     <div className="space-y-2 text-center">
@@ -953,33 +998,31 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                       </p>
                       
                       <p className="mt-4">¿Querés Cancelarlo para Pedir Uno nuevo ❓</p>
-                      
-                      <button 
+                        <button 
                         onClick={() => handleCancelarTurno(existingTurno.id)} 
                         className="bg-slate-400 hover:bg-slate-500 text-black font-bold py-3 px-6 rounded-lg mt-4 flex items-center gap-2 mx-auto transition duration-300"
                       >
-                        <i className="fa-solid fa-times text-red-500 text-xl"></i>
+                        <FaTimes className="text-red-500 text-xl" />
                         Cancelar Turno
-                        <i className="fa-solid fa-times text-red-500 text-xl"></i>
+                        <FaTimes className="text-red-500 text-xl" />
                       </button>
                        <button
                           onClick={() => enviarRecordatorio(existingTurno)}
                           className="bg-slate-400 hover:bg-slate-500 text-black font-bold py-3 px-6 rounded-lg mt-4 flex items-center gap-2 mx-auto transition duration-300"
                           title="Enviar Recordatorios"
                           >
-                          <i className="fa fa-solid fa-bell text-green-600 "></i>
+                          <FaBell className="text-green-600" />
                           Re Enviar Recordatorio
-                          <i className="fa fa-solid fa-bell text-green-600 "></i>
+                          <FaBell className="text-green-600" />
                       </button>
                     </div>
                   </div>
                 )}
               </div>
             )}
-            
-            {showErrorTurno && (
+              {showErrorTurno && (
               <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg flex items-center gap-3 mt-4">
-                <i className="fa-solid fa-circle-exclamation text-xl"></i>
+                <FaExclamationCircle className="text-xl" />
                 <span>{errorTurnoMessage}</span>
               </div>
             )}
@@ -993,10 +1036,9 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
             <div id="agenda" 
                 className={showLoading ? 'hidden' : 'block'}
             >
-              {agenda.length === 0 ? (
-                <div className="rounded-lg p-6 text-center">
+              {agenda.length === 0 ? (                <div className="rounded-lg p-6 text-center">
                   <div className="text-xl font-medium  mb-4">No hay turnos Disponibles en este Momento.</div>
-                  <i className="fa-solid fa-sad-tear text-5xl text-red-300"></i>
+                  <FaSadTear className="text-5xl text-red-300 mx-auto" />
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -1004,16 +1046,15 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                       <div 
                         className={`flex items-center justify-between ${theme==='light' ? 'bg-[var(--color-secondary)]' : 'bg-[var(--color-primary-dark)]'} px-4 py-3 border-b border-[var(--color-primary)] cursor-pointer`}
                         onClick={() => toggleHorasVisibility(dia.fecha)}
-                      >
-                        <div className="flex items-center gap-2">
-                          <i className="fa-solid fa-calendar-day text-[var(--color-primary)]"></i> 
+                      >                        <div className="flex items-center gap-2">
+                          <FaCalendarDay className="text-[var(--color-primary)]" /> 
                           <span className="font-medium">{dia.diaSemana}</span>
                           <span className="font-bold">{formatoFecha(dia.fecha, false, false, false, false)}</span>
                         </div>
                         <button 
                           className="text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] focus:outline-none transition-colors"
                         >
-                          <i className="fa-solid fa-chevron-down"></i>
+                          <FaChevronDown />
                         </button>
                       </div>
                       
@@ -1026,11 +1067,10 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                               key={idx} 
                               className={`flex items-center justify-between gap-3 p-3 ${theme==='light' ? 'bg-orange-100' : 'border border-white'} hover:bg-orange-200 rounded-lg shadow-lg transition-colors cursor-pointer`}
                               onClick={() => handleSelectTurno(dia.fecha, turno)}
-                            >
-                              <i className="fa-regular fa-clock text-[var(--color-primary)] text-lg"></i>
+                            >                              <FaClock className="text-[var(--color-primary)] text-lg" />
                               <span className="text-xl font-bold">{zfill(turno.hora, 2)}:{zfill(turno.min, 2)} Hs.</span>
                               <span className="text-sm">{turno.doctor.nombre}</span>
-                              <i className="fa-solid fa-check text-[var(--color-primary)] fa-2xl"></i>
+                              <FaCheck className="text-[var(--color-primary)] text-2xl" />
                             </button>
                           ))}
                         </div>
@@ -1041,12 +1081,11 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
               )}
             </div>
             
-            <div className="flex justify-center mt-6">
-              <button 
+            <div className="flex justify-center mt-6">              <button 
                 onClick={handleVolver} 
                 className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-lg flex items-center gap-2 transition-colors"
               >
-                <i className="fa-solid fa-arrow-left"></i>
+                <FaArrowLeft />
                 Volver
               </button>
             </div>
@@ -1055,28 +1094,25 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
             {showRegistrarTurno && (
               <div className="mt-6 space-y-4">
                   {turno.desde && (<>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div className="border border-slate-200 rounded-lg p-3 flex justify-between items-center">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">                      <div className="border border-slate-200 rounded-lg p-3 flex justify-between items-center">
                         <div className="flex items-center gap-2 ">
-                          <i className="fa-solid fa-calendar-day text-[var(--color-primary)]"></i> Fecha:
+                          <FaCalendarDay className="text-[var(--color-primary)]" /> Fecha:
                         </div>
                         <div className=" px-3 py-2 rounded border border-gray-300 font-bold">
                           {formatoFecha(turno.desde, false, false, false, true)}
                         </div>
                       </div>
                       
-                      <div className="border border-slate-200  rounded-lg p-3 flex justify-between items-center">
-                        <div className="flex items-center gap-2 ">
-                          <i className="fa-regular fa-clock text-[var(--color-primary)]"></i> Hora:
+                      <div className="border border-slate-200  rounded-lg p-3 flex justify-between items-center">                        <div className="flex items-center gap-2 ">
+                          <FaClock className="text-[var(--color-primary)]" /> Hora:
                         </div>
                         <div className=" px-3 py-2 rounded border border-gray-300 font-bold text-xl">
                           {formatoFecha(turno.desde, true, false, false, false).substring(formatoFecha(turno.desde, true, true, false, false).indexOf(' ') + 1)}
                         </div>
                       </div>
                       
-                      <div className="border border-slate-200  rounded-lg p-3 flex justify-between items-center">
-                        <div className="flex items-center gap-2 ">
-                          <i className="fa-solid fa-user-doctor text-[var(--color-primary)]"></i> Doctor:
+                      <div className="border border-slate-200  rounded-lg p-3 flex justify-between items-center">                        <div className="flex items-center gap-2 ">
+                          <FaUserMd className="text-[var(--color-primary)]" /> Doctor:
                         </div>
                         <div className=" px-3 py-2 rounded border border-gray-300 font-medium">
                           {turno.doctor}
