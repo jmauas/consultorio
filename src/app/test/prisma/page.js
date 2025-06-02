@@ -24,7 +24,7 @@ export default function PrismaTestPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Prisma Connection Test</h1>
+      <h1 className="text-2xl font-bold mb-6">Prisma Connection Test 2</h1>
       
       <div className="space-y-4">
         <button
