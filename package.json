@@ -7,7 +7,7 @@
     "dev": "npm run copy-env && npm run prisma:generate && next dev --turbopack",
     "dev:fast": "npm run copy-env && next dev --turbopack",
     "build": "prisma generate && next build",
-    "build:vercel": "npm run copy-env && prisma generate && next build",
+    "build:vercel": "prisma generate --no-engine && prisma generate && next build",
     "build2": "npm run copy-env && next build",
     "start2": "npm run copy-env && next start",
     "start": "npm run copy-env && node ./src/server.mjs",

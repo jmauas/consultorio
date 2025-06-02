@@ -51,7 +51,7 @@ export default function PrismaTestPage() {
           <ol className="list-decimal list-inside space-y-1 text-sm">
             <li>Deploy your app to Vercel</li>
             <li>Navigate to <code>/test/prisma</code> on your deployed app</li>
-            <li>Click "Test Prisma Connection"</li>
+            <li>Click &ldquo;Test Prisma Connection&rdquo;</li>
             <li>Check the result and Vercel function logs for detailed debugging</li>
           </ol>
         </div>

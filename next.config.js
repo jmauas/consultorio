@@ -26,7 +26,6 @@ const nextConfig = {
   // Configuración del webpack para incluir archivos binarios de Prisma
   webpack: (config, { isServer, dev }) => {
     if (isServer) {
-      config.externals.push('@prisma/client');
       // Excluir Supabase de la compilación de producción
       if (!dev) {
         config.externals.push('supabase');
@@ -46,12 +45,6 @@ const nextConfig = {
       
       // Optimización para producción
       if (!dev) {
-        config.resolve.alias = {
-          ...config.resolve.alias,
-          '@prisma/client': '@prisma/client',
-        };
-        
-        // Configuración específica para Vercel deployment
         config.resolve.fallback = {
           ...config.resolve.fallback,
           fs: false,
