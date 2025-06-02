@@ -9,8 +9,6 @@ import { formatoFecha, formatoDuracion, sonMismaFecha } from '@/lib/utils/dateUt
 import Modal from '@/components/Modal';
 import DetalleTurno from './DetalleTurno';
 import { toast } from 'react-hot-toast';
-import { enviarMailConfTurno } from "@/lib/services/sender/resendService";
-import { enviarRecordatorioTurno } from '@/lib/services/sender/whatsappService';
 import ModalNuevoTurno from '@/components/ModalNuevoTurno';
 import { agregarFeriados } from '@/lib/utils/variosUtils.js';
 import { obtenerEstados } from '@/lib/utils/estadosUtils';
@@ -114,15 +112,51 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
         
         if (!turno || !turno.paciente || !turno.paciente.celular) {
             toast.error('No se encontró información de contacto para este paciente');
-            return;
-        }
+            return;        }
     
         let celular = turno.paciente.celular;
 
         if (celular.length >= 8) {
-            const res = await enviarRecordatorioTurno(turno);
+          try {
+            const response = await fetch('/api/mensajeria/whatsapp', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ turno }),
+            });
+            
+            const result = await response.json();
+            if (!result.ok) {
+              console.error('Error al enviar WhatsApp:', result.error);
+              toast.error('Error al enviar WhatsApp: ' + result.error);
+              return;
+            }
+            toast.success('WhatsApp enviado correctamente');
+          } catch (error) {
+            console.error('Error al enviar WhatsApp:', error);
+          }
         }
-        await enviarMailConfTurno(turno);
+        
+        try {
+          const response = await fetch('/api/mensajeria/email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ turno }),
+          });
+          
+          const result = await response.json();
+          if (!result.ok) {
+            console.error('Error al enviar email:', result.error);
+            toast.error('Error al enviar email: ' + result.error);
+            return;
+          }
+            toast.success('Email enviado correctamente');
+        } catch (error) {
+          console.error('Error al enviar email:', error);
+        }
         
         toast.success('Iniciando envío de confirmación');
         } catch (error) {

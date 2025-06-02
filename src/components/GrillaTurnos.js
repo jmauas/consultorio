@@ -7,8 +7,6 @@ import { formatoFecha } from '@/lib/utils/dateUtils';
 import { obtenerEstados } from '@/lib/utils/estadosUtils';
 import DetalleTurno from '@/components/DetalleTurno';
 import Modal from '@/components/Modal';
-import { textoMensajeConfTurno } from '@/lib/services/sender/whatsappService';
-import { enviarRecordatorioTurno } from '@/lib/services/sender/whatsappService';
 import Loader from '@/components/Loader';
 import { isColorLight } from '@/lib/utils/variosUtils';
 import { useTheme } from 'next-themes';
@@ -57,21 +55,60 @@ export default function GrillaTurnos({
   const enviarRecordatorio = async (id) => {
     try {
       const turno = turnos.find(turno => turno.id === id);
+      toast.success('Iniciando envío de confirmación');
       
       if (!turno || !turno.paciente || !turno.paciente.celular) {
         toast.error('No se encontró información de contacto para este paciente');
         return;
       }
       
-      const msg = await textoMensajeConfTurno(turno);
-      
       let celular = turno.paciente.celular;
 
       if (celular.length >= 8) {
-          const res = await enviarRecordatorioTurno(turno);
+        try {
+          const response = await fetch('/api/mensajeria/whatsapp', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ turno }),
+          });
+          
+          const result = await response.json();
+          if (!result.ok) {
+            console.error('Error al enviar WhatsApp:', result.error);
+            toast.error('Error al enviar el recordatorio por WhatsApp: ' + (result.error || 'Error desconocido'));
+          }
+          console.log('WhatsApp enviado exitosamente:', result.data);
+          toast.success('Recordatorio enviado exitosamente por WhatsApp');
+        } catch (error) {
+          console.error('Error al enviar WhatsApp:', error);
+        }
+      }
+
+      // Enviar email de confirmación
+      try {
+        const response = await fetch('/api/mensajeria/email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ turno }),
+        });
+        const result = await response.json();
+        if (!result.ok) {
+          console.error('Error al enviar email:', result.error);
+          toast.error('Error al enviar el email de confirmación: ' + (result.error || 'Error desconocido'));
+          return;
+        }
+        console.log('Email enviado exitosamente:', result.data);
+        toast.success('Email de confirmación enviado exitosamente');
+      } catch (error) {
+        console.error('Error al enviar email:', error);
+        toast.error('Error al enviar el email de confirmación: ' + (error.message || 'Error desconocido'));
+        return;
       }
       
-      toast.success('Iniciando envío de confirmación');
     } catch (error) {
       console.error('Error al enviar recordatorio:', error);
       toast.error('Error al enviar el recordatorio: ' + (error.message || 'Error desconocido'));

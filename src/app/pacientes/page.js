@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { handleExcel } from '@/lib/services/excel';
 import { toast } from 'react-hot-toast';
 import Modal from '@/components/Modal';
 import { obtenerCoberturasDesdeDB } from '@/lib/utils/coberturasUtils';
@@ -11,6 +10,8 @@ import Loader from '@/components/Loader';
 import TurnoNuevo from '@/components/TurnoNuevo';
 import TurnoDisponibilidad from '@/components/TurnoDisponibilidad';
 import { useTheme } from 'next-themes';
+import { handleExcel } from '@/lib/services/excel';
+import { formatoFecha } from '@/lib/utils/dateUtils';
 
 export default function PacientesPage() {
   const router = useRouter();
@@ -104,11 +105,15 @@ export default function PacientesPage() {
       }
       
       const data = await response.json();
-      
-      if (data.pacientes || data.paciente) {
+        if (data.pacientes || data.paciente) {
         const listaPacientes = data.pacientes || data.paciente;
-        handleExcel(listaPacientes, 'Pacientes');
-      } 
+        
+        try {
+          handleExcel(listaPacientes, `pacientes_${formatoFecha(new Date(), true, true, true, false).replaceAll(' ', '_')}`);
+        } catch (exportError) {
+          toast.error('Error al exportar a Excel');
+        }
+      }
     } catch (error) {
       console.error('Error:', error);
       setError(error.message);      

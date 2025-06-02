@@ -7,7 +7,6 @@ import { obtenerEstados } from '@/lib/utils/estadosUtils';
 import { obtenerCoberturasDesdeDB } from '@/lib/utils/coberturasUtils';
 import { calcularTurnosDisponiblesPorRango } from '@/lib/services/turnos/turnosServiceC';
 import GrillaTurnos from '@/components/GrillaTurnos';
-import { handleExcelTurnos } from '@/lib/services/excel';
 import Loader from '@/components/Loader';
 import TurnoNuevo from '@/components/TurnoNuevo';
 import TurnoDisponibilidad from '@/components/TurnoDisponibilidadDirecta';
@@ -15,7 +14,7 @@ import EventoNuevo from '@/components/EventoNuevo';
 import Modal from '@/components/Modal';
 import CalendarioTurnos from '@/components/CalendarioTurno';
 import CalendarioMensual from '@/components/CalendarioMensual';
-import { config } from 'dotenv';
+import { handleExcelTurnos } from '@/lib/services/excel';
 
 // Memoizar los estados para evitar recálculos en cada renderizado
 const estados = obtenerEstados();
@@ -114,6 +113,10 @@ export default function TurnosPage() {
       
       // Crear un string de fechas separadas por comas
       const fechasString = fechasParaConsulta.join(',');
+      if (fechasString.length === 0) {
+        console.warn('No hay fechas para cargar contadores de turnos');
+        return;
+      }
       
       // Realizar una consulta a la API para obtener contadores de turnos existentes
       const response = await fetch(`/api/turnos/contadores?fechas=${fechasString}&estado=activo`);
@@ -698,11 +701,13 @@ export default function TurnosPage() {
               >
                 <i className="fas fa-sync-alt"></i>
                 <span className="hidden sm:inline">Actualizar</span>
-              </button>
-              <button
-                onClick={() => {
-                  handleExcelTurnos(turnos);
-                  toast.success('Exportando a Excel...');
+              </button>              <button
+                onClick={async () => {
+                  try {
+                    handleExcelTurnos(turnos);
+                  } catch (error) {
+                    toast.error('Error al exportar a Excel');
+                  }
                 }}
                 className="ml-2 px-3 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 flex items-center gap-2"
                 title="Exportar A Excel"

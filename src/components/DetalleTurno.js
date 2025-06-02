@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { formatoFecha, formatoDuracion } from '@/lib/utils/dateUtils';
-import { enviarRecordatorioTurno } from '@/lib/services/sender/whatsappService';
 import { obtenerCoberturasDesdeDB } from '@/lib/utils/coberturasUtils';
 import { obtenerEstados } from '@/lib/utils/estadosUtils';
 import { isColorLight } from '@/lib/utils/variosUtils';
@@ -258,10 +257,24 @@ export default function DetalleTurno({
     try {
            
       setLoadingAction(true);
-      setError(null);
+      setError(null);      
       setSuccess(null);     
       
-      const res = await enviarRecordatorioTurno(turno);
+      const response = await fetch('/api/mensajeria/whatsapp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ turno }),
+      });
+      
+      const result = await response.json();
+      
+      if (result.ok) {
+        setSuccess('Recordatorio enviado con éxito');
+      } else {
+        setError(result.error || 'Error al enviar recordatorio');
+      }
     } catch (error) {
       console.error('Error:', error);
       setError(error.message);

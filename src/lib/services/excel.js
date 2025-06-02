@@ -20,7 +20,7 @@ export const handleExcelTurnos = async (data) => {
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(datos);
     XLSX.utils.book_append_sheet(wb, ws);
-    XLSX.writeFile(wb, `Turnos.xlsx`)
+    XLSX.writeFile(wb, `turnos_${formatoFecha(new Date(), true, true, true, false).replaceAll(' ', '_')}.xlsx`)
 }
 
 export const handleExcel = async (data, nombre) => {

@@ -9,8 +9,6 @@ import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 import Loader from '@/components/Loader';
-import { enviarMailConfTurno } from "@/lib/services/sender/resendService";
-import { enviarRecordatorioTurno } from '@/lib/services/sender/whatsappService';
 
 
 const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
@@ -589,14 +587,44 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
 
   // Función para enviar recordatorio por WhatsApp e EMail
     const enviarRecordatorio = async (turno) => {
-        try {
-          console.log('Enviando recordatorio para el turno:', turno);
+        try {        console.log('Enviando recordatorio para el turno:', turno);
           let celular = turno.paciente.celular;
 
           if (celular.length >= 8) {
-              const res = await enviarRecordatorioTurno(turno);
+            try {
+              const response = await fetch('/api/mensajeria/whatsapp', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ turno }),
+              });
+              
+              const result = await response.json();
+              if (!result.ok) {
+                console.error('Error al enviar WhatsApp:', result.error);
+              }
+            } catch (error) {
+              console.error('Error al enviar WhatsApp:', error);
+            }
           }
-            await enviarMailConfTurno(turno);
+          
+          try {
+            const response = await fetch('/api/mensajeria/email', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ turno }),
+            });
+            
+            const result = await response.json();
+            if (!result.ok) {
+              console.error('Error al enviar email:', result.error);
+            }
+          } catch (error) {
+            console.error('Error al enviar email:', error);
+          }
         
           toast.success('Iniciando envío de confirmación');
         } catch (error) {
