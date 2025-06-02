@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { registrarConfig } from '@/lib/services/configService.js';
 import { toast } from 'react-hot-toast';
 
 export default function TecnicaPage() {
@@ -53,12 +52,24 @@ export default function TecnicaPage() {
       // Solo incluir campos que existen en el modelo ConfiguracionConsultorio
       const datosTecnicos = {
         urlApp: datos.urlApp,
-        urlAppDev: datos.urlAppDev
-      };
+        urlAppDev: datos.urlAppDev      };
       
-      // Usar el parámetro 'tecnica' para indicar que solo se actualicen los campos de esta sección
-      await registrarConfig(datosTecnicos, 'tecnica');
-      toast.success('Opciones técnicas guardadas correctamente');
+      // Enviar datos al endpoint /api/configuracion
+      const response = await fetch('/api/configuracion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(datosTecnicos)
+      });
+
+      const result = await response.json();
+      
+      if (result.ok) {
+        toast.success('Opciones técnicas guardadas correctamente');
+      } else {
+        throw new Error(result.message || 'Error al guardar la configuración');
+      }
     } catch (error) {
       console.error('Error al guardar opciones técnicas:', error);
       toast.error('Error al guardar la configuración');

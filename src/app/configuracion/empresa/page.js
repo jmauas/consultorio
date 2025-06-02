@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { registrarConfig } from '@/lib/services/configService.js';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import Loader from '@/components/Loader';
@@ -103,12 +102,24 @@ export default function EmpresaPage() {
         diasEnvio: datos.diasEnvio,
         envioMail: datos.envioMail,
         horaEnvioMail: datos.horaEnvioMail,
-        diasEnvioMail: datos.diasEnvioMail
-      };
+        diasEnvioMail: datos.diasEnvioMail      };
       
-      // Usar el parámetro 'empresa' para indicar que solo se actualicen los campos de esta sección
-      await registrarConfig(datosEmpresa, 'empresa');
-      toast.success('Datos de la empresa guardados correctamente');
+      // Enviar datos al endpoint /api/configuracion
+      const response = await fetch('/api/configuracion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(datosEmpresa)
+      });
+
+      const result = await response.json();
+      
+      if (result.ok) {
+        toast.success('Datos de la empresa guardados correctamente');
+      } else {
+        throw new Error(result.message || 'Error al guardar los datos');
+      }
     } catch (error) {
       console.error('Error al guardar datos de empresa:', error);
       toast.error('Error al guardar los datos: ' + error.message);

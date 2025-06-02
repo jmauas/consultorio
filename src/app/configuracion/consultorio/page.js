@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { Tab } from '@headlessui/react';
 import toast from 'react-hot-toast';
 import { obtenerCoberturasDesdeDB } from '@/lib/utils/coberturasUtils';
-import { registrarConfig } from '@/lib/services/configService.js';
 import Loader from '@/components/Loader';
 import { useTheme } from 'next-themes';
 
@@ -225,16 +224,29 @@ export default function ConsultorioPage() {
       
       const feriadosParaGuardar = config.feriados.map(feriado => feriado.fecha);
       
-      
-      const configActualizada = {
+        const configActualizada = {
         ...configActual,
         doctores: doctoresParaGuardar,
         feriados: feriadosParaGuardar,
         duracionTurno: config.duracionTurno,
       };
       
-      await registrarConfig(configActualizada);
-      toast.success('Configuración guardada correctamente');
+      // Enviar datos al endpoint /api/configuracion
+      const response = await fetch('/api/configuracion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(configActualizada)
+      });
+
+      const result = await response.json();
+      
+      if (result.ok) {
+        toast.success('Configuración guardada correctamente');
+      } else {
+        throw new Error(result.message || 'Error al guardar la configuración');
+      }
     } catch (error) {
       console.error('Error al guardar configuración:', error);
       toast.error('Error al guardar la configuración: ' + error.message);
