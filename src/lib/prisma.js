@@ -12,6 +12,12 @@ const createPrismaClient = () => {
         url: process.env.DATABASE_URL,
       },
     },
+    // Configuración específica para serverless/edge
+    __internal: {
+      engine: {
+        binaryTarget: process.env.VERCEL ? 'rhel-openssl-3.0.x' : undefined,
+      },
+    },
   });
 };
 

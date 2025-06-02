@@ -27,7 +27,6 @@ const nextConfig = {
   webpack: (config, { isServer, dev }) => {
     if (isServer) {
       config.externals.push('@prisma/client');
-      
       // Excluir Supabase de la compilación de producción
       if (!dev) {
         config.externals.push('supabase');
@@ -39,11 +38,25 @@ const nextConfig = {
         use: 'raw-loader',
       });
       
+      // Configuración específica para Prisma binaries en Vercel
+      config.externals.push({
+        'utf-8-validate': 'commonjs utf-8-validate',
+        'bufferutil': 'commonjs bufferutil',
+      });
+      
       // Optimización para producción
       if (!dev) {
         config.resolve.alias = {
           ...config.resolve.alias,
           '@prisma/client': '@prisma/client',
+        };
+        
+        // Configuración específica para Vercel deployment
+        config.resolve.fallback = {
+          ...config.resolve.fallback,
+          fs: false,
+          path: false,
+          os: false,
         };
       }
     }

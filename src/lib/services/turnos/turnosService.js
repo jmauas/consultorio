@@ -10,6 +10,13 @@ import { sonMismaFecha } from  '@/lib/utils/dateUtils';
 
 export const getTurnoById = async (id) => {
     try {
+        console.log('🔍 [Vercel Debug] Iniciando getTurnoById, ID:', id);
+        console.log('🔍 [Vercel Debug] Prisma client status:', typeof prisma);
+        
+        // Test básico de conexión
+        await prisma.$connect();
+        console.log('🔍 [Vercel Debug] Prisma conectado exitosamente');
+        
         const turno = await prisma.turno.findUnique({
         where: { id },
         include: {
@@ -23,9 +30,14 @@ export const getTurnoById = async (id) => {
             coberturaMedica: true,
         },
         });
+        
+        console.log('🔍 [Vercel Debug] Turno obtenido exitosamente');
         return turno;
     } catch (error) {
-        console.error('Error al obtener el turno:', error);
+        console.error('❌ [Vercel Debug] Error al obtener el turno:', error);
+        console.error('❌ [Vercel Debug] Error stack:', error.stack);
+        console.error('❌ [Vercel Debug] Error message:', error.message);
+        console.error('❌ [Vercel Debug] Error name:', error.name);
         return null;
     }
 }

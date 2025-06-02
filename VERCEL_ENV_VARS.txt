@@ -1,0 +1,25 @@
+# ===== VARIABLES DE ENTORNO PARA VERCEL =====
+# Copia estas variables al dashboard de Vercel en Settings > Environment Variables
+
+# Database configuration
+DATABASE_URL=tu_database_url_aqui
+DIRECT_URL=tu_direct_url_aqui
+
+# NextAuth configuration  
+NEXTAUTH_URL=https://tu-app.vercel.app
+NEXTAUTH_SECRET=tu_nextauth_secret_aqui
+
+# Prisma Engine Configuration (CRÍTICO para Vercel)
+PRISMA_CLI_QUERY_ENGINE_TYPE=binary
+PRISMA_CLIENT_ENGINE_TYPE=binary
+PRISMA_QUERY_ENGINE_BINARY=./node_modules/.prisma/client/query-engine-rhel-openssl-3.0.x
+PRISMA_SCHEMA_ENGINE_BINARY=./node_modules/.prisma/client/schema-engine-rhel-openssl-3.0.x
+
+# Vercel optimization
+NEXT_TELEMETRY_DISABLED=1
+NPM_CONFIG_PRODUCTION=true
+
+# Otras variables que tengas configuradas...
+# CLOUDINARY_URL=tu_cloudinary_url
+# RESEND_API_KEY=tu_resend_key
+# etc...

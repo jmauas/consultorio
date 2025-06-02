@@ -6,3 +6,7 @@ test/
 *.test.ts
 *.spec.js
 *.spec.ts
+
+# IMPORTANT: DO NOT ignore Prisma binaries - they are needed for production
+# !node_modules/.prisma/
+# !src/generated/prisma/
