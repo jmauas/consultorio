@@ -39,14 +39,14 @@ export async function GET(request) {
       const currentHour = now.getHours();
       const currentMinute = now.getMinutes();
       
-      if (currentHour === cronHour && Math.abs(currentMinute - cronMinute) <= 5) {
+      // if (currentHour === cronHour && Math.abs(currentMinute - cronMinute) <= 5) {
         try {
           await tareaEnvioMail(diasEnvioMail);
         } catch (error) {
           console.error('Error en envío Email:', error);
           results.email.errors.push(error.message);
         }
-      }
+      // }
     }
 
     return NextResponse.json({

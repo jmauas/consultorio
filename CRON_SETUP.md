@@ -28,11 +28,13 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 4. Agrega `CRON_SECRET` con el valor generado
 
 ### 3. Cron Job Schedule
-Los cron jobs están configurados para ejecutarse diariamente:
-- **WhatsApp**: `0 9 * * *` (todos los días a las 9:00 AM)
+Los cron jobs están configurados para ejecutarse diariamente en zona horaria Argentina (UTC-3):
+- **WhatsApp**: `0 12 * * *` (UTC) = 9:00 AM Argentina
   - **Endpoint**: `/api/cron/envios/whatsapp`
-- **Email**: `1 9 * * *` (todos los días a las 9:01 AM)
+- **Email**: `1 12 * * *` (UTC) = 9:01 AM Argentina
   - **Endpoint**: `/api/cron/envios/email`
+
+**Nota**: Los cron jobs de Vercel se ejecutan en UTC, por lo que se configuran para las 12:00 y 12:01 UTC para ejecutarse a las 9:00 y 9:01 en Argentina (UTC-3).
 
 ### 4. Funcionamiento
 - Cada job verifica la configuración de la base de datos independientemente
@@ -64,4 +66,4 @@ Authorization: Bearer TU_CRON_SECRET
 ✅ Configurado `vercel.json` con 2 cron jobs separados  
 ✅ Implementadas API routes `/api/cron/envios/whatsapp` y `/api/cron/envios/email`  
 ✅ Sistema compatible con Vercel serverless  
-✅ Horarios configurados: WhatsApp a las 9:00 AM, Email a las 9:01 AM diariamente
+✅ Horarios configurados: WhatsApp a las 9:00 AM, Email a las 9:01 AM (Argentina UTC-3)
