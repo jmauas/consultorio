@@ -23,6 +23,7 @@ const publicRoutes = [
   '/turnos/disponibilidad',
   '/turnos/cancelar',
   '/turnos/confirmar',
+  '/pp',
 ];
 const publicRoutesSource = [
   '/api/auth',

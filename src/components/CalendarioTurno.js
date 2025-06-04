@@ -411,15 +411,29 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                         </div>
                     </div>
                     <div 
-                        className={`hidden md:grid items-center justify-start w-full bg-[var(--card-bg)] p-3 font-bold text-xl rounded-md sticky top-18 z-50`}
+                        className={`hidden md:grid items-center justify-start w-full bg-[var(--card-bg)] p-3 font-bold text-xl rounded-md sticky top-0 z-50`}
                         style={{ 
                             gridTemplateColumns: `repeat(${(consultorios.length*4)+1}, minmax(0, 1fr))`
                         }}
                     >
-                        <div
-                            className="m-1 p-2 text-xl font-bold col-span-1"
-                        >
-                            Hora
+                        <div className="p-1 col-span-1 flex items-center justify-start gap-3">
+                            <div className="calendar-icon border border-red-500 rounded-lg shadow-sm overflow-hidden w-14 h-14 flex flex-col">
+                                <div className="bg-red-600 text-xs font-bold text-center py-1">
+                                    {fecha.toLocaleDateString('es-AR', { month: 'short' }).toUpperCase()}
+                                </div>
+                                <div className="flex-grow flex items-center justify-center">
+                                    <span className="font-bold text-xl">
+                                    {fecha.getDate()}
+                                    </span>
+                                </div>
+                            </div>
+                            <span className="text-lg font-bold ">
+                               {fecha.toLocaleDateString('es-AR', {
+                                    weekday: 'short',
+                                }).charAt(0).toUpperCase() + fecha.toLocaleDateString('es-AR', {
+                                    weekday: 'short',
+                                }).slice(1)}
+                            </span>
                         </div>
                         {consultorios.map((consultorio) => (
                             <div
@@ -723,18 +737,25 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                                         return (
                                             <div key={`mobile-slot-${hora.hora}`} className="bg-blue-50 rounded-lg grid grid-cols-5 gap-1">
                                                 {/* Time slot header */}
-                                                <div className="w-full col-span-1 flex flex-col items-center justify-start gap-4 my-2">
-                                                    <div className="text-[var(--color-primary)] bg-[var(--card-bg)] text-xl font-bold border p-2 rounded-md shadow-xl">
+                                                <div className="w-full col-span-1 flex flex-col items-center justify-start gap-4 my-2 mx-1 text-[var(--color-primary)] bg-[var(--card-bg)]">
+                                                    <div className="text-xl font-bold border p-2 rounded-md shadow-xl">
                                                         {hora.hora}
                                                     </div>
                                                     <div className="calendar-icon border border-red-500 rounded-lg shadow-sm overflow-hidden flex flex-col">
                                                         <div className="bg-red-600 text-white text-xs font-bold text-center px-2 py-1 w-14">
                                                             {fecha.toLocaleDateString('es-AR', { month: 'short' }).toUpperCase()}
                                                         </div>
-                                                        <div className="flex-grow flex items-center justify-center px-2 py-1 text-[var(--color-primary)] bg-[var(--card-bg)]">
+                                                        <div className="flex-grow flex items-center justify-center px-2 py-1">
                                                             <span className="font-bold text-xl">{fecha.getDate()}</span>
                                                         </div>
                                                     </div>
+                                                     <span className="text-lg font-bold ">
+                                                        {fecha.toLocaleDateString('es-AR', {
+                                                                weekday: 'short',
+                                                            }).charAt(0).toUpperCase() + fecha.toLocaleDateString('es-AR', {
+                                                                weekday: 'short',
+                                                            }).slice(1)}
+                                                    </span>
                                                 </div>                                                
                                                 {/* Consultorios for this time slot */}
                                                 <div className="col-span-4 p-2 flex flex-col gap-4">
