@@ -14,14 +14,19 @@ export default function DetalleTurno({
   onSuccess, 
   isModal = false 
 }) {
-  // const [turno, setTurno] = useState(null);
   const turnoId = turno?.id || null;
   const [loading, setLoading] = useState(true);
   const [loadingAction, setLoadingAction] = useState(false);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
-  const [nuevoEstado, setNuevoEstado] = useState('');
+  const [success, setSuccess] = useState(null);  const [nuevoEstado, setNuevoEstado] = useState('');
 
+  // Estado para controlar la reprogramación
+  const [mostrarReprogramacion, setMostrarReprogramacion] = useState(false);
+  const [turnosDisponibles, setTurnosDisponibles] = useState([]);
+  const [loadingTurnos, setLoadingTurnos] = useState(false);
+  const [turnoSeleccionadoReprogramacion, setTurnoSeleccionadoReprogramacion] = useState(null);
+  const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
+  const [expandedDateRows, setExpandedDateRows] = useState({});
 
   // Estado para controlar el modo de edición
   const [modoEdicion, setModoEdicion] = useState(false);
@@ -51,9 +56,7 @@ export default function DetalleTurno({
       }
       
       const data = await response.json();
-      
-      if (data.ok && data.turno) {
-        turno = data.turno;
+        if (data.ok && data.turno) {
         // Inicializar los datos editables con los valores actuales del turno
         inicializarDatosEditables(data.turno);
       } else {
@@ -128,12 +131,9 @@ export default function DetalleTurno({
         throw new Error(errorData.message || 'Error al actualizar turno');
       }
       
-      const data = await response.json();
-      
-      if (data.ok) {
+      const data = await response.json();      if (data.ok) {
         setSuccess('Turno actualizado correctamente');
-        // Recargar los datos del turno
-        cargarTurno(turnoId);
+        
         // Salir del modo edición
         setModoEdicion(false);
         
@@ -184,12 +184,9 @@ export default function DetalleTurno({
         throw new Error('Error al cambiar estado');
       }
       
-      const data = await response.json();
-      
-      if (data.ok) {
+      const data = await response.json();      if (data.ok) {
         setSuccess(`Estado cambiado a ${nuevoEstado} correctamente`);
-        // Recargar los datos del turno
-        cargarTurno(turnoId);
+        
         // Limpiar el campo de selección
         setNuevoEstado('');
         
@@ -205,7 +202,133 @@ export default function DetalleTurno({
       setError(error.message);
     } finally {
       setLoadingAction(false);
+    }  };
+
+  // Función para obtener turnos disponibles para reprogramación
+  const obtenerTurnosDisponibles = async () => {
+    try {
+      setLoadingTurnos(true);
+      setError(null);
+      
+      const params = new URLSearchParams({
+        doctor: turno.doctorId,
+        tipo: turno.tipoDeTurnoId,
+        duracion: turno.duracion.toString(),
+        asa: 'no',
+        ccr: 'no',
+      });
+      
+      const response = await fetch(`/api/turnos/disponibles?${params}`);
+      
+      if (!response.ok) {
+        throw new Error('Error al obtener turnos disponibles');
+      }
+      
+      const data = await response.json();
+      setTurnosDisponibles(data.turnos || []);
+      setMostrarReprogramacion(true);
+    } catch (error) {
+      console.error('Error:', error);
+      setError(error.message);
+    } finally {
+      setLoadingTurnos(false);
     }
+  };
+
+  // Función para seleccionar un turno para reprogramación
+  const seleccionarTurnoReprogramacion = (fecha, turno) => {
+    let ano, mes, dia, desde, hasta;
+    if (fecha.includes('-')) {
+      ano = fecha.split('-')[0];
+      mes = fecha.split('-')[1] - 1;
+      dia = fecha.split('-')[2];
+    } else {
+      ano = new Date(fecha).getFullYear();
+      mes = new Date(fecha).getMonth();
+      dia = new Date(fecha).getDate();
+    }
+    
+    desde = new Date(ano, mes, dia, turno.hora, turno.min);
+    hasta = new Date(ano, mes, dia, turno.hora, turno.min);
+    hasta.setMinutes(hasta.getMinutes() + turno.duracion);
+    
+    setTurnoSeleccionadoReprogramacion({
+      desde: desde.toISOString(),
+      hasta: hasta.toISOString(),
+      fecha: fecha,
+      hora: `${String(turno.hora).padStart(2, '0')}:${String(turno.min).padStart(2, '0')}`
+    });
+    setMostrarConfirmacion(true);
+  };
+
+  // Función para confirmar la reprogramación
+  const confirmarReprogramacion = async () => {
+    try {
+      setLoadingAction(true);
+      setError(null);
+      setSuccess(null);
+      
+      const datosActualizados = {
+        desde: turnoSeleccionadoReprogramacion.desde,
+        hasta: turnoSeleccionadoReprogramacion.hasta
+      };
+      
+      const response = await fetch(`/api/turnos/${turnoId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(datosActualizados),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al reprogramar turno');
+      }
+      
+      const data = await response.json();      if (data.ok) {
+        setSuccess('Turno reprogramado correctamente');
+        
+        // Cerrar modales
+        cerrarModalesReprogramacion();
+
+        // Enviar recordatorio automáticamente tras reprogramación exitosa
+        handleEnviarRecordatorio();
+        
+        // Notificar al componente padre del cambio exitoso con los nuevos datos
+        if (onSuccess) {
+          onSuccess('update', {
+            ...data.turno,
+            desde: turnoSeleccionadoReprogramacion.desde,
+            hasta: turnoSeleccionadoReprogramacion.hasta
+          });
+        }
+      } else {
+        throw new Error(data.message || 'Error al reprogramar turno');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setError(error.message);
+    } finally {
+      setLoadingAction(false);
+    }
+  };
+
+  // Función para cerrar modales de reprogramación
+  const cerrarModalesReprogramacion = () => {
+    setMostrarReprogramacion(false);
+    setMostrarConfirmacion(false);
+    setTurnoSeleccionadoReprogramacion(null);
+    setTurnosDisponibles([]);
+    setExpandedDateRows({});
+  };
+
+  // Función para alternar visibilidad de horas
+  const toggleHorasVisibility = (fecha) => {
+    setExpandedDateRows(prev => ({
+      ...prev,
+      [fecha]: !prev[fecha]
+    }));
   };
 
   const handleEliminarTurno = async () => {
@@ -301,12 +424,8 @@ export default function DetalleTurno({
         throw new Error('Error al limpiar penalidad');
       }
       
-      const data = await response.json();
-      
-      if (data.ok) {
+      const data = await response.json();      if (data.ok) {
         setSuccess('Penalidad eliminada correctamente');
-        // Recargar los datos del turno
-        cargarTurno(turnoId);
         
         // Notificar al componente padre del cambio exitoso
         if (onSuccess) {
@@ -322,7 +441,6 @@ export default function DetalleTurno({
       setLoadingAction(false);
     }
   };
-
   useEffect(() => {
     setLoading(true);
     // if (turnoId) {
@@ -339,8 +457,7 @@ export default function DetalleTurno({
       setLoading(false);
     };
     cober();
-    
-  }, [turnoId]);
+      }, [turnoId]);
 
   // Función para obtener el color del estado
   const obtenerColorEstado = (estadoId) => {
@@ -687,7 +804,7 @@ export default function DetalleTurno({
           <div className="p-6 border-t border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-bold mb-3">Acciones</h3>
           {loadingAction && <Loader titulo={'Regisrando Cambios ...'}/>}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 items-center">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 p-3 rounded-lg border border-gray-200">
                 <label>
                   Cambiar Estado:
@@ -713,20 +830,20 @@ export default function DetalleTurno({
                     </option>
                   ))}
                 </select>
-              </div>
-              <button
-                onClick={handleCambiarEstado}
-                disabled={loadingAction || !nuevoEstado || nuevoEstado === estado}
-                className="mt-2 sm:mt-6 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded flex items-center disabled:bg-blue-300 disabled:cursor-not-allowed"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-                {loadingAction ? "Actualizando..." : "Aplicar Cambio"}
-              </button>
             </div>
-          </div>            
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mt-4 p-3 rounded-lg border border-gray-200">
+            <button
+              onClick={handleCambiarEstado}
+              disabled={loadingAction || !nuevoEstado || nuevoEstado === estado}
+              className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded flex items-center disabled:bg-blue-300 disabled:cursor-not-allowed"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              {loadingAction ? "Actualizando..." : "Aplicar Cambio"}
+            </button>
+          </div>
+        </div>              
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mt-4 p-3 rounded-lg border border-gray-200">
             <button
               onClick={handleEnviarRecordatorio}
               disabled={loadingAction || estado === 'cancelado'}
@@ -736,6 +853,17 @@ export default function DetalleTurno({
                 <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
               </svg>
               Enviar Recordatorio
+            </button>
+            
+            <button
+              onClick={obtenerTurnosDisponibles}
+              disabled={loadingAction || loadingTurnos || estado === 'cancelado'}
+              className="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded disabled:bg-purple-300 disabled:cursor-not-allowed flex items-center"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+              </svg>
+              {loadingTurnos ? "Buscando..." : "Reprogramar Turno"}
             </button>
             
             <button
@@ -781,10 +909,167 @@ export default function DetalleTurno({
                 </svg>
                 {loadingAction ? "Guardando..." : "Guardar Cambios"}
               </button>
-            )}
+            )}          
+            </div>
+        </div>
+      </div>      
+      {/* Modal para mostrar turnos disponibles */}
+      {mostrarReprogramacion && (
+        <div className="fixed inset-0 bg-white/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Reprogramar Turno - Seleccione nueva fecha y hora
+                </h2>
+                <button
+                  onClick={cerrarModalesReprogramacion}
+                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg mb-6">
+                <h3 className="font-bold text-blue-800 dark:text-blue-200 mb-2">Turno actual:</h3>
+                <div className="flex flex-wrap gap-4 text-blue-700 dark:text-blue-300">
+                  <div><strong>Fecha:</strong> {formatoFecha(turno.desde, false, false, false, true)}</div>
+                  <div><strong>Hora:</strong> {formatoFecha(turno.desde, true, false, false, false).split(' ')[1]}</div>
+                  <div><strong>Doctor:</strong> {turno.doctor.nombre}</div>
+                  <div><strong>Duración:</strong> {turno.duracion} min</div>
+                </div>
+              </div>
+
+              {loadingTurnos && <Loader />}
+
+              {!loadingTurnos && turnosDisponibles.length === 0 && (
+                <div className="text-center py-8">
+                  <div className="text-gray-500 dark:text-gray-400 text-lg">
+                    No hay turnos disponibles para reprogramar
+                  </div>
+                </div>
+              )}
+
+              {!loadingTurnos && turnosDisponibles.length > 0 && (
+                <div className="space-y-4">
+                  {turnosDisponibles.map((dia) => (
+                    <div key={dia.fecha} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                      <div 
+                        className="flex items-center justify-between bg-purple-600 dark:bg-purple-700 px-4 py-3 cursor-pointer"
+                        onClick={() => toggleHorasVisibility(dia.fecha)}
+                      >
+                        <div className="flex items-center gap-2 text-white">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <span className="font-medium">{dia.diaSemana}</span>
+                          <span className="font-bold">{formatoFecha(dia.fecha, false, false, false, false)}</span>
+                          <span className="text-purple-200">({dia.turnos.length} turnos)</span>
+                        </div>
+                        <button className="text-white hover:text-purple-200 focus:outline-none transition-colors">
+                          {expandedDateRows[dia.fecha] ? (
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" />
+                            </svg>
+                          ) : (
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                      
+                      {expandedDateRows[dia.fecha] && (
+                        <div className="p-4 bg-white dark:bg-gray-800">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                            {dia.turnos.map((turnoDisponible, index) => (
+                              <button
+                                key={`${dia.fecha}-${turnoDisponible.hora}-${turnoDisponible.min}-${index}`}
+                                onClick={() => seleccionarTurnoReprogramacion(dia.fecha, turnoDisponible)}
+                                className="p-3 border border-green-300 bg-green-50 hover:bg-green-100 dark:bg-green-900 dark:border-green-700 dark:hover:bg-green-800 rounded-lg transition-colors flex flex-col items-center gap-1"
+                              >
+                                <div className="font-bold text-green-800 dark:text-green-200">
+                                  {String(turnoDisponible.hora).padStart(2, '0')}:{String(turnoDisponible.min).padStart(2, '0')}
+                                </div>
+                                <div className="text-xs text-green-600 dark:text-green-300">
+                                  {turnoDisponible.doctor.emoji} {turnoDisponible.doctor.nombre}
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}      {/* Modal de confirmación */}
+      {mostrarConfirmacion && turnoSeleccionadoReprogramacion && (
+        <div className="fixed inset-0 bg-white/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  Confirmar Reprogramación
+                </h2>
+                <button
+                  onClick={() => setMostrarConfirmacion(false)}
+                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                <div className="bg-red-50 dark:bg-red-900 p-4 rounded-lg">
+                  <h3 className="font-bold text-red-800 dark:text-red-200 mb-2">Fecha y hora actual:</h3>
+                  <div className="text-red-700 dark:text-red-300">
+                    <div>Fecha:<strong> {formatoFecha(turno.desde, false, false, false, true)}</strong></div>
+                    <div>Hora:<strong> {formatoFecha(turno.desde, true, false, false, false).split(' ')[1]}</strong></div>
+                  </div>
+                </div>
+
+                <div className="bg-green-50 dark:bg-green-900 p-4 rounded-lg">
+                  <h3 className="font-bold text-green-800 dark:text-green-200 mb-2">Nueva fecha y hora:</h3>
+                  <div className="text-green-700 dark:text-green-300 text-lg">
+                    <div>Fecha: <strong>{formatoFecha(turnoSeleccionadoReprogramacion.fecha, false, false, false, true)}</strong></div>
+                    <div>Hora: <strong>{turnoSeleccionadoReprogramacion.hora}</strong></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setMostrarConfirmacion(false)}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-500 rounded-lg transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmarReprogramacion}
+                  disabled={loadingAction}
+                  className="px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 disabled:bg-purple-300 disabled:cursor-not-allowed rounded-lg transition-colors flex items-center gap-2"
+                >
+                  {loadingAction && (
+                    <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                  )}
+                  {loadingAction ? 'Reprogramando...' : 'Confirmar Reprogramación'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
