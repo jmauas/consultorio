@@ -30,7 +30,7 @@ export const agendarEnvios = async () => {
         const sc = {
             scheduled: true,
             timezone: 'America/Argentina/Buenos_Aires',
-            name: 'Limpieza Adjuntos 16 Hs.'
+            name: 'Envio Recordatorios'
         }
         // SEG MIN HORAS DIA_MES MES DIA_SEMANA
         // * TODOS LOS VALORES

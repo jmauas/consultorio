@@ -6,7 +6,17 @@
     "src/app/api/**/*.js": {
       "maxDuration": 30
     }
-  },
+  },  
+  "crons": [
+    {
+      "path": "/api/cron/envios/whatsapp",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/envios/email",
+      "schedule": "1 9 * * *"
+    }
+  ],
   "regions": ["iad1"],
   "build": {
     "env": {
