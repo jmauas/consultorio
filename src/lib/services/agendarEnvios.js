@@ -66,7 +66,7 @@ export const agendarEnvios = async () => {
     }
 }
 
-const tareaEnvioWA = async (diasEnvio) => {
+export const tareaEnvioWA = async (diasEnvio) => {
     console.log(new Date().toLocaleString()+'  -  '+'Ejecutando Tarea Envio Whatsapp', diasEnvio);
     try {
         const hoy = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }));
@@ -104,7 +104,7 @@ const tareaEnvioWA = async (diasEnvio) => {
     }
 }
 
-const tareaEnvioMail = async (diasEnvio) => {
+export const tareaEnvioMail = async (diasEnvio) => {
     console.log(new Date().toLocaleString()+'  -  '+'Ejecutando Tarea Envio Mails', diasEnvio);
     try {
         const hoy = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }));
