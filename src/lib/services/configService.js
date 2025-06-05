@@ -74,9 +74,6 @@ const procesarDoctoresOptimizado = async (tx, doctores) => {
     // Preparar arrays para operaciones en lote
     const doctoresAActualizar = [];
     const doctoresACrear = [];
-    const agendasACrear = [];
-    const tiposTurnoACrear = [];
-    const tiposTurnoAActualizar = [];
     const doctoresConAgendas = [];
     const doctoresConTipos = [];
     

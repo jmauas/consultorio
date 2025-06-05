@@ -1,40 +1,86 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request) {
   try {
-    const doctores = await prisma.doctor.findMany({
-      include: {
-        AgendaDoctor: true,
-        TipoTurnoDoctor: {
-          include: {
-            consultorios: true
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    
+    if (id) {
+      // Obtener un doctor específico por ID
+      const doctor = await prisma.doctor.findUnique({
+        where: { id: id },
+        include: {
+          AgendaDoctor: true,
+          TipoTurnoDoctor: {
+            include: {
+              consultorios: true
+            }
           }
         }
-      },
-      orderBy: {
-        nombre: 'asc'
+      });
+      
+      if (!doctor) {
+        return NextResponse.json({ 
+          ok: false, 
+          error: 'Doctor no encontrado' 
+        }, { status: 404 });
       }
-    });
-    
-    // Transform the data to match the expected structure in the frontend
-    const doctoresFormateados = doctores.map(doctor => ({
-      ...doctor,
-      agenda: doctor.AgendaDoctor || [],
-      tiposTurno: doctor.TipoTurnoDoctor ? doctor.TipoTurnoDoctor.map(tipo => ({
-        ...tipo,
-        consultorioIds: tipo.consultorios.map(c => c.id),
-        consultorios: tipo.consultorios
-      })) : [],
-      // Remove the capitalized fields to avoid duplication
-      AgendaDoctor: undefined,
-      TipoTurnoDoctor: undefined
-    }));
-    
-    return NextResponse.json({ 
-      ok: true, 
-      doctores: doctoresFormateados
-    });
+      
+      // Transform the data to match the expected structure in the frontend
+      const doctorFormateado = {
+        ...doctor,
+        agenda: doctor.AgendaDoctor || [],
+        tiposTurno: doctor.TipoTurnoDoctor ? doctor.TipoTurnoDoctor.map(tipo => ({
+          ...tipo,
+          consultorioIds: tipo.consultorios.map(c => c.id),
+          consultorios: tipo.consultorios
+        })) : [],
+        // Remove the capitalized fields to avoid duplication
+        AgendaDoctor: undefined,
+        TipoTurnoDoctor: undefined
+      };
+      
+      return NextResponse.json({ 
+        ok: true, 
+        doctor: doctorFormateado
+      });
+    } else {
+      // Obtener todos los doctores
+      const doctores = await prisma.doctor.findMany({
+        include: {
+          AgendaDoctor: true,
+          TipoTurnoDoctor: {
+            include: {
+              consultorios: true
+            }
+          }
+        },
+        orderBy: {
+          nombre: 'asc'
+        }
+      });
+      
+      // Transform the data to match the expected structure in the frontend
+      const doctoresFormateados = doctores.map(doctor => ({
+        ...doctor,
+        agenda: doctor.AgendaDoctor || [],
+        tiposTurno: doctor.TipoTurnoDoctor ? doctor.TipoTurnoDoctor.map(tipo => ({
+          ...tipo,
+          consultorioIds: tipo.consultorios.map(c => c.id),
+          consultorios: tipo.consultorios
+        })) : [],
+        // Remove the capitalized fields to avoid duplication
+        AgendaDoctor: undefined,
+        TipoTurnoDoctor: undefined
+      }));
+      
+      return NextResponse.json({ 
+        ok: true, 
+        doctores: doctoresFormateados
+      });
+    }
   } catch (error) {
     console.error('Error al obtener doctores:', error);
     return NextResponse.json(

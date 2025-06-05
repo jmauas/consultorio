@@ -147,7 +147,6 @@ export default function ConsultorioPage() {
     
     return conflictos;
   };
-
   const handleGuardarConfiguracion = async () => {
     try {
       setGuardando(true);
@@ -156,12 +155,61 @@ export default function ConsultorioPage() {
       const data = await rspa.json();
       const configActual = data.config;
       console.log(config.doctores)
-      const doctoresParaGuardar = config.doctores.map(doctor => {
+      
+      // Obtener la agenda completa de cada doctor desde la base de datos para preservar datos
+      const doctoresCompletos = await Promise.all(
+        config.doctores.map(async (doctor) => {
+          if (!doctor.id) return doctor; // Si es doctor nuevo, usar tal como está
+          
+          try {
+            // Obtener agenda completa del doctor desde la DB
+            const response = await fetch(`/api/configuracion/doctores?id=${doctor.id}`);
+            const doctorDB = await response.json();
+            
+            if (doctorDB.ok && doctorDB.doctor) {
+              // Combinar agenda de la DB con cambios locales
+              const agendaCompleta = [...(doctorDB.doctor.agenda || [])];
+              
+              // Actualizar solo las entradas que han sido modificadas en el estado local
+              if (doctor.agenda && Array.isArray(doctor.agenda)) {
+                doctor.agenda.forEach(agendaLocal => {
+                  const index = agendaCompleta.findIndex(agendaDB => 
+                    agendaDB.dia === agendaLocal.dia && 
+                    agendaDB.consultorioId === agendaLocal.consultorioId &&
+                    (agendaLocal.dia !== 99 || 
+                     (agendaDB.fecha && agendaLocal.fecha && 
+                      new Date(agendaDB.fecha).getTime() === new Date(agendaLocal.fecha).getTime()))
+                  );
+                  
+                  if (index !== -1) {
+                    // Actualizar entrada existente
+                    agendaCompleta[index] = agendaLocal;
+                  } else {
+                    // Agregar nueva entrada
+                    agendaCompleta.push(agendaLocal);
+                  }
+                });
+              }
+              
+              return {
+                ...doctor,
+                agenda: agendaCompleta
+              };
+            }
+          } catch (error) {
+            console.error(`Error al obtener agenda completa del doctor ${doctor.id}:`, error);
+          }
+          
+          return doctor; // Fallback al doctor local si hay error
+        })
+      );
+      
+      const doctoresParaGuardar = doctoresCompletos.map(doctor => {
         // Ensure each doctor has agenda items for all days in each consultorio
         const agendaCompleta = [];
         
         if (doctor.agenda && Array.isArray(doctor.agenda)) {
-          // Get all unique consultorio IDs
+          // Get all unique consultorio IDs from the complete agenda
           const consultorioIds = [...new Set(doctor.agenda.map(a => a.consultorioId))];
           
           // For each consultorio, ensure all days are registered
