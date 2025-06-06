@@ -32,6 +32,7 @@ const publicRoutesSource = [
   '/turnos/cancelar',
   '/turnos/confirmar',
   '/api/cron/envios',
+  '/api/turnos/',
 ];
 
 const adminRoutesSource = [

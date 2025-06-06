@@ -598,7 +598,6 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-source': 'whatsapp'
         },
         body: JSON.stringify({ estado: 'cancelado' })
       });
@@ -616,7 +615,8 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
 
   // Función para enviar recordatorio por WhatsApp e EMail
     const enviarRecordatorio = async (turno) => {
-        try {        console.log('Enviando recordatorio para el turno:', turno);
+        try {        
+          console.log('Enviando recordatorio para el turno:', turno);
           let celular = turno.paciente.celular;
 
           if (celular.length >= 8) {
