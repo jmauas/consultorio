@@ -176,7 +176,7 @@ export default function Header() {
                 </div>
                 
                 {menuOpen && (
-                  <div className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 z-50 border border-gray-200 ${theme==='light' ? 'bg-white' : 'bg-black'}`}>
+                  <div className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 z-50 border border-gray-200 ${theme==='dark' ? 'bg-black' : 'bg-white'}`}>
                     {session?.user && session.user.perfil && Number(session.user.perfil.id) == 100 && (<>
                     <Link 
                       href="/configuracion/usuarios" 

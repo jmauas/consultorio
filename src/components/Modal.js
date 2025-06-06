@@ -77,7 +77,7 @@ export default function Modal({ isOpen, onClose, children, size = 'medium', titl
       style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
       onClick={handleOverlayClick}
     >      <div 
-        className={`relative ${theme==='light' ? 'bg-white' : 'bg-slate-800'} rounded-lg shadow-xl overflow-hidden w-full ${sizeClass} max-h-[90vh] flex flex-col transition-all duration-300 ease-out transform ${isVisible ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 translate-y-4'}`}
+        className={`relative ${theme==='dark' ? 'bg-slate-800' : 'bg-white'} rounded-lg shadow-xl overflow-hidden w-full ${sizeClass} max-h-[90vh] flex flex-col transition-all duration-300 ease-out transform ${isVisible ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 translate-y-4'}`}
       >
         {/* Cabecera del modal con título y botón de cierre */}
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">

@@ -462,7 +462,7 @@ export default function PacienteDetallePage() {
                   name="coberturaMedicaId"
                   value={formData.coberturaMedicaId}
                   onChange={handleCoberturaChange}
-                  className={`px-3 py-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='light' ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-200'}`}
+                  className={`px-3 py-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='dark' ? 'bg-slate-900 text-slate-200' : 'bg-slate-200 text-slate-900'}`}
                 >
                   <option value="" disabled>Seleccionar Cobertura</option>
                   {coberturasDisponibles.map((cobertura) => (
@@ -556,7 +556,7 @@ export default function PacienteDetallePage() {
               <h3 className="text-md font-medium mb-2">Turnos Cancelados</h3>
               <div className="border rounded-md divide-y divide-gray-200">
                 {turnos.cancelados.map((turno) => (
-                  <div key={turno.id} className={`p-3 hover:bg-slate-300 ${theme==='light' ? 'bg-red-50' : 'bg-slate-900 text-white'}`}>
+                  <div key={turno.id} className={`p-3 hover:bg-slate-300 ${theme==='dark' ? 'bg-slate-900 text-white' : 'bg-red-50'}`}>
                     <div className="flex justify-between">
                       <div>
                         <p className="font-medium">{new Date(turno.desde).toLocaleDateString('es-ES', { 

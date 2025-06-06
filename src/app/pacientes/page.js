@@ -266,7 +266,7 @@ export default function PacientesPage() {
               name="cobertura"
               value={filtros.cobertura}
               onChange={handleFiltroChange}
-              className={`px-3 py-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='light' ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-200'}`}
+              className={`px-3 py-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='dark' ? 'bg-slate-900 text-slate-200' : 'bg-slate-200 text-slate-900'}`}
             >
               <option value="todos">Todas las coberturas</option>
               {coberturas.map((cobertura) => (

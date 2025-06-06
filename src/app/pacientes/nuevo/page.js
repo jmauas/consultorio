@@ -346,7 +346,7 @@ export default function NuevoPacientePage() {
                     name="coberturaMedicaId"
                     value={formData.coberturaMedicaId}
                     onChange={handleChange}
-                    className={`px-3 py-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='light' ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-200'}`}
+                    className={`px-3 py-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='dark' ? 'bg-slate-900 text-slate-200' : 'bg-slate-200 text-slate-900'}`}
                   >
                     <option value="">Seleccione una cobertura</option>
                     {coberturas.map((cobertura) => (

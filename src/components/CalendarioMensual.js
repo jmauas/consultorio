@@ -101,7 +101,7 @@ const CalendarioMensual = ({ fechaInicial, onFechaClick }) => {
     
     const dias = obtenerDiasDelMes();
       return (
-        <div className={`${theme==='light' ? 'bg-white' : 'bg-[var(--card-bg)]'} border border-[var(--card-border)] rounded-lg shadow-lg p-2 sm:p-4 transition-all duration-200`}>
+        <div className={`${theme==='dark' ? 'bg-[var(--card-bg)]' : 'bg-white'} border border-[var(--card-border)] rounded-lg shadow-lg p-2 sm:p-4 transition-all duration-200`}>
             {/* Header del calendario */}
             <div className="flex items-center justify-between mb-2 sm:mb-4">                
                 <button
@@ -150,7 +150,7 @@ const CalendarioMensual = ({ fechaInicial, onFechaClick }) => {
                                 p-1 sm:p-2 h-6 sm:h-8 text-center text-xs sm:text-sm rounded-lg transition-all duration-200
                                 hover:scale-105 hover:shadow-md border
                                 ${diaObj.esDelMesActual 
-                                    ? theme==='light' ? 'text-[var(--text-color)] hover:bg-[var(--color-primary)] hover:text-white border-gray-300' : 'hover:bg-[var(--color-primary)] hover:text-white border-gray-600'
+                                    ? theme==='dark' ? 'hover:bg-[var(--color-primary)] hover:text-white border-gray-600' : 'text-[var(--text-color)] hover:bg-[var(--color-primary)] hover:text-white border-gray-300'
                                     : 'text-gray-400 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 border-gray-200 dark:border-gray-700'
                                 }
                                 ${esHoyDia 
@@ -158,7 +158,7 @@ const CalendarioMensual = ({ fechaInicial, onFechaClick }) => {
                                     : ''
                                 }
                                 ${esFinSemana && diaObj.esDelMesActual 
-                                    ? theme==='light' ? 'bg-red-50 border-red-200' : 'bg-slate-600 border-slate-300 text-slate-400'
+                                    ? theme==='dark' ? 'bg-slate-600 border-slate-300 text-slate-400' : 'bg-red-50 border-red-200'
                                     : ''
                                 }
                                 ${!diaObj.esDelMesActual 

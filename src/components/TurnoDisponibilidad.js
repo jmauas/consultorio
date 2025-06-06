@@ -793,7 +793,7 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
               </label>
               <select
                 id="doctor"
-                className={`flex-1 p-2 border border-gray-300 rounded-lg bg-[var(--background)] text-[var(--text-color)] focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                className={`flex-1 p-2 border border-gray-300 rounded-lg ${theme==='dark' ? 'bg-slate-900 text-slate-200' : 'bg-slate-200 text-slate-900'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 value={formData.doctorId}
                 onChange={handleDoctorChange}
               >
@@ -819,14 +819,15 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
               </select>
             </div>
 
-            {showTipoTurno && (              <div className="flex flex-wrap items-center gap-4">                
+            {showTipoTurno && (              
+              <div className="flex flex-wrap items-center gap-4">                
                 <label htmlFor="servicio" className="font-medium dark:text-gray-300 flex items-center gap-2">
                   <FaStethoscope className="text-[var(--color-primary)]" />
                   Tipo de Turno:
                 </label>
                 <select
                   id="servicio"
-                  className={`flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='light' ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-200'}
+                  className={`flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='dark' ? 'bg-slate-900 text-slate-200' : 'bg-slate-200 text-slate-900'}
                     ${fieldErrors.servicio ? 'border-red-500 dark:border-red-400' : 'border-gray-300 dark:border-gray-600'}`}
                   value={formData.servicioId}
                   onChange={handleServiceChange}
@@ -888,7 +889,8 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
              <Loader titulo={'Buscando Datos del Paciente ...'}/>
             )}
 
-            {showPacienteForm && dniValidado && !showLoadingPaciente && (              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {showPacienteForm && dniValidado && !showLoadingPaciente && (              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
                   <label htmlFor="nombre" className="font-medium w-24 flex items-center gap-2">
                     <FaUser className="text-[var(--color-primary)] text-sm" />
@@ -959,7 +961,7 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                   </label>
                   <select
                     id="coberturaMedicaId"
-                    className={`flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='light' ? 'bg-slate-200 text-slate-900' : 'bg-slate-900 text-slate-200'}
+                    className={`flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme==='dark' ? 'bg-slate-900 text-slate-200' : 'bg-slate-200 text-slate-900'}
                       ${fieldErrors.coberturaMedicaId ? 'border-red-500' : 'border-gray-300'}`}
                     value={formData.coberturaMedicaId}
                     onChange={handleInputChange}
@@ -1044,7 +1046,7 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                 <div className="space-y-4">
                   {agenda.map((dia) => (                    <div key={dia.fecha} className={`border border-[var(--color-primary)] rounded-lg overflow-hidden`}>
                       <div 
-                        className={`flex items-center justify-between ${theme==='light' ? 'bg-[var(--color-secondary)]' : 'bg-[var(--color-primary-dark)]'} px-4 py-3 border-b border-[var(--color-primary)] cursor-pointer`}
+                        className={`flex items-center justify-between ${theme==='dark' ? 'bg-[var(--color-primary-dark)]' : 'bg-[var(--color-secondary)]'} px-4 py-3 border-b border-[var(--color-primary)] cursor-pointer`}
                         onClick={() => toggleHorasVisibility(dia.fecha)}
                       >                        <div className="flex items-center gap-2">
                           <FaCalendarDay className="text-[var(--color-primary)]" /> 
@@ -1065,7 +1067,7 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                           {dia.turnos.map((turno, idx) => (
                             <button 
                               key={idx} 
-                              className={`flex items-center justify-between gap-3 p-3 ${theme==='light' ? 'bg-orange-100' : 'border border-white'} hover:bg-orange-200 rounded-lg shadow-lg transition-colors cursor-pointer`}
+                              className={`flex items-center justify-between gap-3 p-3 ${theme==='dark' ? 'border border-white' : 'bg-orange-100'} hover:bg-orange-200 rounded-lg shadow-lg transition-colors cursor-pointer`}
                               onClick={() => handleSelectTurno(dia.fecha, turno)}
                             >                              <FaClock className="text-[var(--color-primary)] text-lg" />
                               <span className="text-xl font-bold">{zfill(turno.hora, 2)}:{zfill(turno.min, 2)} Hs.</span>

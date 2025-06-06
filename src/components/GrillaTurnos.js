@@ -234,7 +234,7 @@ const cardLibre = (turno, anterior, color, index) => {
   return (
     <>      {/* Vista de tabla para pantallas medianas y grandes */}
       <div className="hidden md:block overflow-x-auto">
-        <table className={`min-w-full divide-y ${theme==='light' ? 'bg-slate-100 divide-gray-200' : 'bg-slate-800 divide-gray-700'}`}>
+        <table className={`min-w-full divide-y ${theme==='dark' ? 'bg-slate-800 divide-gray-700' : 'bg-slate-100 divide-gray-200'}`}>
           <thead className="">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider">Fecha</th>
@@ -248,7 +248,7 @@ const cardLibre = (turno, anterior, color, index) => {
             </tr>          
           </thead>
           <tbody 
-            className={`min-w-full divide-y ${theme==='light' ? 'bg-slate-50 divide-gray-200' : 'bg-slate-800 divide-gray-700'}`}
+            className={`min-w-full divide-y ${theme==='dark' ? 'bg-slate-800 divide-gray-700' : 'bg-slate-50 divide-gray-200'}`}
           >
             {turnos.map((turno, index) => (
               <React.Fragment key={turno.id || `turno-${index}`}>
@@ -479,7 +479,7 @@ const cardLibre = (turno, anterior, color, index) => {
                 </div>
               </div>
             </div>
-              <div className={`flex justify-between px-4 py-3 ${theme==='light' ? 'bg-slate-200' : 'bg-slate-800'}`}>
+              <div className={`flex justify-between px-4 py-3 ${theme==='dark' ? 'bg-slate-800' : 'bg-slate-200'}`}>
               <button
                 onClick={() => abrirDetalleTurno(turno)}
                 className="inline-flex rounded-md bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 border border-blue-600"
