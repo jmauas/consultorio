@@ -202,6 +202,8 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
       } else if (ccr == true) {
         fechaInicioBusqueda.setDate(fechaInicioBusqueda.getDate() + 7);
       }
+
+      console.log('Fecha de inicio de búsqueda:', fechaInicioBusqueda);
       
       // Obtener turnos existentes para el periodo
       const turnos = await prisma.turno.findMany({
@@ -321,6 +323,9 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
               const fin = new Date(turno[turno.length - 1].hasta);
               hoy = new Date(fin);
               hoy.setMinutes(hoy.getMinutes() - minutosTurno);
+              console.log('Turno ocupado a la hora', hoy);
+              console.log('Turnos ', turno);
+              console.log('saltando a la hora de fin del turno', fin);
               continue;
             }
             //const fh = hoy.getFullYear() + '-' + (hoy.getMonth() + 1) + '-' + hoy.getDate() + ' ' + hoy.getHours() + ':' + hoy.getMinutes() + ':00';
