@@ -229,6 +229,7 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
         
         try {
           while (hoy <= limite) {
+            console.log('Nuevo Bucle:', hoy, limite);
             hoy.setMinutes(hoy.getMinutes() + minutosTurno);
             // Convertir la fecha UTC a zona horaria argentina para comparaciones de día
             const fechaLocal = new Date(hoy.toLocaleString("en-US", {timeZone: TIMEZONE}));
