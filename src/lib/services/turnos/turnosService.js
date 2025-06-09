@@ -407,6 +407,7 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
   }
 
 const calcularProximoSlot = (minutosTurno) => {
+    // Mantener en UTC para consistencia con la base de datos
   const ahora = new Date();
   const minutosActuales = ahora.getMinutes();
   
