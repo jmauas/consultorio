@@ -314,7 +314,11 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
               const finTurno = new Date(t.hasta);
               const finHoy = new Date(hoy).setMinutes(hoy.getMinutes() + minutosTurno);
               if ((inicioTurno < hoy && finTurno > hoy) || (inicioTurno >= hoy && inicioTurno < finHoy) || (finTurno > hoy && finTurno <= finHoy)) {
-                return true;
+                if (t.doctorId === doctor.id || t.consultorioId === aten.consultorioId) {
+                  return true;
+                } else {
+                  return false;
+                }
               } else {
                 return false
               }
