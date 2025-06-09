@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { formatoFecha } from '@/lib/utils/dateUtils';
 import { useTheme } from 'next-themes';
 
@@ -98,6 +98,11 @@ const CalendarioMensual = ({ fechaInicial, onFechaClick }) => {
         const dia = fecha.getDay();
         return dia === 0 || dia === 6; // Domingo o Sábado
     };
+
+    useEffect(() => {
+       
+    }, [theme]);
+       
     
     const dias = obtenerDiasDelMes();
       return (

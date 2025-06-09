@@ -6,7 +6,7 @@ import { enviarRecordatorioTurno } from '@/lib/services/sender/whatsappService';
 import { enviarMailConfTurno } from "@/lib/services/sender/resendService";
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { sonMismaFecha } from  '@/lib/utils/dateUtils';
+import { formatoFecha, sonMismaFecha } from  '@/lib/utils/dateUtils';
 
 export const getTurnoById = async (id) => {
     try {
@@ -191,18 +191,18 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
       }
   
       // Calcular fechas para buscar disponibilidad
-      const ahora = new Date();
+      let fechaInicioBusqueda = new Date();
       const finPeriodo = new Date(config.limite);
   
       // Ajustar para penalidades
-      let fechaInicioBusqueda = new Date(ahora);
       
       // Si tiene penalidades, aplicar restricciones
-      if (asa && config.diasAsa > 0) {
-        fechaInicioBusqueda.setDate(fechaInicioBusqueda.getDate() + Number(config.diasAsa || 0));
-      } else if (ccr && config.diasCcr > 0) {
-        fechaInicioBusqueda.setDate(fechaInicioBusqueda.getDate() + Number(config.diasCcr || 0));
+      if (asa == true) {
+        fechaInicioBusqueda.setDate(fechaInicioBusqueda.getDate() + 30);
+      } else if (ccr == true) {
+        fechaInicioBusqueda.setDate(fechaInicioBusqueda.getDate() + 7);
       }
+      console.log(new Date().toLocaleString()+'  -  '+'Fecha de inicio de búsqueda:', formatoFecha(fechaInicioBusqueda, true, true, false, true));
   
       // Obtener turnos existentes para el periodo
       const turnos = await prisma.turno.findMany({
@@ -220,15 +220,7 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
           return;
         }
         const agenda = doctor.agenda;
-        let hoy = new Date();
-        hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-        hoy.setDate(hoy.getDate() + 1);
-        //ANALIZO PENALIZACIÓN
-        if (asa && asa === 'si') {
-          hoy.setDate(hoy.getDate() + 30)
-        } else if (ccr && ccr === 'si') {
-          hoy.setDate(hoy.getDate() + 7)
-        }
+        let hoy = fechaInicioBusqueda;
         hoy.setMinutes(hoy.getMinutes() - minutosTurno);
         const atenEnFeriado = { ...agenda.find(d => d.dia === 9) };
         try {

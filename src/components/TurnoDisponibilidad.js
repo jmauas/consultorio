@@ -1083,7 +1083,8 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
               )}
             </div>
             
-            <div className="flex justify-center mt-6">              <button 
+            <div className="flex justify-center mt-6">              
+              <button 
                 onClick={handleVolver} 
                 className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-lg flex items-center gap-2 transition-colors"
               >
@@ -1096,7 +1097,8 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
             {showRegistrarTurno && (
               <div className="mt-6 space-y-4">
                   {turno.desde && (<>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">                      <div className="border border-slate-200 rounded-lg p-3 flex justify-between items-center">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">                      
+                      <div className="border border-slate-200 rounded-lg p-3 flex justify-between items-center">
                         <div className="flex items-center gap-2 ">
                           <FaCalendarDay className="text-[var(--color-primary)]" /> Fecha:
                         </div>
@@ -1105,7 +1107,8 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                         </div>
                       </div>
                       
-                      <div className="border border-slate-200  rounded-lg p-3 flex justify-between items-center">                        <div className="flex items-center gap-2 ">
+                      <div className="border border-slate-200  rounded-lg p-3 flex justify-between items-center">                        
+                        <div className="flex items-center gap-2 ">
                           <FaClock className="text-[var(--color-primary)]" /> Hora:
                         </div>
                         <div className=" px-3 py-2 rounded border border-gray-300 font-bold text-xl">
@@ -1113,7 +1116,8 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                         </div>
                       </div>
                       
-                      <div className="border border-slate-200  rounded-lg p-3 flex justify-between items-center">                        <div className="flex items-center gap-2 ">
+                      <div className="border border-slate-200  rounded-lg p-3 flex justify-between items-center">                        
+                        <div className="flex items-center gap-2 ">
                           <FaUserMd className="text-[var(--color-primary)]" /> Doctor:
                         </div>
                         <div className=" px-3 py-2 rounded border border-gray-300 font-medium">
@@ -1121,7 +1125,8 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                         </div>
                       </div>
                       
-                      <div className="border border-slate-200  rounded-lg p-3 flex justify-between items-center">                        <div className="flex items-center gap-2 ">
+                      <div className="border border-slate-200  rounded-lg p-3 flex justify-between items-center">                        
+                        <div className="flex items-center gap-2 ">
                           <FaListAlt className="text-[var(--color-primary)]" /> Tipo Turno:
                         </div>
                         <div className=" px-3 py-2 rounded border border-gray-300 font-medium">
