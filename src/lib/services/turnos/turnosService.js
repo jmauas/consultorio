@@ -242,6 +242,9 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
             let dia = fechaLocal.getDay();
 
             const aten = { ...agenda.find(d => d.dia === dia) };
+
+            console.log('diaSemana', dia, 'hoy', hoy, 'Fecha para feriado', fechaFer, 'fecha', fecha, 'aten', aten);
+
             const esFeriado = feriados.some(f => sonMismaFecha(f, fechaFer));
             const diasNoAtiende = agregarFeriados([], doctor.feriados);
             const noAtiende = diasNoAtiende.some(f => sonMismaFecha(f, fecha));
