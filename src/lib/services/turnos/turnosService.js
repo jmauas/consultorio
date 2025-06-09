@@ -6,7 +6,7 @@ import { enviarRecordatorioTurno } from '@/lib/services/sender/whatsappService';
 import { enviarMailConfTurno } from "@/lib/services/sender/resendService";
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { formatoFecha, sonMismaFecha } from  '@/lib/utils/dateUtils';
+import { sonMismaFecha } from  '@/lib/utils/dateUtils';
 
 export const getTurnoById = async (id) => {
     try {
@@ -202,8 +202,7 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
       } else if (ccr == true) {
         fechaInicioBusqueda.setDate(fechaInicioBusqueda.getDate() + 7);
       }
-      console.log(new Date().toLocaleString()+'  -  '+'Fecha de inicio de búsqueda:', formatoFecha(fechaInicioBusqueda, true, true, false, true));
-  
+      
       // Obtener turnos existentes para el periodo
       const turnos = await prisma.turno.findMany({
         where: {
@@ -220,7 +219,7 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
           return;
         }
         const agenda = doctor.agenda;
-        let hoy = fechaInicioBusqueda;
+        let hoy = calcularProximoSlot(minutosTurno);
         hoy.setMinutes(hoy.getMinutes() - minutosTurno);
         const atenEnFeriado = { ...agenda.find(d => d.dia === 9) };
         try {
@@ -373,6 +372,30 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
       }
     }
   }
+
+const calcularProximoSlot = (minutosTurno) => {
+  const ahora = new Date();
+  const minutosActuales = ahora.getMinutes();
+  
+  // Calcular el próximo slot múltiplo de minutosTurno
+  const slotActual = Math.floor(minutosActuales / minutosTurno);
+  const proximoSlot = (slotActual + 1) * minutosTurno;
+  
+  // Si el próximo slot está en la misma hora
+  if (proximoSlot < 60) {
+    ahora.setMinutes(proximoSlot);
+    ahora.setSeconds(0);
+    ahora.setMilliseconds(0);
+  } else {
+    // Si el próximo slot está en la siguiente hora
+    ahora.setHours(ahora.getHours() + 1);
+    ahora.setMinutes(0);
+    ahora.setSeconds(0);
+    ahora.setMilliseconds(0);
+  }
+  
+  return ahora;
+};
 
 export const analizarTurnosDisponibles = async (turnos) => {
     // Obtener la agenda del doctor para ese día
