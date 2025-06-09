@@ -272,6 +272,13 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
                   hoy.setMinutes(hoy.getMinutes() - minutosTurno);
                   continue;
                 }
+            }            // Validar que los campos de horarios existen y no son null/undefined
+            if (!aten.desde || !aten.hasta) {
+              console.log(`Doctor ${doctor.nombre} - Agenda incompleta para el día ${dia}`);
+              hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+              hoy.setDate(hoy.getDate() + 1);
+              hoy.setMinutes(hoy.getMinutes() - minutosTurno);
+              continue;
             }
 
             // Usar la hora local para comparaciones con horarios de agenda
@@ -281,10 +288,12 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
             const minInicio = Number(aten.desde.split(':')[1]);
             const hrFin = Number(aten.hasta.split(':')[0]);
             const minFin = Number(aten.hasta.split(':')[1]);
-            const hrCorteDesde = Number(aten.corteDesde.split(':')[0]);
-            const hrCorteHasta = Number(aten.corteHasta.split(':')[0]);
-            const minCorteDesde = aten.corteDesde.split(':')[1] ? Number(aten.corteDesde.split(':')[1]): 0;
-            const minCorteHasta = aten.corteHasta.split(':')[1] ? Number(aten.corteHasta.split(':')[1]) : 0;
+            
+            // Validar campos de corte (pueden ser null)
+            const hrCorteDesde = aten.corteDesde ? Number(aten.corteDesde.split(':')[0]) : null;
+            const hrCorteHasta = aten.corteHasta ? Number(aten.corteHasta.split(':')[0]) : null;
+            const minCorteDesde = aten.corteDesde && aten.corteDesde.split(':')[1] ? Number(aten.corteDesde.split(':')[1]) : 0;
+            const minCorteHasta = aten.corteHasta && aten.corteHasta.split(':')[1] ? Number(aten.corteHasta.split(':')[1]) : 0;
   
             //console.log(new Date().toLocaleString()+'  -  '+'diaSemana', dia, 'hoy', hoy, 'Fecha para feriado', fechaFer, 'fecha', fecha, 'hora', hora, 'minutos', minutos, 'hrInicio', hrInicio, 'minInicio', minInicio, 'hrFin', hrFin, 'minFin', minFin)
             //console.log(new Date().toLocaleString()+'  -  '+'hora', hora, 'minutos', minutos, 'hrCorte', hrCorteDesde, minCorteDesde, 'hrCorteHasta', hrCorteHasta, minCorteHasta)
@@ -304,8 +313,7 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
               hoy = new Date(nuevaHoraLocal.getTime() + diferencia);
               hoy.setMinutes(hoy.getMinutes() - minutosTurno);
               continue;
-            }
-            if (hora > hrFin) {
+            }            if (hora > hrFin) {
               hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
               hoy.setDate(hoy.getDate() + 1);
               hoy.setMinutes(hoy.getMinutes() - minutosTurno);
@@ -317,20 +325,27 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
               hoy.setMinutes(hoy.getMinutes() - minutosTurno);
               continue;
             }
-            if (hora > hrCorteDesde && hora < hrCorteHasta) {
-              const diferencia = hoy.getTime() - fechaLocal.getTime();
-              const nuevaHoraLocal = new Date(fechaLocal);
-              nuevaHoraLocal.setHours(hrCorteHasta);
-              nuevaHoraLocal.setMinutes(minCorteHasta);
-              hoy = new Date(nuevaHoraLocal.getTime() + diferencia);
-              hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-              continue;
-            }
-            if ((hora === hrCorteDesde && minutos > minCorteDesde) || (hora === hrCorteHasta && minutos < minCorteHasta)) {
-              const diferencia = hoy.getTime() - fechaLocal.getTime();
-              const nuevaHoraLocal = new Date(fechaLocal);
-              nuevaHoraLocal.setHours(hrCorteHasta);
-              hoy = new Date(nuevaHoraLocal.getTime() + diferencia);
+            
+            // Verificar horarios de corte solo si están definidos
+            if (hrCorteDesde !== null && hrCorteHasta !== null) {
+              if (hora > hrCorteDesde && hora < hrCorteHasta) {
+                const diferencia = hoy.getTime() - fechaLocal.getTime();
+                const nuevaHoraLocal = new Date(fechaLocal);
+                nuevaHoraLocal.setHours(hrCorteHasta);
+                nuevaHoraLocal.setMinutes(minCorteHasta);
+                hoy = new Date(nuevaHoraLocal.getTime() + diferencia);
+                hoy.setMinutes(hoy.getMinutes() - minutosTurno);
+                continue;
+              }
+              if ((hora === hrCorteDesde && minutos >= minCorteDesde) || (hora === hrCorteHasta && minutos < minCorteHasta)) {
+                const diferencia = hoy.getTime() - fechaLocal.getTime();
+                const nuevaHoraLocal = new Date(fechaLocal);
+                nuevaHoraLocal.setHours(hrCorteHasta);
+                nuevaHoraLocal.setMinutes(minCorteHasta);
+                hoy = new Date(nuevaHoraLocal.getTime() + diferencia);
+                hoy.setMinutes(hoy.getMinutes() - minutosTurno);
+                continue;
+              }
             }
             
             // Verificar turnos existentes (comparar en UTC)

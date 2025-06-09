@@ -379,7 +379,8 @@ const DoctoresTab = ({
                     
                     <div className="flex items-center">
                       <input
-                        type="checkbox"                        id={`publico-${doctor.id}`}
+                        type="checkbox"                        
+                        id={`publico-${doctor.id}`}
                         checked={doctor.nuevoTipoTurno?.publico !== false}
                         onChange={(e) => {
                           const newDoctores = [...config.doctores];

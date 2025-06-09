@@ -227,14 +227,13 @@ const procesarTiposTurnoOptimizado = async (tx, doctoresConTipos, doctoresCreado
       const tiposAActualizar = [];
       
       doctor.tiposTurno.forEach(tipoTurno => {
-        const tipoExistente = tiposTurnoExistentesMap.get(tipoTurno.nombre);
-        if (tipoExistente) {
+        const tipoExistente = tiposTurnoExistentesMap.get(tipoTurno.nombre);        if (tipoExistente) {
           tiposAActualizar.push({
             id: tipoExistente.id,
             data: {
               duracion: tipoTurno.duracion,
               habilitado: tipoTurno.habilitado,
-              publico: tipoTurno.publico || true,
+              publico: tipoTurno.publico !== undefined ? tipoTurno.publico : true,
             }
           });
         } else {
@@ -243,7 +242,7 @@ const procesarTiposTurnoOptimizado = async (tx, doctoresConTipos, doctoresCreado
             nombre: tipoTurno.nombre,
             duracion: tipoTurno.duracion,
             habilitado: tipoTurno.habilitado,
-            publico: tipoTurno.publico || true,
+            publico: tipoTurno.publico !== undefined ? tipoTurno.publico : true,
           });
         }
       });
@@ -267,14 +266,13 @@ const procesarTiposTurnoOptimizado = async (tx, doctoresConTipos, doctoresCreado
   // Procesar tipos de turno para doctores nuevos
   const tiposNuevosACrear = [];
   doctoresCreados.forEach(({ original, creado }) => {
-    if (original.tiposTurno && Array.isArray(original.tiposTurno)) {
-      original.tiposTurno.forEach(tipoTurno => {
+    if (original.tiposTurno && Array.isArray(original.tiposTurno)) {      original.tiposTurno.forEach(tipoTurno => {
         tiposNuevosACrear.push({
           doctorId: creado.id,
           nombre: tipoTurno.nombre,
           duracion: tipoTurno.duracion,
           habilitado: tipoTurno.habilitado,
-          publico: tipoTurno.publico || true,
+          publico: tipoTurno.publico !== undefined ? tipoTurno.publico : true,
         });
       });
     }
