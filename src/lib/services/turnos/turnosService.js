@@ -127,11 +127,9 @@ export const updateTurnoService = async (id, datos) => {
 export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, asa, ccr) => {
   try {
       // Obtener la configuración
-      // Definir zona horaria argentina
-      const TIMEZONE = 'America/Argentina/Buenos_Aires';
       const config = await obtenerConfig();
       let limite = new Date(config.limite);
-      limite = limite.setDate(limite.getDate() + 1);
+      limite.setDate(limite.getDate() + 1);
       let feriados = agregarFeriados([], config.feriados);
       // Obtengo los consultorios relacionados con el tipo de turno especificado
       const consultorios = await prisma.consultorio.findMany({
@@ -229,21 +227,17 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
         
         try {
           while (hoy <= limite) {
-            console.log('Nuevo Bucle:', hoy, limite);
+            //console.log('Nuevo Bucle:', hoy, limite);
             hoy.setMinutes(hoy.getMinutes() + minutosTurno);
-            // Convertir la fecha UTC a zona horaria argentina para comparaciones de día
-            const fechaLocal = new Date(hoy.toLocaleString("en-US", {timeZone: TIMEZONE}));
-            let fecha = new Date(fechaLocal.getFullYear(), fechaLocal.getMonth(), fechaLocal.getDate());
+            let fecha = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
             
-            // Para verificar feriados, usar la fecha local
             const fechaFer = new Date(fecha);
             
-            // Obtener el día de la semana en zona horaria argentina
-            let dia = fechaLocal.getDay();
+            let dia = hoy.getUTCDay();
 
             const aten = { ...agenda.find(d => d.dia === dia) };
 
-            console.log('diaSemana', dia, 'hoy', hoy, 'Fecha para feriado', fechaFer, 'fecha', fecha, 'aten', aten);
+            //console.log('diaSemana', dia, 'hoy', hoy, 'Fecha para feriado', fechaFer, 'fecha', fecha, 'aten', aten);
 
             const esFeriado = feriados.some(f => sonMismaFecha(f, fechaFer));
             const diasNoAtiende = agregarFeriados([], doctor.feriados);
@@ -269,25 +263,31 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
                     aten.hasta = agendaFecha.hasta;
                     aten.corteDesde = agendaFecha.corteDesde;
                     aten.corteHasta = agendaFecha.corteHasta;
-                }
+                }                
                 if (!aten.atencion) {
-                  hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-                  hoy.setDate(hoy.getDate() + 1);
+                  // Mantener la fecha UTC pero saltar al siguiente día
+                  const nuevaFecha = new Date(hoy);
+                  nuevaFecha.setUTCDate(nuevaFecha.getUTCDate() + 1);
+                  nuevaFecha.setUTCHours(0, 0, 0, 0);
+                  hoy = nuevaFecha;
                   hoy.setMinutes(hoy.getMinutes() - minutosTurno);
                   continue;
                 }
-            }            // Validar que los campos de horarios existen y no son null/undefined
+            }            
+            // Validar que los campos de horarios existen y no son null/undefined
             if (!aten.desde || !aten.hasta) {
               console.log(`Doctor ${doctor.nombre} - Agenda incompleta para el día ${dia}`);
-              hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-              hoy.setDate(hoy.getDate() + 1);
+              const nuevaFecha = new Date(hoy);
+              nuevaFecha.setUTCDate(nuevaFecha.getUTCDate() + 1);
+              nuevaFecha.setUTCHours(0, 0, 0, 0);
+              hoy = nuevaFecha;
               hoy.setMinutes(hoy.getMinutes() - minutosTurno);
               continue;
             }
 
             // Usar la hora local para comparaciones con horarios de agenda
-            const hora = fechaLocal.getHours();
-            const minutos = fechaLocal.getMinutes();
+            const hora = hoy.getUTCHours();
+            const minutos = hoy.getUTCMinutes();
             const hrInicio = Number(aten.desde.split(':')[0]);
             const minInicio = Number(aten.desde.split(':')[1]);
             const hrFin = Number(aten.hasta.split(':')[0]);
@@ -299,54 +299,50 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
             const minCorteDesde = aten.corteDesde && aten.corteDesde.split(':')[1] ? Number(aten.corteDesde.split(':')[1]) : 0;
             const minCorteHasta = aten.corteHasta && aten.corteHasta.split(':')[1] ? Number(aten.corteHasta.split(':')[1]) : 0;
   
-            //console.log(new Date().toLocaleString()+'  -  '+'diaSemana', dia, 'hoy', hoy, 'Fecha para feriado', fechaFer, 'fecha', fecha, 'hora', hora, 'minutos', minutos, 'hrInicio', hrInicio, 'minInicio', minInicio, 'hrFin', hrFin, 'minFin', minFin)
-            //console.log(new Date().toLocaleString()+'  -  '+'hora', hora, 'minutos', minutos, 'hrCorte', hrCorteDesde, minCorteDesde, 'hrCorteHasta', hrCorteHasta, minCorteHasta)
+            //console.log('diaSemana', dia, 'hoy', hoy, 'Fecha para feriado', fechaFer, 'fecha', fecha, 'hora', hora, 'minutos', minutos, 'hrInicio', hrInicio, 'minInicio', minInicio, 'hrFin', hrFin, 'minFin', minFin)
+            //console.log('hora', hora, 'minutos', minutos, 'Corte Desde', hrCorteDesde, minCorteDesde, 'Corte Hasta', hrCorteHasta, minCorteHasta)
             if (hora < hrInicio) {
-              // Ajustar la hora UTC para corresponder con el horario local deseado
-              const diferencia = hoy.getTime() - fechaLocal.getTime();
-              const nuevaHoraLocal = new Date(fechaLocal);
-              nuevaHoraLocal.setHours(hrInicio);
-              hoy = new Date(nuevaHoraLocal.getTime() + diferencia);
+              hoy.setUTCHours(hrInicio);
+              hoy.setUTCMinutes(minInicio);
               hoy.setMinutes(hoy.getMinutes() - minutosTurno);
               continue;
             }
             if (hora === hrInicio && minutos < minInicio) {
-              const diferencia = hoy.getTime() - fechaLocal.getTime();
-              const nuevaHoraLocal = new Date(fechaLocal);
-              nuevaHoraLocal.setMinutes(minInicio);
-              hoy = new Date(nuevaHoraLocal.getTime() + diferencia);
+              hoy.setUTCHours(hrInicio);
+              hoy.setUTCMinutes(minInicio);
               hoy.setMinutes(hoy.getMinutes() - minutosTurno);
               continue;
-            }            if (hora > hrFin) {
-              hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-              hoy.setDate(hoy.getDate() + 1);
+            }            
+            if (hora > hrFin) {
+              const nuevaFecha = new Date(hoy);
+              nuevaFecha.setUTCDate(nuevaFecha.getUTCDate() + 1);
+              nuevaFecha.setUTCHours(0, 0, 0, 0);
+              hoy = nuevaFecha;
               hoy.setMinutes(hoy.getMinutes() - minutosTurno);
+              console.log('Hora mayor que fin, saltando al siguiente día:', hoy);
               continue;
             }
             if (hora === hrFin && minutos >= minFin) {
-              hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-              hoy.setDate(hoy.getDate() + 1);
+             const nuevaFecha = new Date(hoy);
+              nuevaFecha.setUTCDate(nuevaFecha.getUTCDate() + 1);
+              nuevaFecha.setUTCHours(0, 0, 0, 0);
+              hoy = nuevaFecha;
               hoy.setMinutes(hoy.getMinutes() - minutosTurno);
+              console.log('Hora de Cierre, saltando al siguiente día:', hoy);
               continue;
             }
             
             // Verificar horarios de corte solo si están definidos
             if (hrCorteDesde !== null && hrCorteHasta !== null) {
               if (hora > hrCorteDesde && hora < hrCorteHasta) {
-                const diferencia = hoy.getTime() - fechaLocal.getTime();
-                const nuevaHoraLocal = new Date(fechaLocal);
-                nuevaHoraLocal.setHours(hrCorteHasta);
-                nuevaHoraLocal.setMinutes(minCorteHasta);
-                hoy = new Date(nuevaHoraLocal.getTime() + diferencia);
+                hoy.setUTCHours(hrCorteHasta);
+                hoy.setUTCMinutes(minCorteHasta);
                 hoy.setMinutes(hoy.getMinutes() - minutosTurno);
                 continue;
               }
               if ((hora === hrCorteDesde && minutos >= minCorteDesde) || (hora === hrCorteHasta && minutos < minCorteHasta)) {
-                const diferencia = hoy.getTime() - fechaLocal.getTime();
-                const nuevaHoraLocal = new Date(fechaLocal);
-                nuevaHoraLocal.setHours(hrCorteHasta);
-                nuevaHoraLocal.setMinutes(minCorteHasta);
-                hoy = new Date(nuevaHoraLocal.getTime() + diferencia);
+                hoy.setUTCHours(hrCorteHasta);
+                hoy.setUTCMinutes(minCorteHasta);
                 hoy.setMinutes(hoy.getMinutes() - minutosTurno);
                 continue;
               }
@@ -356,7 +352,8 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
             const turno = turnos.filter(t => {
               const inicioTurno = new Date(t.desde);
               const finTurno = new Date(t.hasta);
-              const finHoy = new Date(hoy.getTime() + (minutosTurno * 60000));
+              const finHoy = new Date(hoy);
+              finHoy.setUTCMinutes(finHoy.getUTCMinutes() + minutosTurno);
               if ((inicioTurno < hoy && finTurno > hoy) || (inicioTurno >= hoy && inicioTurno < finHoy) || (finTurno > hoy && finTurno <= finHoy)) {
                 if (t.doctorId === doctor.id || t.consultorioId === aten.consultorioId) {
                   return true;
@@ -369,16 +366,17 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
             });
             
             if (turno && turno.length > 0) {
+              console.log('HOY:', hoy);
+              console.log('Turnos existente encontrado:', turno);
               const fin = new Date(turno[turno.length - 1].hasta);
               hoy = new Date(fin);
               hoy.setMinutes(hoy.getMinutes() - minutosTurno);
               continue;
             }
             
-            // Para mostrar, usar la fecha local
-            fecha = fechaLocal.getFullYear() + '-' + (fechaLocal.getMonth() + 1) + '-' + fechaLocal.getDate();
-            const hr = fechaLocal.getHours();
-            const min = fechaLocal.getMinutes();
+            fecha = hoy.getFullYear() + '-' + (hoy.getMonth() + 1) + '-' + hoy.getDate();
+            const hr = hoy.getUTCHours();
+            const min = hoy.getUTCMinutes();
             dia = disp.find(turno => turno.fecha == fecha);
             const consultorioId = aten.consultorioId;
             const turnoAgregar = {
@@ -397,7 +395,7 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
             if (!dia) {
               disp.push({
                 fecha: fecha,
-                diaSemana: fechaLocal.toLocaleDateString('es-ES', { weekday: 'long' }),
+                diaSemana: hoy.toLocaleDateString('es-ES', { weekday: 'long' }),
                 turnos: [turnoAgregar],
               });
             } else {
