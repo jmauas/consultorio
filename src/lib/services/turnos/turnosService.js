@@ -208,6 +208,7 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
       console.log('🕐 Fecha actual local:', new Date().toString());
       let timeOffset = new Date().getTimezoneOffset() / 60;
       console.log('🕐 Time Offset (horas):', timeOffset);
+      timeOffset = 3;
       
       let feriados = agregarFeriados([], config.feriados, timeOffset);
       // Obtener turnos existentes para el periodo
