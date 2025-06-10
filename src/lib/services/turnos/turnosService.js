@@ -204,6 +204,9 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
       }
 
       console.log('Fecha de inicio de búsqueda:', fechaInicioBusqueda);
+      console.log('🕐 Timezone del servidor:', Intl.DateTimeFormat().resolvedOptions().timeZone);
+      console.log('🕐 Fecha actual UTC:', new Date().toISOString());
+      console.log('🕐 Fecha actual local:', new Date().toString());
       
       // Obtener turnos existentes para el periodo
       const turnos = await prisma.turno.findMany({
@@ -349,7 +352,7 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
             }
             
             // Verificar turnos existentes (comparar en -3)
-            const timeOffset = -3
+            const timeOffset = 0
             const turno = turnos.filter(t => {
               const inicioTurno = new Date(t.desde);
               const finTurno = new Date(t.hasta);
@@ -375,7 +378,7 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
             
             if (turno && turno.length > 0) {
               console.log('HOY:', hoy);
-              console.log('Turnos existente encontrado:', turno);
+              //console.log('Turnos existente encontrado:', turno);
               const fin = new Date(turno[turno.length - 1].hasta);
               hoy = new Date(fin);
               hoy.setMinutes(hoy.getMinutes() - minutosTurno);
