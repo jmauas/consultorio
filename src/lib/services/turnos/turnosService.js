@@ -352,16 +352,23 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
             const turno = turnos.filter(t => {
               const inicioTurno = new Date(t.desde);
               const finTurno = new Date(t.hasta);
+              const inicioTurnoUTC = new Date(inicioTurno.getTime() - (inicioTurno.getTimezoneOffset() * 60000));
+              const finTurnoUTC = new Date(finTurno.getTime() - (finTurno.getTimezoneOffset() * 60000));
+              
               const finHoy = new Date(hoy);
               finHoy.setUTCMinutes(finHoy.getUTCMinutes() + minutosTurno);
-              if ((inicioTurno < hoy && finTurno > hoy) || (inicioTurno >= hoy && inicioTurno < finHoy) || (finTurno > hoy && finTurno <= finHoy)) {
+              
+              // Comparar en UTC
+              if ((inicioTurnoUTC < hoy && finTurnoUTC > hoy) || 
+                  (inicioTurnoUTC >= hoy && inicioTurnoUTC < finHoy) || 
+                  (finTurnoUTC > hoy && finTurnoUTC <= finHoy)) {
                 if (t.doctorId === doctor.id || t.consultorioId === aten.consultorioId) {
                   return true;
                 } else {
                   return false;
                 }
               } else {
-                return false
+                return false;
               }
             });
             
@@ -371,6 +378,8 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
               const fin = new Date(turno[turno.length - 1].hasta);
               hoy = new Date(fin);
               hoy.setMinutes(hoy.getMinutes() - minutosTurno);
+              hoy = new Date(hoy.getTime() - (hoy.getTimezoneOffset() * 60000));
+              console.log('HOY 2:', hoy);
               continue;
             }
             
