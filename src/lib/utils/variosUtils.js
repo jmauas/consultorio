@@ -29,17 +29,14 @@ export const agregarFeriados = (actual, agregar) => {
   if (!agregar || agregar.lenght === 0) return actual;
   agregar.forEach(f => {
       if (f.indexOf('|') >= 0) {
-          let fecha1 = new Date(f.split('|')[0]);
-          let fecha2 = new Date(f.split('|')[1]);
-          fecha1.setHours(fecha1.getHours() + 3);
-          fecha2.setHours(fecha2.getHours() + 3);
+          let fecha1 = new Date(f.split('|')[0] + 'T00:00:00.000Z');
+          let fecha2 = new Date(f.split('|')[1] + 'T00:00:00.000Z');
           while (fecha1 <= fecha2) {
               actual.push(new Date(fecha1));
               fecha1.setDate(fecha1.getDate() + 1);
           }
       } else {
-        let fecha1 = new Date(f);
-        fecha1.setHours(fecha1.getHours() + 3);
+        let fecha1 = new Date(f + 'T00:00:00.000Z');
         actual.push(fecha1);
       }
   });

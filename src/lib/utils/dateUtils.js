@@ -346,9 +346,9 @@ export const calcularProximosDias = (fechaInicio = new Date(), numeroDias = 7, i
 };
 
 export const sonMismaFecha = (fecha1, fecha2) => {
-  return (
-      fecha1.getDate() === fecha2.getDate() &&
+  const res = fecha1.getDate() === fecha2.getDate() &&
       fecha1.getMonth() === fecha2.getMonth() &&
-      fecha1.getFullYear() === fecha2.getFullYear()
-  )
+      fecha1.getFullYear() === fecha2.getFullYear();
+  if (res===true) console.log(`Comparando fechas: ${fecha1} y ${fecha2} - Resultado: ${res}`);
+  return res;
 }
