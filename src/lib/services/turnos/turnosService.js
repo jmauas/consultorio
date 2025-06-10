@@ -348,12 +348,13 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
               }
             }
             
-            // Verificar turnos existentes (comparar en UTC)
+            // Verificar turnos existentes (comparar en -3)
+            const timeOffset = -3
             const turno = turnos.filter(t => {
               const inicioTurno = new Date(t.desde);
               const finTurno = new Date(t.hasta);
-              const inicioTurnoUTC = new Date(inicioTurno.getTime() - (inicioTurno.getTimezoneOffset() * 60000));
-              const finTurnoUTC = new Date(finTurno.getTime() - (finTurno.getTimezoneOffset() * 60000));
+              const inicioTurnoUTC = new Date(inicioTurno.getTime() - (timeOffset * 60000));
+              const finTurnoUTC = new Date(finTurno.getTime() - (timeOffset * 60000));
               
               const finHoy = new Date(hoy);
               finHoy.setUTCMinutes(finHoy.getUTCMinutes() + minutosTurno);
@@ -378,7 +379,7 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
               const fin = new Date(turno[turno.length - 1].hasta);
               hoy = new Date(fin);
               hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-              hoy = new Date(hoy.getTime() - (hoy.getTimezoneOffset() * 60000));
+              hoy = new Date(hoy.getTime() - (timeOffset * 60000));
               console.log('HOY 2:', hoy);
               continue;
             }
