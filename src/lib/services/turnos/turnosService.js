@@ -201,7 +201,6 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
       } else if (ccr == true) {
         fechaInicioBusqueda.setDate(fechaInicioBusqueda.getDate() + 7);
       }
-
       console.log('Fecha de inicio de búsqueda:', fechaInicioBusqueda);
       console.log('🕐 Timezone del servidor:', Intl.DateTimeFormat().resolvedOptions().timeZone);
       console.log('🕐 Fecha actual UTC:', new Date().toISOString());

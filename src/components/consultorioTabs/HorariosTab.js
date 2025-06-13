@@ -918,8 +918,7 @@ const HorariosTab = ({
                 </>
               )}
                 {/* Botón para guardar agenda */}
-              <div className="mt-6 flex justify-end">
-                <button
+              <div className="mt-6 flex justify-end">                <button
                   onClick={() => {
                     // Crear copia profunda del array de doctores
                     let newDoctores = JSON.parse(JSON.stringify(config.doctores));
@@ -929,52 +928,52 @@ const HorariosTab = ({
                       const agenda = [...newDoctores[doctorIndex].agenda];
                       newDoctores[doctorIndex].agenda = []
 
-                      if (agenda.length > 0) {
-                        // Si es agenda semanal, mantener comportamiento actual
-                        if (agendaMode === 'semanal') {
-                          ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'feriado'].forEach((dia, index) => {
-                            const diaNum = index < 7 ? index : 9;
-                            
-                            // Recuperar entrada de UI si existe
-                            const diaAgenda = agenda.find(a => 
-                              a.dia === diaNum && 
-                              a.consultorioId === selectedConsultorioForAgenda.id
-                            );
-                            
-                            if (diaAgenda && diaAgenda.atencion) {
-                              newDoctores[doctorIndex].agenda.push({
-                                ...diaAgenda,
-                                fecha: null // Asegurar que el campo fecha esté vacío
-                              });
-                            }
-                          });
-                        }
-                        // Para agenda por fechas, usar las fechas originales guardadas
-                        else if (agendaMode === 'fechas') {
-                          const diaAgenda = agenda.filter(a => a.dia === 99);                   // Agregar fechas a la agenda desde las guardadas temporalmente
-                          if (diaAgenda.length > 0) {
-                            newDoctores[doctorIndex].agenda = diaAgenda;
+                      // Si es agenda semanal, mantener comportamiento actual
+                      if (agendaMode === 'semanal') {
+                        ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'feriado'].forEach((dia, index) => {
+                          const diaNum = index < 7 ? index : 9;
+                          
+                          // Recuperar entrada de UI si existe
+                          const diaAgenda = agenda.find(a => 
+                            a.dia === diaNum && 
+                            a.consultorioId === selectedConsultorioForAgenda.id
+                          );
+                          
+                          // Guardar todos los días, tanto activos como inactivos
+                          if (diaAgenda) {
+                            newDoctores[doctorIndex].agenda.push({
+                              ...diaAgenda,
+                              fecha: null // Asegurar que el campo fecha esté vacío
+                            });
                           }
-                        } 
-                        console.log('Doctor:', newDoctores[doctorIndex]);
-                        console.log('Doctores:', newDoctores);
-
-                        // Actualizar el estado con las nuevas configuraciones
-                        setConfig({...config, doctores: newDoctores});
-                        
-                        // Actualizar el doctor seleccionado con los datos del arreglo original 
-                        // para mantener los objetos Date intactos
-                        const doctorActualizado = {
-                          ...selectedDoctorForAgenda,
-                          agenda: [
-                            ...selectedDoctorForAgenda.agenda.filter(a => a.consultorioId !== selectedConsultorioForAgenda.id),
-                            ...newDoctores[doctorIndex].agenda.filter(a => a.consultorioId === selectedConsultorioForAgenda.id)
-                          ]
-                        };                      
-                        setSelectedDoctorForAgenda(doctorActualizado);
-                        // Mostrar mensaje de éxito
-                        toast.success('Agenda guardada correctamente');
+                        });
                       }
+                      // Para agenda por fechas, usar las fechas originales guardadas
+                      else if (agendaMode === 'fechas') {
+                        const diaAgenda = agenda.filter(a => a.dia === 99);                   
+                        // Agregar fechas a la agenda desde las guardadas temporalmente
+                        if (diaAgenda.length > 0) {
+                          newDoctores[doctorIndex].agenda = diaAgenda;
+                        }
+                      } 
+                      console.log('Doctor:', newDoctores[doctorIndex]);
+                      console.log('Doctores:', newDoctores);
+
+                      // Actualizar el estado con las nuevas configuraciones
+                      setConfig({...config, doctores: newDoctores});
+                      
+                      // Actualizar el doctor seleccionado con los datos del arreglo original 
+                      // para mantener los objetos Date intactos
+                      const doctorActualizado = {
+                        ...selectedDoctorForAgenda,
+                        agenda: [
+                          ...selectedDoctorForAgenda.agenda.filter(a => a.consultorioId !== selectedConsultorioForAgenda.id),
+                          ...newDoctores[doctorIndex].agenda.filter(a => a.consultorioId === selectedConsultorioForAgenda.id)
+                        ]
+                      };                      
+                      setSelectedDoctorForAgenda(doctorActualizado);
+                      // Mostrar mensaje de éxito
+                      toast.success('Agenda guardada correctamente');
                     }
                   }}
                   className="px-4 py-2 bg-[var(--color-primary)] text-white font-medium rounded-md hover:bg-[var(--color-primary-dark)]"
