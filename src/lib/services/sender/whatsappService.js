@@ -122,10 +122,10 @@ Desde *${config.nombreConsultorio}*, te confirmamos tu Turno Agendado. 👍
 🧑‍⚕️ Paciente: ${turno.paciente.nombre} ${turno.paciente.apellido || ''}.
 📅 Fecha del Turno: *${formatoFecha(turno.desde, true, false, false, true)}*.
 🦷 Tipo Turno: ${turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}.
+🕧 Duración: ${turno.duracion || 'No especificada'} minutos.
 💉 Profesional: ${turno.doctor.nombre}.
 🏥 Domicilio: *${turno.consultorio.direccion || config.domicilio}*.
 📱 Celular: ${turno.consultorio.telefono || config.telefono}.
-📧 Email: ${turno.consultorio.email || config.mail}.
 
 Recordá llegar 5 minutos antes.
 
@@ -146,10 +146,10 @@ Desde *${config.nombreConsultorio}*, te notificamos el cambio del estado de tu t
 🧑‍⚕️ Paciente: ${turno.paciente.nombre} ${turno.paciente.apellido || ''}.
 📅 Fecha del Turno: *${formatoFecha(turno.desde, true, false, false, true)}*.
 🦷 Tipo Turno: ${turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}.
+🕧 Duración: ${turno.duracion || 'No especificada'} minutos.
 💉 Profesional: ${turno.doctor.nombre}.
 🏥 Domicilio: *${turno.consultorio.direccion || config.domicilio}*.
 📱 Celular: ${turno.consultorio.telefono || config.telefono}.
-📧 Email: ${turno.consultorio.email || config.mail}.
 
 Gracias, y que tengas buen día! 👋👋👋.
       `;
