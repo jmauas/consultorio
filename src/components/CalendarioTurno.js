@@ -123,7 +123,7 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ turno }),
+              body: JSON.stringify({ turno, confirmacion: true }),
             });
             
             const result = await response.json();

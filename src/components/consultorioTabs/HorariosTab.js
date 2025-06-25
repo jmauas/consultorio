@@ -918,7 +918,8 @@ const HorariosTab = ({
                 </>
               )}
                 {/* Botón para guardar agenda */}
-              <div className="mt-6 flex justify-end">                <button
+              <div className="mt-6 flex justify-end">                
+                <button
                   onClick={() => {
                     // Crear copia profunda del array de doctores
                     let newDoctores = JSON.parse(JSON.stringify(config.doctores));

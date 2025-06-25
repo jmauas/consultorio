@@ -2,7 +2,7 @@ import { enviarRecordatorioTurno } from '@/lib/services/sender/whatsappService';
 
 export async function POST(request) {
   try {
-    const { turno, cambioEstado } = await request.json();
+    const { turno, cambioEstado, confirmacion } = await request.json();
     
     if (!turno) {
       return Response.json({ 
@@ -11,7 +11,7 @@ export async function POST(request) {
       }, { status: 400 });
     }
 
-    const result = await enviarRecordatorioTurno(turno, cambioEstado);
+    const result = await enviarRecordatorioTurno(turno, cambioEstado, confirmacion);
     
     return Response.json({ 
       ok: true, 

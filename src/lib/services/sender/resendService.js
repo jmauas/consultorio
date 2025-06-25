@@ -226,13 +226,28 @@ export const htmlMensajeConfTurno = async (turno, cambioEstado) => {
             width: fit-content;
             }
             .cancel-button:hover {
-            background-color: #ff5252;
+              background-color: #ff5252;
             }
             .cancel-notice {
             font-size: 16px;
             text-align: center;
             color: #666;
             margin-bottom: 10px;
+            }
+            .conf-button {
+            display: block;
+            margin: 25px auto;
+            padding: 12px 25px;
+            background-color: green;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+            width: fit-content;
+            }
+            .conf-button:hover {
+              background-color: #ff5252;
             }
         </style>
         </head>
@@ -246,6 +261,10 @@ export const htmlMensajeConfTurno = async (turno, cambioEstado) => {
         <div class="content">
             <div class="greeting">
             <span class="emoji">👋</span> Hola ${turno.paciente.nombre}!
+            </div>
+
+            <div class="greeting">
+              <span class="emoji">⚠️</span> No responder este mail. Es una casilla no supervisada. Cualquier duda, comunicarse vía Whatsapp al <a href="https://wa.me/549${turno.consultorio.telefono.replaceAll('-', '') || config.telefono.replaceAll('-', '')}">${turno.consultorio.telefono || config.telefono}</a> !
             </div>
             
             <div class="confirmation">
@@ -290,12 +309,12 @@ export const htmlMensajeConfTurno = async (turno, cambioEstado) => {
             <span class="emoji">⏰</span> Recordá llegar 5 minutos antes de tu turno
             </div>
 
-             ${turno.token ? `
+            ${turno.token ? `
             <div class="info-box">
                 <strong>Por favor, confirmá tu asistencia haciendo clic en el siguiente enláce</strong>
             </div>
             <a href="${enlaceConfirmacion}" class="cancel-button">
-                <span class="emoji">❌</span> Cancelar Turno
+              <span class="emoji">✅</span> Confirmar Turno  
             </a>
             ` : ''}
 
@@ -308,12 +327,12 @@ export const htmlMensajeConfTurno = async (turno, cambioEstado) => {
                 <p>Si necesitas cancelar tu turno, por favor utiliza el siguiente enlace:</p>
             </div>
             <a href="${enlaceCancelacion}" class="cancel-button">
-                <span class="emoji">✅</span> Confirmar Turno
+                <span class="emoji">❌</span> Cancelar Turno
             </a>
             ` : ''}
 
             `
-            : ``}@v4
+            : ``}
             
             <div class="footer">
             <p>Gracias, y que tengas buen día! <span class="emoji">👋👋👋</span></p>
@@ -327,11 +346,13 @@ export const htmlMensajeConfTurno = async (turno, cambioEstado) => {
 
 export const textoMailConfTurno = async (turno, cambioEstado) => {
     const enlaceCancelacion = turno.token 
-        ? `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/cancelar-turno/${turno.token}`
+        ? `${urlApp}/turnos/cancelar/${turno.token}`
         : '';
+
     const enlaceConfirmacion = turno.token
         ? `${urlApp}/turnos/confirmar/${turno.token}`
         : '';
+
 
     const textoMsg = `👋 Hola ${turno.paciente.nombre}!
   
@@ -339,6 +360,8 @@ export const textoMailConfTurno = async (turno, cambioEstado) => {
     ?  `👍 Desde ${config.nombreConsultorio}, te confirmamos tu turno agendado.`
     :  `‼️ Desde ${config.nombreConsultorio}, te notificamos el cambio del estado de tu turno a ${turno.estado.toUpperCase()}`
   }
+
+  ⚠️ No responder este mail. Es una casilla no supervisada. Cualquier duda, comunicarse vía Whatsapp al ${turno.consultorio.telefono || config.telefono}
   
   ✅ DETALLES DEL TURNO:
   -----------------------------------------
@@ -379,6 +402,13 @@ export const textoMailConfTurno = async (turno, cambioEstado) => {
 // Función para generar archivo ICS (iCalendar)
 export const generarArchivoICS = async (turno) => {
     return new Promise((resolve, reject) => {
+      const enlaceCancelacion = turno.token 
+        ? `${urlApp}/turnos/cancelar/${turno.token}`
+        : '';
+
+      const enlaceConfirmacion = turno.token
+        ? `${urlApp}/turnos/confirmar/${turno.token}`
+        : '';
       // Convertir fecha y hora de inicio a formato array para la librería ICS
       const fechaInicio = new Date(turno.desde);
       const fechaFin = new Date(turno.hasta || new Date(fechaInicio.getTime() + 30 * 60000));
@@ -403,22 +433,22 @@ export const generarArchivoICS = async (turno) => {
         fechaFin.getMinutes()
       ];
 
-      const url = `${config.url}/turnos/${turno.id}`;
-      
+      console.log('Generando evento ICS para el turno:', turno.id, 'con inicio:', inicio, 'y fin:', fin);
+
+           
       // Mejorar la información del evento para aumentar compatibilidad
       const evento = {
         uid: eventoId,
         sequence: 0,
         start: inicio,
         end: fin,
-        startInputType: 'local', // Indica que la hora es local respecto a la zona horaria
-        endInputType: 'local',
-        startOutputType: 'local',
-        endOutputType: 'local',
+        // startInputType: 'local', // Indica que la hora es local respecto a la zona horaria
+        // endInputType: 'local',
+        // startOutputType: 'local',
+        // endOutputType: 'local',
         title: `Turno: ${config.nombreConsultorio} - ${turno.tipoDeTurno && turno.tipoDeTurno.nombre || ''}}`,
         location: turno.consultorio.direccion || config.domicilio,
-        description: `Paciente: ${turno.paciente.nombre} ${turno.paciente.apellido || ''}\nProfesional: ${turno.doctor.nombre}\nTipo: ${turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}\n\nPor favor, confirme su asistencia a través del siguiente enlace.\n\n${url}`,
-        //url: url,
+        description: `Paciente: ${turno.paciente.nombre} ${turno.paciente.apellido || ''}\nProfesional: ${turno.doctor.nombre}\nTipo: ${turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}\n\nPor favor, confirmá tu asistencia a través del siguiente enlace.\n\n${enlaceConfirmacion}\n\nSi necesita cancelar el turno, utilizá el siguiente enlace:\n\n${enlaceCancelacion}`,
         status: 'CONFIRMED',
         busyStatus: 'BUSY',
         method: 'REQUEST',

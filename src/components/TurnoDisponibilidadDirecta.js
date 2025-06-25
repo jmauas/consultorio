@@ -551,32 +551,32 @@ const TurnoDisponibilidadDirecta = ({ dniParam, celularParam, pacienteIdParam, o
 
   return (
     <div className="max-w-4xl mx-auto p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+      <div className= "rounded-lg shadow-lg p-6">
           {/* Parte 1: Selección de Doctor y Tipo de Turno */}
         {showParte1 && (
           <div className="space-y-6">
             <div className="text-center">
               <div className="flex items-center justify-center gap-3 mb-2">
                 <FaCalendarPlus className="text-blue-600 text-3xl" />
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-2xl font-bold">
                   Nuevo Turno - Selección Rápida
                 </h2>
               </div>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="">
                 Selecciona el doctor y tipo de turno para ver disponibilidad inmediata
               </p>
             </div>
 
             {/* Selección de Doctor */}
             <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="flex items-center gap-2 text-sm font-medium">
                 <FaUserMd className="text-blue-600" />
                 Doctor <span className="text-red-500">*</span>
               </label>
               <select
                 value={formData.doctorId}
                 onChange={handleDoctorChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'}`}
               >
                 <option value="">Seleccionar Doctor</option>
                 {doctores.map(doctor => (
@@ -590,14 +590,14 @@ const TurnoDisponibilidadDirecta = ({ dniParam, celularParam, pacienteIdParam, o
             {/* Selección de Tipo de Turno */}
             {showTipoTurno && (
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="flex items-center gap-2 text-sm font-medium ">
                   <FaStethoscope className="text-blue-600" />
                   Tipo de Turno <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={formData.servicioId}
                   onChange={handleServiceChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'}`}
                 >
                   <option value="">Seleccionar Tipo de Turno</option>
                   {tipos.map(tipo => (
@@ -609,13 +609,14 @@ const TurnoDisponibilidadDirecta = ({ dniParam, celularParam, pacienteIdParam, o
               </div>
             )}
           </div>
-        )}        {/* Parte 2: Disponibilidad de Turnos */}
+        )}       
+         {/* Parte 2: Disponibilidad de Turnos */}
         {showParte2 && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <FaCalendarAlt className="text-blue-600 text-2xl" />
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-2xl font-bold">
                   Turnos Disponibles
                 </h2>
               </div>
@@ -674,7 +675,7 @@ const TurnoDisponibilidadDirecta = ({ dniParam, celularParam, pacienteIdParam, o
                     </div>
                     
                     {expandedDateRows[dia.fecha] && (
-                      <div className="p-4 bg-white dark:bg-gray-800">
+                      <div className="p-4">
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                           {dia.turnos.map((turno, index) => (
                             <button
@@ -808,7 +809,7 @@ const TurnoDisponibilidadDirecta = ({ dniParam, celularParam, pacienteIdParam, o
             </div>            {/* Formulario de paciente */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="flex items-center gap-2 text-sm font-medium  mb-1">
                   <FaUser className="text-blue-600" />
                   Nombre <span className="text-red-500">*</span>
                 </label>
@@ -826,7 +827,7 @@ const TurnoDisponibilidadDirecta = ({ dniParam, celularParam, pacienteIdParam, o
               </div>
 
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="flex items-center gap-2 text-sm font-medium  mb-1">
                   <FaUser className="text-blue-600" />
                   Apellido <span className="text-red-500">*</span>
                 </label>
@@ -844,7 +845,7 @@ const TurnoDisponibilidadDirecta = ({ dniParam, celularParam, pacienteIdParam, o
               </div>
 
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="flex items-center gap-2 text-sm font-medium  mb-1">
                   <FaEnvelope className="text-blue-600" />
                   Email
                 </label>
@@ -864,7 +865,7 @@ const TurnoDisponibilidadDirecta = ({ dniParam, celularParam, pacienteIdParam, o
               </div>
 
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="flex items-center gap-2 text-sm font-medium  mb-1">
                   <FaShieldAlt className="text-blue-600" />
                   Cobertura Médica <span className="text-red-500">*</span>
                 </label>
@@ -883,8 +884,9 @@ const TurnoDisponibilidadDirecta = ({ dniParam, celularParam, pacienteIdParam, o
                     </option>
                   ))}
                 </select>
-              </div>              <div className="md:col-span-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              </div>            
+                <div className="md:col-span-2">
+                <label className="flex items-center gap-2 text-sm font-medium  mb-1">
                   <FaStickyNote className="text-blue-600" />
                   Observaciones
                 </label>
@@ -897,7 +899,8 @@ const TurnoDisponibilidadDirecta = ({ dniParam, celularParam, pacienteIdParam, o
                     rows={3}
                     className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                   />
-                </div>              </div>
+                </div>             
+              </div>
             </div>
 
             {/* Alerta de turnos futuros del paciente */}
@@ -936,7 +939,8 @@ const TurnoDisponibilidadDirecta = ({ dniParam, celularParam, pacienteIdParam, o
                   </div>
                 </div>
               </div>
-            )}            {/* Botones de acción */}
+            )}            
+            {/* Botones de acción */}
             <div className="flex justify-end gap-4">
               <button
                 onClick={volverASeleccionTurnos}
@@ -958,10 +962,11 @@ const TurnoDisponibilidadDirecta = ({ dniParam, celularParam, pacienteIdParam, o
               </button>
             </div>
           </div>
-        )}        {/* Mensaje de éxito */}
+        )}        
+        {/* Mensaje de éxito */}
         {showSuccessMessage && (
           <div className="fixed inset-0 bg-white/20 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
               <div className="text-center">
                 <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-900">
                   <FaCheck className="text-green-600 dark:text-green-400 text-xl" />
@@ -983,7 +988,7 @@ const TurnoDisponibilidadDirecta = ({ dniParam, celularParam, pacienteIdParam, o
 
         {/* Loading overlay */}
         {showLoading && (
-          <div className="absolute inset-0 bg-white bg-opacity-75 dark:bg-gray-800 dark:bg-opacity-75 flex items-center justify-center">
+          <div className="absolute inset-0 bg-opacity-75 dark:bg-opacity-75 flex items-center justify-center">
             <Loader />
           </div>
         )}

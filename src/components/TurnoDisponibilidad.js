@@ -30,13 +30,7 @@ import {
   FaBell, 
   FaExclamationCircle, 
   FaSadTear, 
-  FaCheckCircle, 
   FaListAlt, 
-  FaMobile, 
-  FaComments, 
-  FaCalendarCheck, 
-  FaEdit,
-  FaSpinner
 } from 'react-icons/fa';
 
 
@@ -754,6 +748,10 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [formData]);
 
+    useEffect(() => {
+
+    }, [theme])
+
 
   return (
     <div className="min-h-screen ">      <div className="flex justify-evenly items-center p-5 md:p-8  shadow-md">
@@ -793,7 +791,7 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
               </label>
               <select
                 id="doctor"
-                className={`flex-1 p-2 border border-gray-300 rounded-lg ${theme==='dark' ? 'bg-slate-900 text-slate-200' : 'bg-slate-200 text-slate-900'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                className={`flex-1 p-2 border border-gray-300 rounded-lg ${theme==='dark' ? 'bg-black text-slate-200' : 'bg-slate-200 text-slate-900'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 value={formData.doctorId}
                 onChange={handleDoctorChange}
               >
@@ -986,7 +984,8 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                 )}
                 
                 {existingTurno && formData && (
-                  <div className="md:col-span-2 bg-red-100 border border-red-400 rounded-lg p-4 my-4 shadow-md">                       <div className="flex gap-2 items-center justify-center mb-4 font-bold text-red-800">
+                  <div className="md:col-span-2 bg-red-100 border border-red-400 rounded-lg p-4 my-4 shadow-md">                       
+                  <div className="flex gap-2 items-center justify-center mb-4 font-bold text-red-800">
                       <FaExclamationTriangle className="text-red-600 text-2xl" />
                       Ya tenés un turno agendado
                       <FaExclamationTriangle className="text-red-600 text-2xl" />
@@ -1033,18 +1032,19 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
 
         {/* Part 2: Available appointments */}
         {showParte2 && (
-          <div>
-            
+          <div>            
             <div id="agenda" 
                 className={showLoading ? 'hidden' : 'block'}
             >
-              {agenda.length === 0 ? (                <div className="rounded-lg p-6 text-center">
+              {agenda.length === 0 ? (                
+                <div className="rounded-lg p-6 text-center">
                   <div className="text-xl font-medium  mb-4">No hay turnos Disponibles en este Momento.</div>
                   <FaSadTear className="text-5xl text-red-300 mx-auto" />
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {agenda.map((dia) => (                    <div key={dia.fecha} className={`border border-[var(--color-primary)] rounded-lg overflow-hidden`}>
+                  {agenda.map((dia) => (                    
+                    <div key={dia.fecha} className={`border border-[var(--color-primary)] rounded-lg overflow-hidden`}>
                       <div 
                         className={`flex items-center justify-between ${theme==='dark' ? 'bg-[var(--color-primary-dark)]' : 'bg-[var(--color-secondary)]'} px-4 py-3 border-b border-[var(--color-primary)] cursor-pointer`}
                         onClick={() => toggleHorasVisibility(dia.fecha)}

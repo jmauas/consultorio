@@ -77,13 +77,13 @@ export const postAdjunto = async (cel, adj, ruta, externa, urlAdj) => {
  * @param {object} turno - Datos del turno
  * @returns {Promise<object>} - Resultado de la operación
  */
-export async function enviarRecordatorioTurno(turno, cambioEstado) {
+export async function enviarRecordatorioTurno(turno, cambioEstado, confirmacion) {
   try {
     if (!turno) {
       throw new Error('Datos de turno insuficientes');
     }
    
-    const msg = await textoMensajeConfTurno(turno, cambioEstado);    
+    const msg = await textoMensajeConfTurno(turno, cambioEstado, confirmacion);    
     // Normalizar número de celular
     const celularNormalizado = normalizarNumeroCelular(turno.paciente.celular);
     if (!celularNormalizado) {
@@ -108,11 +108,11 @@ export async function enviarRecordatorioTurno(turno, cambioEstado) {
   }
 }
 
-export const textoMensajeConfTurno = async (turno, cambioEstado) => {
+export const textoMensajeConfTurno = async (turno, cambioEstado, confirmacion) => {
   const enlaceCancelacion = turno.token 
   ? `${urlApp}/turnos/cancelar/${turno.token}`
   : '';
-  const enlaceConfirmacion = turno.token
+  const enlaceConfirmacion = turno.token && confirmacion && confirmacion === true
   ? `${urlApp}/turnos/confirmar/${turno.token}`
   : '';
   let msg = `Hola ${turno.paciente.nombre}. 👋

@@ -216,7 +216,7 @@ export default function Home() {
       <div className="mt-24 flex flex-col items-center justify-center p-4">
         <h1 className="text-3xl font-bold text-center mb-8">Sistema de Gestión de Turnos</h1>
         
-        <div className="max-w-md w-full bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="max-w-md w-full shadow-lg rounded-lg overflow-hidden">
           <div className="px-6 py-8">
             <div className="text-center mb-6">
               <h2 className="text-2xl font-semibold">Bienvenido</h2>
@@ -429,7 +429,8 @@ export default function Home() {
             </div>
           </>
         )}
-      </div>        {/* Modal para nuevo Turno */}
+      </div>        
+      {/* Modal para nuevo Turno */}
         <Modal
           isOpen={modalTurnoNuevo || modalTurnoDisponibilidad || modalEventoNuevo}
           onClose={cerrarModal}

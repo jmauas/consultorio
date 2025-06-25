@@ -71,7 +71,7 @@ export default function GrillaTurnos({
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ turno }),
+            body: JSON.stringify({ turno, confirmacion: true }),
           });
           
           const result = await response.json();

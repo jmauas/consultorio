@@ -15,6 +15,7 @@ import {
     FaSpinner,
     FaStar
 } from 'react-icons/fa';
+import { useTheme } from 'next-themes';
 
 const EventoNuevo = ({ doctores = [], consultorios = [], onEventoCreado, onCancelar }) => {    const [formData, setFormData] = useState({
         doctorId: '',
@@ -27,7 +28,10 @@ const EventoNuevo = ({ doctores = [], consultorios = [], onEventoCreado, onCance
     
     const [conflictos, setConflictos] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [verificandoConflictos, setVerificandoConflictos] = useState(false);    // Función para verificar conflictos de horarios
+    const [verificandoConflictos, setVerificandoConflictos] = useState(false);    
+    const { theme } = useTheme();
+    
+    // Función para verificar conflictos de horarios    
     const verificarConflictos = async () => {
         const { doctorId, consultorioId, fecha, horaDesde, horaHasta } = formData;
         
@@ -211,16 +215,17 @@ const EventoNuevo = ({ doctores = [], consultorios = [], onEventoCreado, onCance
         }
     };
 
-    return (        <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl mx-auto my-6">
+    return (        
+        <div className="rounded-lg shadow-lg p-6 max-w-2xl mx-auto my-6">
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+                <h2 className="text-2xl font-bold flex items-center">
                     <FaStar className="mr-3 text-purple-600" />
                     Registrar Nuevo Evento
                 </h2>
                 {onCancelar && (
                     <button
                         onClick={onCancelar}
-                        className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        className=" hover: p-2 rounded-full hover:bg-gray-100 transition-colors"
                         type="button"
                     >
                         <FaTimes className="text-xl" />
@@ -228,8 +233,10 @@ const EventoNuevo = ({ doctores = [], consultorios = [], onEventoCreado, onCance
                 )}
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">                {/* Doctor */}
-                <div>                    <label className="text-sm font-medium text-gray-700 mb-2 flex items-center">
+            <form onSubmit={handleSubmit} className="space-y-4">                
+                {/* Doctor */}
+                <div>                    
+                    <label className="text-sm font-medium  mb-2 flex items-center">
                         <FaUserMd className="mr-2 text-blue-600" />
                         Doctor <span className="text-red-500">*</span>
                     </label>
@@ -238,7 +245,7 @@ const EventoNuevo = ({ doctores = [], consultorios = [], onEventoCreado, onCance
                             name="doctorId"
                             value={formData.doctorId}
                             onChange={handleInputChange}
-                            className="w-full p-3 pl-10 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className={`w-full p-3 pl-10 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'}`}
                             required
                         >
                             <option value="">Seleccionar doctor...</option>
@@ -253,7 +260,8 @@ const EventoNuevo = ({ doctores = [], consultorios = [], onEventoCreado, onCance
                 </div>
 
                 {/* Consultorio */}
-                <div>                    <label className="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                <div>                    
+                    <label className="text-sm font-medium  mb-2 flex items-center">
                         <FaHospital className="mr-2 text-green-600" />
                         Consultorio <span className="text-red-500">*</span>
                     </label>
@@ -262,7 +270,7 @@ const EventoNuevo = ({ doctores = [], consultorios = [], onEventoCreado, onCance
                             name="consultorioId"
                             value={formData.consultorioId}
                             onChange={handleInputChange}
-                            className="w-full p-3 pl-10 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className={`w-full p-3 pl-10 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'}`}
                             required
                         >
                             <option value="">Seleccionar consultorio...</option>
@@ -275,7 +283,7 @@ const EventoNuevo = ({ doctores = [], consultorios = [], onEventoCreado, onCance
                         <FaHospital className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     </div>
                 </div>                {/* Fecha */}
-                <div>                    <label className="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                <div>                    <label className="text-sm font-medium  mb-2 flex items-center">
                         <FaCalendarAlt className="mr-2 text-indigo-600" />
                         Fecha del Evento <span className="text-red-500">*</span>
                     </label>
@@ -293,7 +301,7 @@ const EventoNuevo = ({ doctores = [], consultorios = [], onEventoCreado, onCance
                 </div>                {/* Hora Desde y Hora Hasta */}
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                        <label className="text-sm font-medium  mb-2 flex items-center">
                             <FaClock className="mr-2 text-orange-600" />
                             Hora Desde <span className="text-red-500">*</span>
                         </label>
@@ -310,7 +318,7 @@ const EventoNuevo = ({ doctores = [], consultorios = [], onEventoCreado, onCance
                         </div>
                     </div>
                     <div>
-                        <label className="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                        <label className="text-sm font-medium  mb-2 flex items-center">
                             <FaClock className="mr-2 text-orange-600" />
                             Hora Hasta <span className="text-red-500">*</span>
                         </label>
@@ -328,7 +336,7 @@ const EventoNuevo = ({ doctores = [], consultorios = [], onEventoCreado, onCance
                     </div>
                 </div>                {/* Observaciones */}
                 <div>
-                    <label className="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                    <label className="text-sm font-medium  mb-2 flex items-center">
                         <FaClipboardList className="mr-2 text-teal-600" />
                         Observaciones <span className="text-red-500">*</span>
                     </label>

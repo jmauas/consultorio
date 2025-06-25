@@ -88,8 +88,7 @@ export const tareaEnvioWA = async (diasEnvio) => {
         // Procesar cada turno y enviar recordatorio
         for await (const turno of turnos) {
             try {
-                const res = await enviarRecordatorioTurno(turno);
-                console.log(new Date().toLocaleString(), '  -  ', res);
+                const res = await enviarRecordatorioTurno(turno, false, true);
                 // Esperar un breve tiempo entre envíos para evitar bloqueos de la API
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 
