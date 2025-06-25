@@ -129,8 +129,9 @@ Desde *${config.nombreConsultorio}*, te confirmamos tu Turno Agendado. 👍
 
 Recordá llegar 5 minutos antes.
 
-✅ Para confirmar tu asistencia, por favor hacé clic en este Link:
-${enlaceConfirmacion  }
+${enlaceConfirmacion != '' &&
+  `✅ Para confirmar tu asistencia, por favor hacé clic en este Link:
+${enlaceConfirmacion}`}
 
 ❌ Si no podés asistir, por favor cancelá tu turno desde el siguiente link: 
 ${enlaceCancelacion}

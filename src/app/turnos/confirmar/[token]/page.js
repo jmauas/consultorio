@@ -95,7 +95,7 @@ export default function ConfirmarTurnoPage({ }) {
   if (error) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-4">
-        <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+        <div className="w-full max-w-md p-6 rounded-lg shadow-md">
           <h1 className="text-2xl font-bold mb-4 text-center text-red-600">Error</h1>
           <p className="text-center mb-6">{error}</p>
           <div className="text-center">
@@ -117,7 +117,7 @@ export default function ConfirmarTurnoPage({ }) {
   if (confirmed) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-4">
-        <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+        <div className="w-full max-w-md p-6 rounded-lg shadow-md">
           <div className="flex justify-center mb-4">
             <div className="h-16 w-16 bg-green-100 rounded-full flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -126,7 +126,7 @@ export default function ConfirmarTurnoPage({ }) {
             </div>
           </div>
           <h1 className="text-2xl font-bold mb-2 text-center">Turno Confirmado</h1>
-          <p className="text-center text-gray-600 mb-6">
+          <p className="text-center mb-6">
             Tu turno ha sido confirmado exitosamente.
           </p>
           

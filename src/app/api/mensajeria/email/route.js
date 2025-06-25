@@ -2,19 +2,19 @@ import { enviarMailConfTurno } from '@/lib/services/sender/resendService';
 
 export async function POST(request) {
   try {
-    const { turno, cambioEstado } = await request.json();
+    const { turno, cambioEstado, confirmacion } = await request.json();
     
-    if (!turno) {
+        if (!turno) {
       return Response.json({ 
         ok: false, 
         error: 'Datos del turno requeridos' 
       }, { status: 400 });
     }
 
-    const result = await enviarMailConfTurno(turno, cambioEstado);
-    
-    return Response.json({ 
-      ok: true, 
+    const result = await enviarMailConfTurno(turno, cambioEstado, confirmacion);
+
+    return Response.json({
+      ok: true,
       data: result 
     });
     

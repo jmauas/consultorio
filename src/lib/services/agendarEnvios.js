@@ -126,7 +126,7 @@ export const tareaEnvioMail = async (diasEnvio) => {
         for await (const turno of turnos) {
             try {
 
-                const res = await enviarMailConfTurno(turno);
+                const res = await enviarMailConfTurno(turno, false, true);
                 console.log(new Date().toLocaleString(), '  -  ', res);
                 // Esperar un breve tiempo entre envíos para evitar bloqueos de la API
                 await new Promise(resolve => setTimeout(resolve, 1000));

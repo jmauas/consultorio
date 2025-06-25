@@ -105,7 +105,7 @@ export const updateTurnoService = async (id, datos) => {
         await enviarRecordatorioTurno(turnoActualizado, true);
         
         // Enviar correo electrónico
-        await enviarMailConfTurno(turnoActualizado, true);
+        await enviarMailConfTurno(turnoActualizado, true, false);
       }
       return {
         ok: true,

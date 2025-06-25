@@ -25,11 +25,11 @@ if (!resendRte) {
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 
-export const enviarMailConfTurno = async (turno, cambioEstado) => {   
+export const enviarMailConfTurno = async (turno, cambioEstado, confirmacion) => {   
     const mail = ValidarEmail(turno.paciente.email);
     if (mail && mail !== '') {
         // Enviar el correo usando el servicio de Resend
-        const html = await htmlMensajeConfTurno(turno, cambioEstado);
+        const html = await htmlMensajeConfTurno(turno, cambioEstado, confirmacion);
         const ics = await generarArchivoICS(turno);
         const text = await textoMailConfTurno(turno, cambioEstado);
         const asunto = cambioEstado
@@ -115,9 +115,9 @@ export const enviarMail = async (email, asunto, mensaje, ics = null, text = null
 }
 
 
-export const htmlMensajeConfTurno = async (turno, cambioEstado) => {
+export const htmlMensajeConfTurno = async (turno, cambioEstado, confirmacion) => {
     // Construir enlace de cancelación si existe token
-    const enlaceCancelacion = turno.token 
+    const enlaceCancelacion = turno.token && confirmacion && confirmacion === true
         ? `${urlApp}/turnos/cancelar/${turno.token}`
         : '';
 
@@ -309,7 +309,7 @@ export const htmlMensajeConfTurno = async (turno, cambioEstado) => {
             <span class="emoji">⏰</span> Recordá llegar 5 minutos antes de tu turno
             </div>
 
-            ${turno.token ? `
+            ${enlaceConfirmacion != '' ? `
             <div class="info-box">
                 <strong>Por favor, confirmá tu asistencia haciendo clic en el siguiente enláce</strong>
             </div>
@@ -432,8 +432,6 @@ export const generarArchivoICS = async (turno) => {
         fechaFin.getHours(),
         fechaFin.getMinutes()
       ];
-
-      console.log('Generando evento ICS para el turno:', turno.id, 'con inicio:', inicio, 'y fin:', fin);
 
            
       // Mejorar la información del evento para aumentar compatibilidad

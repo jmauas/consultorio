@@ -103,7 +103,7 @@ export default function CancelarTurnoPage({ }) {
   if (error) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-4">
-        <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+        <div className="w-full max-w-md p-6 rounded-lg shadow-md">
           <h1 className="text-2xl font-bold mb-4 text-center text-red-600">Error</h1>
           <p className="text-center mb-6">{error}</p>
           <div className="text-center">
@@ -126,7 +126,7 @@ export default function CancelarTurnoPage({ }) {
   if (canceled) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-4">
-        <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+        <div className="w-full max-w-md p-6 rounded-lg shadow-md">
           <div className="flex justify-center mb-4">
             <div className="h-16 w-16 bg-green-100 rounded-full flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -135,7 +135,7 @@ export default function CancelarTurnoPage({ }) {
             </div>
           </div>
           <h1 className="text-2xl font-bold mb-2 text-center">Turno Cancelado</h1>
-          <p className="text-center text-gray-600 mb-6">
+          <p className="text-center mb-6">
             Tu turno ha sido cancelado exitosamente.
           </p>
           
@@ -178,12 +178,12 @@ export default function CancelarTurnoPage({ }) {
   if (confirmationStep) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-4">
-        <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+        <div className="w-full max-w-md p-6 rounded-lg shadow-md">
           <h1 className="text-2xl font-bold mb-4 text-center">Confirmar Cancelación</h1>
           <p className="text-center mb-6">¿Estás seguro de que deseas cancelar este turno?</p>
           
           {turno && (
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg font-bold">
+            <div className="mb-6 p-4  rounded-lg font-bold">
               <h2 className="text-lg font-bold mb-2">Detalles del Turno</h2>
               <p><span className="font-normal">Paciente: </span> {turno.paciente.nombre} {turno.paciente.apellido}</p>
               <p><span className="font-normal">Servicio: </span> {turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}</p>
@@ -221,12 +221,12 @@ export default function CancelarTurnoPage({ }) {
   // Vista principal cuando se carga el turno correctamente
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+      <div className="w-full max-w-md p-6 rounded-lg shadow-md">
         <h1 className="text-2xl font-bold mb-4 text-center">Cancelar Turno</h1>
         
         {turno && (
           <div className="mb-6">
-            <div className="p-4 bg-gray-50 rounded-lg mb-6 font-bold">
+            <div className="p-4  rounded-lg mb-6 font-bold">
               <h2 className="text-lg font-bold mb-2">Detalles del Turno</h2>
               <p><span className="font-normal">Paciente: </span> {turno.paciente.nombre} {turno.paciente.apellido}</p>
               <p><span className="font-normal">Servicio: </span> {turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}</p>

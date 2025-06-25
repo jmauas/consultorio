@@ -638,7 +638,7 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ turno }),
+              body: JSON.stringify({ turno, confirmacion: true }),
             });
             
             const result = await response.json();
@@ -865,7 +865,7 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                     inputMode="tel"
                     autoComplete='dni'
                     id="dni"
-                    className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200
+                    className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 min-w-24
                       ${fieldErrors.dni ? 'border-red-500 dark:border-red-400' : 'border-gray-300 dark:border-gray-600'}`}
                     value={formData.dni}
                     onChange={handleInputChange}
