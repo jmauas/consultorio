@@ -269,9 +269,6 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                     
                     if (noLaborablesDoctor && noLaborablesDoctor.length > 0) {
                         const esNoLaborable = noLaborablesDoctor.some(f => sonMismaFecha(f, fecha));
-                        console.log('DOCTOR FERIADOS', doctor.feriados);
-                        console.log('DIAS NO ATIENDE', noLaborablesDoctor);
-                        console.log('NO ATIENDE', esNoLaborable);
                         if (esNoLaborable) noLaborable = true;
                     }
                     if (!atencionHoy) {

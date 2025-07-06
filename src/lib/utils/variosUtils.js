@@ -34,7 +34,6 @@ export const agregarFeriados = (actual, agregar) => {
   } else {
     timeOffset = 0; // En el servidor, asumimos UTC
   }
-  console.log(timeOffset, 'timeOffset', isClient);
   agregar.forEach(f => {
       if (f.indexOf('|') >= 0) {
           let fecha1 = new Date(f.split('|')[0] + 'T00:00:00.000Z');

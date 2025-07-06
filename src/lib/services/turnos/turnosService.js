@@ -308,9 +308,6 @@ const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fe
   const esFeriado = feriados.some(f => sonMismaFecha(f, fechaFer));
   const diasNoAtiende = agregarFeriados([], doctor.feriados);
   const noAtiende = diasNoAtiende.some(f => sonMismaFecha(f, fechaFer));
-    console.log('DOCTOR FERIADOS', doctor.feriados);
-  console.log('DIAS NO ATIENDE', diasNoAtiende);
-  console.log('NO ATIENDE', noAtiende);
   if (noAtiende) {
     aten.atencion = false;
   } else if (atenEnFeriado && esFeriado) {
