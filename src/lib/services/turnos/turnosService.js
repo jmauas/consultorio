@@ -432,13 +432,15 @@ const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fe
     }
   });
     
-    if (turno && turno.length > 0) {
-      hoy = new Date(turno[turno.length - 1].hasta);
-      hoy.setHours(hoy.getHours() - timeOffset);
-      hoy.setMinutes(hoy.getMinutes() - minutosTurno);             
-      return { hoy, aten, ok: false };
-    }
-    return { hoy, aten, ok: true };
+  if (turno && turno.length > 0) {
+    hoy = new Date(turno[turno.length - 1].hasta);
+    hoy.setHours(hoy.getHours() - timeOffset);
+    hoy.setMinutes(hoy.getMinutes() - minutosTurno);
+    console.log('Turno ocupado:', hoy, 'Doctor:', doctor.nombre, 'Consultorio:', aten.consultorioId);           
+    return { hoy, aten, ok: false };
+  }
+  console.log('Turno disponible:', hoy, 'Doctor:', doctor.nombre, 'Consultorio:', aten.consultorioId);
+  return { hoy, aten, ok: true };
 }
 
 
