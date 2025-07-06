@@ -246,13 +246,13 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
               const a = agendas[i];
               const res = analizarTurnosSlots(feriados, doctor, agenda, hoy, a, timeOffset, fechaFer, turnos, atenEnFeriado, minutosTurno);
               console.log('Resultado de analizarTurnosSlots FLAG:', res.flag);
-              if (res.ok === true) {
+              if (res.ok === true || i === agendas.length - 1) {
                 hoy = res.hoy;
                 aten = res.aten;
                 break;
               }
             }
-            if (!aten || !aten.atencion) {
+            if (!aten || !aten.atencion || aten.atencion === false) {
               continue; // Si no atiende, saltar al siguiente día
             }
 
@@ -345,9 +345,8 @@ const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fe
     const nuevaFecha = new Date(hoy);
     nuevaFecha.setUTCDate(nuevaFecha.getUTCDate() + 1);
     nuevaFecha.setUTCHours(0, 0, 0, 0);
-    hoy = nuevaFecha;
-    hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-    return { hoy, aten, ok: false, flag: 2 };
+    nuevaFecha.setMinutes(hoy.getMinutes() - minutosTurno);
+    return { hoy: nuevaFecha, aten, ok: false, flag: 2 };
   }
 
   const hora = hoy.getUTCHours();
@@ -382,17 +381,15 @@ const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fe
     const nuevaFecha = new Date(hoy);
     nuevaFecha.setUTCDate(nuevaFecha.getUTCDate() + 1);
     nuevaFecha.setUTCHours(0, 0, 0, 0);
-    hoy = nuevaFecha;
-    hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-    return { hoy, aten, ok: false, flag: 5 };
+    nuevaFecha.setMinutes(hoy.getMinutes() - minutosTurno);
+    return { hoy: nuevaFecha, aten, ok: false, flag: 5 };
   }
   if (hora === hrFin && minutos >= minFin) {
     const nuevaFecha = new Date(hoy);
     nuevaFecha.setUTCDate(nuevaFecha.getUTCDate() + 1);
     nuevaFecha.setUTCHours(0, 0, 0, 0);
-    hoy = nuevaFecha;
-    hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-    return { hoy, aten, ok: false, flag: 6 };
+    nuevaFecha.setMinutes(hoy.getMinutes() - minutosTurno);
+    return { hoy: nuevaFecha, aten, ok: false, flag: 6 };
   }
   
   // Verificar horarios de corte solo si están definidos
