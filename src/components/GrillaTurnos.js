@@ -54,8 +54,8 @@ export default function GrillaTurnos({
   // Función para enviar recordatorio por WhatsApp e EMail
   const enviarRecordatorio = async (id) => {
     try {
-      const turno = turnos.find(turno => turno.id === id);
       toast.success('Iniciando envío de confirmación');
+      const turno = turnos.find(turno => turno.id === id);
       
       if (!turno || !turno.paciente || !turno.paciente.celular) {
         toast.error('No se encontró información de contacto para este paciente');
@@ -75,14 +75,15 @@ export default function GrillaTurnos({
           });
           
           const result = await response.json();
-          if (!result.ok) {
-            console.error('Error al enviar WhatsApp:', result.error);
-            toast.error('Error al enviar el recordatorio por WhatsApp: ' + (result.error || 'Error desconocido'));
+          if (!result.ok || result.ok === false) {
+              console.error('Error al enviar WhatsApp:', result.error);
+              toast.error('Error al enviar WhatsApp: ' + result.error);
+          } else {
+              toast.success('WhatsApp enviado correctamente');
           }
-          console.log('WhatsApp enviado exitosamente:', result.data);
-          toast.success('Recordatorio enviado exitosamente por WhatsApp');
         } catch (error) {
           console.error('Error al enviar WhatsApp:', error);
+          toast.error('Error al enviar WhatsApp: ' + error);
         }
       }
 

@@ -606,11 +606,11 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
     }
     setShowLoading(false);
   };
-
+  
   // Función para enviar recordatorio por WhatsApp e EMail
-    const enviarRecordatorio = async (turno) => {
+  const enviarRecordatorio = async (turno) => {
+      toast.success('Iniciando envío de confirmación');
         try {        
-          console.log('Enviando recordatorio para el turno:', turno);
           let celular = turno.paciente.celular;
 
           if (celular.length >= 8) {
@@ -624,11 +624,15 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
               });
               
               const result = await response.json();
-              if (!result.ok) {
-                console.error('Error al enviar WhatsApp:', result.error);
+              if (!result.ok || result.ok === false) {
+                  console.error('Error al enviar WhatsApp:', result.error);
+                  toast.error('Error al enviar WhatsApp: ' + result.error);
+              } else {
+                  toast.success('WhatsApp enviado correctamente');
               }
             } catch (error) {
               console.error('Error al enviar WhatsApp:', error);
+              toast.error('Error al enviar WhatsApp: ' + error);
             }
           }
           
@@ -649,7 +653,6 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
             console.error('Error al enviar email:', error);
           }
         
-          toast.success('Iniciando envío de confirmación');
         } catch (error) {
           console.error('Error al enviar recordatorio:', error);
           toast.error('Error al enviar el recordatorio: ' + (error.message || 'Error desconocido'));

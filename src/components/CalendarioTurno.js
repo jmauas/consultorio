@@ -15,6 +15,8 @@ import { obtenerEstados } from '@/lib/utils/estadosUtils';
 
 const estados = obtenerEstados();
 
+let timeOffset = 3;
+
 const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doctores, consultorios, setForzarMostrarGrilla, navegarDias, cambiarFecha}) => {    const [agendaConsul, setAgendaConsul] = useState([]);
     const [modalAbierto, setModalAbierto] = useState(false);
     const [turnoSeleccionado, setTurnoSeleccionado] = useState(null);
@@ -104,61 +106,65 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
             y: 0 
         });
     };
-
+    
     // Función para enviar recordatorio por WhatsApp e EMail
     const enviarRecordatorio = async (id) => {
         try {
-        const turno = turnos.find(turno => turno.id === id);
+            toast.success('Iniciando envío de confirmación');
+            const turno = turnos.find(turno => turno.id === id);
         
-        if (!turno || !turno.paciente || !turno.paciente.celular) {
-            toast.error('No se encontró información de contacto para este paciente');
-            return;        }
-    
-        let celular = turno.paciente.celular;
+            if (!turno || !turno.paciente || !turno.paciente.celular) {
+                toast.error('No se encontró información de contacto para este paciente');
+                return;        
+            }
+        
+            let celular = turno.paciente.celular;
 
-        if (celular.length >= 8) {
-          try {
-            const response = await fetch('/api/mensajeria/whatsapp', {
-              method: 'POST',
-              headers: {
+            if (celular.length >= 8) {
+                try {
+                    const response = await fetch('/api/mensajeria/whatsapp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ turno, confirmacion: true }),
+                    });
+                    
+                    const result = await response.json();
+                    if (!result.ok || result.ok === false) {
+                        console.error('Error al enviar WhatsApp:', result.error);
+                        toast.error('Error al enviar WhatsApp: ' + result.error);
+                    } else {
+                        toast.success('WhatsApp enviado correctamente');
+                    }
+                } catch (error) {
+                    console.error('Error al enviar WhatsApp:', error);
+                    toast.error('Error al enviar WhatsApp: ' + error);
+                }
+            } else {
+                toast.error('El número de celular no es válido');
+            }
+        
+            try {
+            const response = await fetch('/api/mensajeria/email', {
+                method: 'POST',
+                headers: {
                 'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ turno, confirmacion: true }),
+                },
+                body: JSON.stringify({ turno, confirmacion: true }),
             });
             
             const result = await response.json();
             if (!result.ok) {
-              console.error('Error al enviar WhatsApp:', result.error);
-              toast.error('Error al enviar WhatsApp: ' + result.error);
-              return;
+                console.error('Error al enviar email:', result.error);
+                toast.error('Error al enviar email: ' + result.error);
+                return;
             }
-            toast.success('WhatsApp enviado correctamente');
-          } catch (error) {
-            console.error('Error al enviar WhatsApp:', error);
-          }
-        }
+                toast.success('Email enviado correctamente');
+            } catch (error) {
+            console.error('Error al enviar email:', error);
+            }
         
-        try {
-          const response = await fetch('/api/mensajeria/email', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ turno, confirmacion: true }),
-          });
-          
-          const result = await response.json();
-          if (!result.ok) {
-            console.error('Error al enviar email:', result.error);
-            toast.error('Error al enviar email: ' + result.error);
-            return;
-          }
-            toast.success('Email enviado correctamente');
-        } catch (error) {
-          console.error('Error al enviar email:', error);
-        }
-        
-        toast.success('Iniciando envío de confirmación');
         } catch (error) {
         console.error('Error al enviar recordatorio:', error);
         toast.error('Error al enviar el recordatorio: ' + (error.message || 'Error desconocido'));
@@ -239,7 +245,7 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
             // Procesar turnos recibidos
             
             const diaSemana = fecha.getDay();
-            const feriados = agregarFeriados([], configuracion.feriados);
+            let feriados = agregarFeriados([], configuracion.feriados);
             const agendas = []
             let esFeriado = false;
             if (feriados && feriados.length > 0) {
@@ -260,8 +266,12 @@ const CalendarioTurno = ({fecha, turnos, loading, setLoading, configuracion, doc
                     let noLaborable = false;            
                     if (esFeriado) noLaborable = true;
                     const noLaborablesDoctor = agregarFeriados([], doctor.feriados);
+                    
                     if (noLaborablesDoctor && noLaborablesDoctor.length > 0) {
                         const esNoLaborable = noLaborablesDoctor.some(f => sonMismaFecha(f, fecha));
+                        console.log('DOCTOR FERIADOS', doctor.feriados);
+                        console.log('DIAS NO ATIENDE', noLaborablesDoctor);
+                        console.log('NO ATIENDE', esNoLaborable);
                         if (esNoLaborable) noLaborable = true;
                     }
                     if (!atencionHoy) {

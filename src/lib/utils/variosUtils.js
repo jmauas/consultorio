@@ -27,16 +27,31 @@ export const isColorLight = (color) => {
 export const agregarFeriados = (actual, agregar) => {
   if (!actual) actual = [];
   if (!agregar || agregar.lenght === 0) return actual;
+  let timeOffset = 0;
+  const isClient = typeof window !== 'undefined';
+  if (isClient) {
+    timeOffset = new Date().getTimezoneOffset() / 60;
+  } else {
+    timeOffset = 0; // En el servidor, asumimos UTC
+  }
+  console.log(timeOffset, 'timeOffset', isClient);
   agregar.forEach(f => {
       if (f.indexOf('|') >= 0) {
           let fecha1 = new Date(f.split('|')[0] + 'T00:00:00.000Z');
           let fecha2 = new Date(f.split('|')[1] + 'T00:00:00.000Z');
           while (fecha1 <= fecha2) {
-              actual.push(new Date(fecha1));
+              let f = new Date(fecha1);
+              if (isClient) {
+                  f.setHours(f.getHours() + timeOffset);
+              }
+              actual.push(f);
               fecha1.setDate(fecha1.getDate() + 1);
           }
       } else {
         let fecha1 = new Date(f + 'T00:00:00.000Z');
+        if (isClient) {
+          fecha1.setHours(fecha1.getHours() + timeOffset);
+        }
         actual.push(fecha1);
       }
   });

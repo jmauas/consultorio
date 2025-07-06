@@ -160,7 +160,7 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
           });
           dr.agenda = agenda;
           doctores.push(dr);
-          console.log(agenda)
+          //console.log(agenda)
         }
       } else {
         doctores = await prisma.doctor.findMany({
@@ -206,9 +206,7 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
       console.log('🕐 Timezone del servidor:', Intl.DateTimeFormat().resolvedOptions().timeZone);
       console.log('🕐 Fecha actual UTC:', new Date().toISOString());
       console.log('🕐 Fecha actual local:', new Date().toString());
-      let timeOffset = new Date().getTimezoneOffset() / 60;
-      console.log('🕐 Time Offset (horas):', timeOffset);
-      timeOffset = 3;
+      let timeOffset = 3;
       
       let feriados = agregarFeriados([], config.feriados, timeOffset);
       // Obtener turnos existentes para el periodo
@@ -308,9 +306,11 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
 
 const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fechaFer, turnos, atenEnFeriado, minutosTurno) => {
   const esFeriado = feriados.some(f => sonMismaFecha(f, fechaFer));
-  const diasNoAtiende = agregarFeriados([], doctor.feriados, timeOffset);
+  const diasNoAtiende = agregarFeriados([], doctor.feriados);
   const noAtiende = diasNoAtiende.some(f => sonMismaFecha(f, fechaFer));
-
+    console.log('DOCTOR FERIADOS', doctor.feriados);
+  console.log('DIAS NO ATIENDE', diasNoAtiende);
+  console.log('NO ATIENDE', noAtiende);
   if (noAtiende) {
     aten.atencion = false;
   } else if (atenEnFeriado && esFeriado) {

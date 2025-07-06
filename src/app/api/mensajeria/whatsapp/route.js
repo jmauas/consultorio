@@ -14,8 +14,8 @@ export async function POST(request) {
     const result = await enviarRecordatorioTurno(turno, cambioEstado, confirmacion);
     
     return Response.json({ 
-      ok: true, 
-      data: result 
+      ok: result.ok, 
+      error: result.msgError || null,
     });
     
   } catch (error) {

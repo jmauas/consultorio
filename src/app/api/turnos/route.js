@@ -215,13 +215,11 @@ export async function POST(request) {
 export async function GET(request) {
   try {
     const session = await getServerSession(authOptions);
-    
     // Verificar si el usuario está autenticado
     if (!session || !session.user || !session.user.perfil) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
- 
     // Obtener parámetros de consulta
     const { searchParams } = new URL(request.url);
     const desde = searchParams.get('desde');
