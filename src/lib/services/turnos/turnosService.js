@@ -336,9 +336,8 @@ const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fe
     const nuevaFecha = new Date(hoy);
     nuevaFecha.setUTCDate(nuevaFecha.getUTCDate() + 1);
     nuevaFecha.setUTCHours(0, 0, 0, 0);
-    hoy = nuevaFecha;
-    hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-    return { hoy, aten, ok: false, flag: 1 };
+    nuevaFecha.setMinutes(hoy.getMinutes() - minutosTurno);
+    return { hoy: nuevaFecha, aten, ok: false, flag: 1 };
   }
   // Validar que los campos de horarios existen y no son null/undefined
   if (!aten.desde || !aten.hasta) {
