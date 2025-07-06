@@ -330,15 +330,15 @@ const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fe
           aten.corteDesde = agendaFecha.corteDesde;
           aten.corteHasta = agendaFecha.corteHasta;
       }                
-      if (!aten.atencion) {
-        const nuevaFecha = new Date(hoy);
-        nuevaFecha.setUTCDate(nuevaFecha.getUTCDate() + 1);
-        nuevaFecha.setUTCHours(0, 0, 0, 0);
-        hoy = nuevaFecha;
-        hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-        return { hoy, aten, ok: false };
-      }
   }            
+  if (!aten.atencion) {
+    const nuevaFecha = new Date(hoy);
+    nuevaFecha.setUTCDate(nuevaFecha.getUTCDate() + 1);
+    nuevaFecha.setUTCHours(0, 0, 0, 0);
+    hoy = nuevaFecha;
+    hoy.setMinutes(hoy.getMinutes() - minutosTurno);
+    return { hoy, aten, ok: false };
+  }
   // Validar que los campos de horarios existen y no son null/undefined
   if (!aten.desde || !aten.hasta) {
     console.log(`Doctor ${doctor.nombre} - Agenda incompleta para el día ${dia}`);
