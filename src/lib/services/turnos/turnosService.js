@@ -224,13 +224,13 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
           console.log(`Doctor ${doctor.nombre} no tiene agenda definida.`);
           return;
         }
-        const agenda = doctor.agenda;
-        const atenEnFeriado = { ...agenda.find(d => d.dia === 9) };
         let hoy = calcularProximoSlot(minutosTurno);
         hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-              
+        
         try {
           while (hoy <= limite) {
+            const agenda = JSON.parse(JSON.stringify(doctor.agenda));
+            const atenEnFeriado = { ...agenda.find(d => d.dia === 9) };
             hoy.setMinutes(hoy.getMinutes() + minutosTurno);
             console.log('Nuevo Bucle:', hoy, limite);
             let fechaFer = new Date(Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth(), hoy.getUTCDate()));
@@ -239,15 +239,17 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
 
             let aten = null;
             const agendas = agenda.filter(d => d.dia === dia);            
-                        
+            
             //console.log('diaSemana', dia, 'hoy', hoy, 'Fecha para feriado', fechaFer, 'fecha', fecha, 'aten', aten);
-
+            
             for (let i = 0; i < agendas.length; i++) {
               const a = agendas[i];
               const res = analizarTurnosSlots(feriados, doctor, agenda, hoy, a, timeOffset, fechaFer, turnos, atenEnFeriado, minutosTurno);
               console.log('Resultado de analizarTurnosSlots FLAG:', res.flag);
               if (res.ok === true || i === agendas.length - 1) {
                 hoy = res.hoy;
+              }
+              if (res.ok === true) {
                 aten = res.aten;
                 break;
               }
@@ -309,16 +311,16 @@ const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fe
   const esFeriado = feriados.some(f => sonMismaFecha(f, fechaFer));
   const diasNoAtiende = agregarFeriados([], doctor.feriados);
   const noAtiende = diasNoAtiende.some(f => sonMismaFecha(f, fechaFer));
-  if (noAtiende) {
+  if (noAtiende === true) {
     aten.atencion = false;
-  } else if (atenEnFeriado && esFeriado) {
+  } else if (atenEnFeriado && esFeriado === true) {
     aten.atencion = atenEnFeriado.atencion;
     aten.desde = atenEnFeriado.desde;
     aten.hasta = atenEnFeriado.hasta;
     aten.corteDesde = atenEnFeriado.corteDesde;
     aten.corteHasta = atenEnFeriado.corteHasta;
   }
-  if (!aten.atencion) {
+  if (aten.atencion === false) {
       const agendaFecha = agenda.find(age =>
           age.atencion === true &&
           age.dia === 99 &&
@@ -364,7 +366,6 @@ const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fe
 
   //console.log('diaSemana', dia, 'hoy', hoy, 'Fecha para feriado', fechaFer, 'fecha', fecha, 'hora', hora, 'minutos', minutos, 'hrInicio', hrInicio, 'minInicio', minInicio, 'hrFin', hrFin, 'minFin', minFin)
   //console.log('hora', hora, 'minutos', minutos, 'Corte Desde', hrCorteDesde, minCorteDesde, 'Corte Hasta', hrCorteHasta, minCorteHasta)
-  console.log('FLAG 1')
   if (hora < hrInicio) {
     hoy.setUTCHours(hrInicio);
     hoy.setUTCMinutes(minInicio);
@@ -436,7 +437,6 @@ const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fe
     hoy.setMinutes(hoy.getMinutes() - minutosTurno);        
     return { hoy, aten, ok: false, flag: 9 };
   }
-  console.log('Turno disponible:', hoy, 'Doctor:', doctor.nombre, 'Consultorio:', aten.consultorioId);
   return { hoy, aten, ok: true, flag: 10 };
 }
 
