@@ -245,6 +245,7 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
             for (let i = 0; i < agendas.length; i++) {
               const a = agendas[i];
               const res = analizarTurnosSlots(feriados, doctor, agenda, hoy, a, timeOffset, fechaFer, turnos, atenEnFeriado, minutosTurno);
+              console.log('Resultado de analizarTurnosSlots FLAG:', res.flag);
               if (res.ok === true) {
                 hoy = res.hoy;
                 aten = res.aten;
@@ -331,13 +332,13 @@ const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fe
           aten.corteHasta = agendaFecha.corteHasta;
       }                
   }            
-  if (!aten.atencion) {
+  if (!aten.atencion || aten.atencion === false) {
     const nuevaFecha = new Date(hoy);
     nuevaFecha.setUTCDate(nuevaFecha.getUTCDate() + 1);
     nuevaFecha.setUTCHours(0, 0, 0, 0);
     hoy = nuevaFecha;
     hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-    return { hoy, aten, ok: false };
+    return { hoy, aten, ok: false, flag: 1 };
   }
   // Validar que los campos de horarios existen y no son null/undefined
   if (!aten.desde || !aten.hasta) {
@@ -347,7 +348,7 @@ const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fe
     nuevaFecha.setUTCHours(0, 0, 0, 0);
     hoy = nuevaFecha;
     hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-    return { hoy, aten, ok: false };
+    return { hoy, aten, ok: false, flag: 2 };
   }
 
   const hora = hoy.getUTCHours();
@@ -365,25 +366,26 @@ const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fe
 
   //console.log('diaSemana', dia, 'hoy', hoy, 'Fecha para feriado', fechaFer, 'fecha', fecha, 'hora', hora, 'minutos', minutos, 'hrInicio', hrInicio, 'minInicio', minInicio, 'hrFin', hrFin, 'minFin', minFin)
   //console.log('hora', hora, 'minutos', minutos, 'Corte Desde', hrCorteDesde, minCorteDesde, 'Corte Hasta', hrCorteHasta, minCorteHasta)
+  console.log('FLAG 1')
   if (hora < hrInicio) {
     hoy.setUTCHours(hrInicio);
     hoy.setUTCMinutes(minInicio);
     hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-    return { hoy, aten, ok: false };
+    return { hoy, aten, ok: false, flag: 3 };
   }
   if (hora === hrInicio && minutos < minInicio) {
     hoy.setUTCHours(hrInicio);
     hoy.setUTCMinutes(minInicio);
     hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-    return { hoy, aten, ok: false };
-  }            
+    return { hoy, aten, ok: false, flag: 4 };
+  }
   if (hora > hrFin) {
     const nuevaFecha = new Date(hoy);
     nuevaFecha.setUTCDate(nuevaFecha.getUTCDate() + 1);
     nuevaFecha.setUTCHours(0, 0, 0, 0);
     hoy = nuevaFecha;
     hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-    return { hoy, aten, ok: false };
+    return { hoy, aten, ok: false, flag: 5 };
   }
   if (hora === hrFin && minutos >= minFin) {
     const nuevaFecha = new Date(hoy);
@@ -391,7 +393,7 @@ const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fe
     nuevaFecha.setUTCHours(0, 0, 0, 0);
     hoy = nuevaFecha;
     hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-    return { hoy, aten, ok: false };
+    return { hoy, aten, ok: false, flag: 6 };
   }
   
   // Verificar horarios de corte solo si están definidos
@@ -400,13 +402,13 @@ const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fe
       hoy.setUTCHours(hrCorteHasta);
       hoy.setUTCMinutes(minCorteHasta);
       hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-      return { hoy, aten, ok: false };
+      return { hoy, aten, ok: false, flag: 7 };
     }
     if ((hora === hrCorteDesde && minutos >= minCorteDesde) || (hora === hrCorteHasta && minutos < minCorteHasta)) {
       hoy.setUTCHours(hrCorteHasta);
       hoy.setUTCMinutes(minCorteHasta);
       hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-      return { hoy, aten, ok: false };
+      return { hoy, aten, ok: false, flag: 8 };
     }
   }
   
@@ -435,12 +437,11 @@ const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fe
   if (turno && turno.length > 0) {
     hoy = new Date(turno[turno.length - 1].hasta);
     hoy.setHours(hoy.getHours() - timeOffset);
-    hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-    console.log('Turno ocupado:', hoy, 'Doctor:', doctor.nombre, 'Consultorio:', aten.consultorioId);           
-    return { hoy, aten, ok: false };
+    hoy.setMinutes(hoy.getMinutes() - minutosTurno);        
+    return { hoy, aten, ok: false, flag: 9 };
   }
   console.log('Turno disponible:', hoy, 'Doctor:', doctor.nombre, 'Consultorio:', aten.consultorioId);
-  return { hoy, aten, ok: true };
+  return { hoy, aten, ok: true, flag: 10 };
 }
 
 
