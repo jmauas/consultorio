@@ -82,8 +82,14 @@ export async function enviarRecordatorioTurno(turno, cambioEstado, confirmacion)
     if (!turno) {
       throw new Error('Datos de turno insuficientes');
     }
-   
-    const msg = await textoMensajeConfTurno(turno, cambioEstado, confirmacion);    
+    
+    const msg = cambioEstado === true
+      ? await textoCambioEstadoTurno(turno)
+      : confirmacion === true
+        ? await textoMensajeRecordatorioTurno(turno, confirmacion)  
+        : await textoMensajeConfTurno(turno, cambioEstado, confirmacion);
+
+    console.log('Mensaje a enviar:', msg);
     // Normalizar número de celular
     const celularNormalizado = normalizarNumeroCelular(turno.paciente.celular);
     if (!celularNormalizado) {
@@ -108,52 +114,122 @@ export async function enviarRecordatorioTurno(turno, cambioEstado, confirmacion)
   }
 }
 
-export const textoMensajeConfTurno = async (turno, cambioEstado, confirmacion) => {
+export const textoMensajeConfTurno = async (turno, confirmacion) => {
   const enlaceCancelacion = turno.token 
   ? `${urlApp}/turnos/cancelar/${turno.token}`
   : '';
   const enlaceConfirmacion = turno.token && confirmacion && confirmacion === true
   ? `${urlApp}/turnos/confirmar/${turno.token}`
   : '';
-  let msg = `Hola ${turno.paciente.nombre}. 👋
+//   let msg = `Hola ${turno.paciente.nombre}. 👋
+// Desde *${config.nombreConsultorio}*, te confirmamos tu Turno Agendado. 👍
+
+// ✔️ Te Detallamos los datos:
+// 🧑‍⚕️ Paciente: ${turno.paciente.nombre} ${turno.paciente.apellido || ''}.
+// 📅 Fecha del Turno: *${formatoFecha(turno.desde, true, false, false, true)}*.
+// 🦷 Tipo Turno: ${turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}.
+// 🕧 Duración: ${turno.duracion || 'No especificada'} minutos.
+// 💉 Profesional: ${turno.doctor.nombre}.
+// 🏥 Domicilio: *${turno.consultorio.direccion || config.domicilio}*.
+// 📱 Celular: ${turno.consultorio.telefono || config.telefono}.
+
+// Recordá llegar 5 minutos antes.
+
+// ${enlaceConfirmacion != '' &&
+//   `✅ Para confirmar tu asistencia, por favor hacé clic en este Link:
+// ${enlaceConfirmacion}`}
+
+// ❌ Si no podés asistir, por favor cancelá tu turno desde el siguiente link: 
+// ${enlaceCancelacion}
+
+// Gracias, y que tengas buen día! 👋👋👋.
+//       `;
+let msg = `Hola ${turno.paciente.nombre}. 👋
 Desde *${config.nombreConsultorio}*, te confirmamos tu Turno Agendado. 👍
 
-✔️ Te Detallamos los datos:
-🧑‍⚕️ Paciente: ${turno.paciente.nombre} ${turno.paciente.apellido || ''}.
-📅 Fecha del Turno: *${formatoFecha(turno.desde, true, false, false, true)}*.
-🦷 Tipo Turno: ${turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}.
-🕧 Duración: ${turno.duracion || 'No especificada'} minutos.
-💉 Profesional: ${turno.doctor.nombre}.
 🏥 Domicilio: *${turno.consultorio.direccion || config.domicilio}*.
-📱 Celular: ${turno.consultorio.telefono || config.telefono}.
 
 Recordá llegar 5 minutos antes.
-
-${enlaceConfirmacion != '' &&
-  `✅ Para confirmar tu asistencia, por favor hacé clic en este Link:
-${enlaceConfirmacion}`}
 
 ❌ Si no podés asistir, por favor cancelá tu turno desde el siguiente link: 
 ${enlaceCancelacion}
 
-Gracias, y que tengas buen día! 👋👋👋.
+Gracias, te esperamos 🩷🦷
       `;
-if (cambioEstado) {   
-  msg = `Hola ${turno.paciente.nombre}. 👋
-Desde *${config.nombreConsultorio}*, te notificamos el cambio del estado de tu turno a *${turno.estado.toUpperCase()}* ‼️
-
-✅ Te Recordamos los datos del Turno Modificado:
-🧑‍⚕️ Paciente: ${turno.paciente.nombre} ${turno.paciente.apellido || ''}.
-📅 Fecha del Turno: *${formatoFecha(turno.desde, true, false, false, true)}*.
-🦷 Tipo Turno: ${turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}.
-🕧 Duración: ${turno.duracion || 'No especificada'} minutos.
-💉 Profesional: ${turno.doctor.nombre}.
-🏥 Domicilio: *${turno.consultorio.direccion || config.domicilio}*.
-📱 Celular: ${turno.consultorio.telefono || config.telefono}.
-
-Gracias, y que tengas buen día! 👋👋👋.
-      `;
+  return msg
 }
+
+export const textoCambioEstadoTurno = async (turno) => {
+     
+//   let msg = `Hola ${turno.paciente.nombre}. 👋
+// Desde *${config.nombreConsultorio}*, te notificamos el cambio del estado de tu turno a *${turno.estado.toUpperCase()}* ‼️
+
+// ✅ Te Recordamos los datos del Turno Modificado:
+// 🧑‍⚕️ Paciente: ${turno.paciente.nombre} ${turno.paciente.apellido || ''}.
+// 📅 Fecha del Turno: *${formatoFecha(turno.desde, true, false, false, true)}*.
+// 🦷 Tipo Turno: ${turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}.
+// 🕧 Duración: ${turno.duracion || 'No especificada'} minutos.
+// 💉 Profesional: ${turno.doctor.nombre}.
+// 🏥 Domicilio: *${turno.consultorio.direccion || config.domicilio}*.
+// 📱 Celular: ${turno.consultorio.telefono || config.telefono}.
+
+// Gracias, y que tengas buen día! 👋👋👋.
+//       `;
+  let msg = `Hola ${turno.paciente.nombre}. 👋
+Desde *${config.nombreConsultorio}*, te notificamos el cambio del estado de tu turno a *${turno.estado.toUpperCase()}* ‼️
+📅 Fecha del Turno: *${formatoFecha(turno.desde, true, false, false, true)}*.
+
+Saludos🩷🦷.
+      `;
+  return msg
+}
+
+export const textoMensajeRecordatorioTurno = async (turno, confirmacion) => {
+  const enlaceCancelacion = turno.token 
+  ? `${urlApp}/turnos/cancelar/${turno.token}`
+  : '';
+  const enlaceConfirmacion = turno.token && confirmacion && confirmacion === true
+  ? `${urlApp}/turnos/confirmar/${turno.token}`
+  : '';
+//   let msg = `Hola ${turno.paciente.nombre}. 👋
+// Desde *${config.nombreConsultorio}*, te confirmamos tu Turno Agendado. 👍
+
+// ✔️ Te Detallamos los datos:
+// 🧑‍⚕️ Paciente: ${turno.paciente.nombre} ${turno.paciente.apellido || ''}.
+// 📅 Fecha del Turno: *${formatoFecha(turno.desde, true, false, false, true)}*.
+// 🦷 Tipo Turno: ${turno.tipoDeTurno && turno.tipoDeTurno.nombre || 'No especificado'}.
+// 🕧 Duración: ${turno.duracion || 'No especificada'} minutos.
+// 💉 Profesional: ${turno.doctor.nombre}.
+// 🏥 Domicilio: *${turno.consultorio.direccion || config.domicilio}*.
+// 📱 Celular: ${turno.consultorio.telefono || config.telefono}.
+
+// Recordá llegar 5 minutos antes.
+
+// ${enlaceConfirmacion != '' &&
+//   `✅ Para confirmar tu asistencia, por favor hacé clic en este Link:
+// ${enlaceConfirmacion}`}
+
+// ❌ Si no podés asistir, por favor cancelá tu turno desde el siguiente link: 
+// ${enlaceCancelacion}
+
+// Gracias, te esperamos 🩷🦷
+//       `;
+let msg = `Hola ${turno.paciente.nombre}. 👋
+Desde *${config.nombreConsultorio}*, te recordamos que tenes turno odontológico. 👍
+📅 Fecha del Turno: *${formatoFecha(turno.desde, true, false, false, true)}*.
+💉 Profesional: ${turno.doctor.nombre}.
+
+🏥 Domicilio: *${turno.consultorio.direccion || config.domicilio}*.
+
+${enlaceConfirmacion != '' &&
+  `✅ Para confirmar tocá aquí:
+${enlaceConfirmacion}`}
+
+❌ Para cancelár y/o sacar uno nuevo tocá aquí: 
+${enlaceCancelacion}
+
+Saludos🩷🦷.
+`;
   return msg
 }
 
