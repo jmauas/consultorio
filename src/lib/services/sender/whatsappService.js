@@ -147,6 +147,8 @@ export const textoMensajeConfTurno = async (turno, confirmacion) => {
 let msg = `Hola ${turno.paciente.nombre}. 👋
 Desde *${config.nombreConsultorio}*, te confirmamos tu Turno Agendado. 👍
 
+📅 *${formatoFecha(turno.desde, true, false, false, true)}*.
+
 🏥 Domicilio: *${turno.consultorio.direccion || config.domicilio}*.
 
 Recordá llegar 5 minutos antes.
