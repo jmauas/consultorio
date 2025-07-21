@@ -55,7 +55,7 @@ export default function PacienteDetallePage() {
       const response = await fetch(`/api/pacientes/${pacienteId}`);
       
       if (!response.ok) {
-        throw new Error(`Error al cargar datos del paciente: ${response.statusText}`);
+        throw new Error(`Error al cargar datos del paciente: ${response.error || response.statusText}`);
       }
       
       const data = await response.json();
@@ -182,7 +182,7 @@ export default function PacienteDetallePage() {
       });
       
       if (!response.ok) {
-        throw new Error(`Error al guardar cambios: ${response.statusText}`);
+        throw new Error(`Error al guardar cambios: ${response.error || response.statusText}`);
       }
       
       const data = await response.json();

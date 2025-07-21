@@ -142,23 +142,7 @@ export async function PUT(request, { params }) {
       if (data.celular.substring(0, 3) != '549') data.celular = '549' + data.celular;
     }
 
-    // Verificar si otro paciente ya tiene ese número de teléfono o DNI
-    if (data.celular && data.celular !== pacienteExistente.celular) {
-      const pacienteConCelular = await prisma.paciente.findFirst({
-        where: {
-          celular: data.celular,
-          id: { not: id }
-        }
-      });
-
-      if (pacienteConCelular) {
-        return NextResponse.json(
-          { ok: false, error: 'Ya existe otro paciente con ese número de teléfono' },
-          { status: 400 }
-        );
-      }
-    }
-
+    // Validar que no exista otro paciente con el mismo DNI   
     if (data.dni && data.dni !== pacienteExistente.dni) {
       // Limpiar DNI si existe
       data.dni = data.dni.replaceAll('.', '').replaceAll('-', '').replaceAll(' ', '');
