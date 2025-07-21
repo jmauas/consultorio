@@ -144,8 +144,8 @@ export const textoMensajeConfTurno = async (turno, confirmacion) => {
 
 // Gracias, y que tengas buen día! 👋👋👋.
 //       `;
-let msg = `Hola ${turno.paciente.nombre}. 👋
-Desde *${config.nombreConsultorio}*, te confirmamos tu Turno Agendado. 👍
+let msg = `Hola ${turno.paciente.nombre}.
+Desde *${config.nombreConsultorio}*, te confirmamos tu Turno Agendado. 
 
 📅 *${formatoFecha(turno.desde, true, false, false, true)}*.
 
@@ -177,8 +177,8 @@ export const textoCambioEstadoTurno = async (turno) => {
 
 // Gracias, y que tengas buen día! 👋👋👋.
 //       `;
-  let msg = `Hola ${turno.paciente.nombre}. 👋
-Desde *${config.nombreConsultorio}*, te notificamos el cambio del estado de tu turno a *${turno.estado.toUpperCase()}* ‼️
+  let msg = `Hola ${turno.paciente.nombre}.
+Tu turno cambió a estado *${turno.estado.toUpperCase()}* ‼️
 📅 Fecha del Turno: *${formatoFecha(turno.desde, true, false, false, true)}*.
 
 Saludos🩷🦷.
@@ -216,8 +216,8 @@ export const textoMensajeRecordatorioTurno = async (turno, confirmacion) => {
 
 // Gracias, te esperamos 🩷🦷
 //       `;
-let msg = `Hola ${turno.paciente.nombre}. 👋
-Desde *${config.nombreConsultorio}*, te recordamos que tenes turno odontológico. 👍
+let msg = `Hola ${turno.paciente.nombre}.
+Desde *${config.nombreConsultorio}*, te recordamos que tenes turno odontológico.
 📅 Fecha del Turno: *${formatoFecha(turno.desde, true, false, false, true)}*.
 💉 Profesional: ${turno.doctor.nombre}.
 
