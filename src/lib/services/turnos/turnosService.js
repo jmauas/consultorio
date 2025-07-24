@@ -237,55 +237,84 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
             
             let dia = hoy.getUTCDay();
 
-            let aten = null;
-            const agendas = agenda.filter(d => d.dia === dia);            
-            
+            let aten = {};
+            const agendas = agenda.filter(d => d.dia === dia && d.atencion === true);
+            agendas.sort((a, b) => {
+              // Convierte 'desde' a minutos desde medianoche para comparar
+              const [ha, ma] = a.desde.split(':').map(Number);
+              const [hb, mb] = b.desde.split(':').map(Number);
+              return (ha * 60 + ma) - (hb * 60 + mb);
+            });
+
+            const esFeriado = feriados.some(f => sonMismaFecha(f, fechaFer));
+
+            if (agendas.length === 0 && (atenEnFeriado.atencion === false || esFeriado === false)) {
+              const nuevaFecha = new Date(hoy);
+              nuevaFecha.setUTCDate(nuevaFecha.getUTCDate() + 1);
+              nuevaFecha.setUTCHours(0, 0, 0, 0);
+              nuevaFecha.setMinutes(hoy.getMinutes() - minutosTurno);
+              hoy = nuevaFecha;
+              continue;
+            }
+
             //console.log('diaSemana', dia, 'hoy', hoy, 'Fecha para feriado', fechaFer, 'fecha', fecha, 'aten', aten);
             
             for (let i = 0; i < agendas.length; i++) {
               const a = agendas[i];
-              const res = analizarTurnosSlots(feriados, doctor, agenda, hoy, a, timeOffset, fechaFer, turnos, atenEnFeriado, minutosTurno);
+              aten.atencion = false
+              const res = analizarTurnosSlots(esFeriado, doctor, agenda, hoy, a, timeOffset, fechaFer, turnos, atenEnFeriado, minutosTurno);
               console.log('Resultado de analizarTurnosSlots FLAG:', res.flag);
-              if (res.ok === true || i === agendas.length - 1) {
-                hoy = res.hoy;
-              }
               if (res.ok === true) {
                 aten = res.aten;
-                break;
+                hoy = res.hoy;
               }
-            }
-            if (!aten || !aten.atencion || aten.atencion === false) {
-              continue; // Si no atiende, saltar al siguiente día
-            }
+              if (!aten || !aten.atencion || aten.atencion === false) {
+                if (res.finAgenda === true) {
+                  if (i === agendas.length - 1) {
+                    const nuevaFecha = new Date(hoy);
+                    nuevaFecha.setUTCDate(nuevaFecha.getUTCDate() + 1);
+                    nuevaFecha.setUTCHours(0, 0, 0, 0);
+                    nuevaFecha.setMinutes(hoy.getMinutes() - minutosTurno);
+                    hoy = nuevaFecha;
+                    break;
+                  }
+                  continue; // Si no atiende, saltar a la agenda siguiente
+                } else {
+                  hoy = res.hoy;
+                  break;
+                }
+              }
 
-            const fecha = hoy.getFullYear() + '-' + (hoy.getMonth() + 1) + '-' + hoy.getDate();
-            const hr = hoy.getUTCHours();
-            const min = hoy.getUTCMinutes();
-            dia = disp.find(turno => turno.fecha == fecha);
-            const consultorioId = aten ? aten.consultorioId : null;
-            const turnoAgregar = {
-              hora: hr,
-              min: min,
-              doctor: {
-                id: doctor.id,
-                nombre: doctor.nombre,
-                emoji: doctor.emoji
-              },
-              consultorioId,
-              tipoTurno: tipoDeTurno,
-              tipoDeTurnoId: tipoDeTurno,
-              duracion: minutosTurno
-            }
-            if (!dia) {
-              disp.push({
-                fecha: fecha,
-                diaSemana: hoy.toLocaleDateString('es-ES', { weekday: 'long' }),
-                turnos: [turnoAgregar],
-              });
-            } else {
-              const index = disp.indexOf(dia);
-              dia.turnos.push(turnoAgregar);
-              disp[index] = dia;
+              const fecha = hoy.getFullYear() + '-' + (hoy.getMonth() + 1) + '-' + hoy.getDate();
+              const hr = hoy.getUTCHours();
+              const min = hoy.getUTCMinutes();
+              dia = disp.find(turno => turno.fecha == fecha);
+              const consultorioId = aten ? aten.consultorioId : null;
+              const turnoAgregar = {
+                hora: hr,
+                min: min,
+                doctor: {
+                  id: doctor.id,
+                  nombre: doctor.nombre,
+                  emoji: doctor.emoji
+                },
+                consultorioId,
+                tipoTurno: tipoDeTurno,
+                tipoDeTurnoId: tipoDeTurno,
+                duracion: minutosTurno
+              }
+              if (!dia) {
+                disp.push({
+                  fecha: fecha,
+                  diaSemana: hoy.toLocaleDateString('es-ES', { weekday: 'long' }),
+                  turnos: [turnoAgregar],
+                });
+              } else {
+                const index = disp.indexOf(dia);
+                dia.turnos.push(turnoAgregar);
+                disp[index] = dia;
+              }
+              break;
             }
           }
         } catch (error) {
@@ -307,8 +336,7 @@ export const disponibilidadDeTurnos = async (doctor, tipoDeTurno, minutosTurno, 
   }
 }
 
-const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fechaFer, turnos, atenEnFeriado, minutosTurno) => {
-  const esFeriado = feriados.some(f => sonMismaFecha(f, fechaFer));
+const analizarTurnosSlots = (esFeriado, doctor, agenda, hoy, aten, timeOffset, fechaFer, turnos, atenEnFeriado, minutosTurno) => {
   const diasNoAtiende = agregarFeriados([], doctor.feriados);
   const noAtiende = diasNoAtiende.some(f => sonMismaFecha(f, fechaFer));
   if (noAtiende === true) {
@@ -335,20 +363,12 @@ const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fe
       }                
   }            
   if (!aten.atencion || aten.atencion === false) {
-    const nuevaFecha = new Date(hoy);
-    nuevaFecha.setUTCDate(nuevaFecha.getUTCDate() + 1);
-    nuevaFecha.setUTCHours(0, 0, 0, 0);
-    nuevaFecha.setMinutes(hoy.getMinutes() - minutosTurno);
-    return { hoy: nuevaFecha, aten, ok: false, flag: 1 };
+    return { aten, ok: false, flag: 1, finAgenda: true };
   }
   // Validar que los campos de horarios existen y no son null/undefined
   if (!aten.desde || !aten.hasta) {
     console.log(`Doctor ${doctor.nombre} - Agenda incompleta para el día ${dia}`);
-    const nuevaFecha = new Date(hoy);
-    nuevaFecha.setUTCDate(nuevaFecha.getUTCDate() + 1);
-    nuevaFecha.setUTCHours(0, 0, 0, 0);
-    nuevaFecha.setMinutes(hoy.getMinutes() - minutosTurno);
-    return { hoy: nuevaFecha, aten, ok: false, flag: 2 };
+    return { aten, ok: false, flag: 2, finAgenda: true };
   }
 
   const hora = hoy.getUTCHours();
@@ -370,27 +390,19 @@ const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fe
     hoy.setUTCHours(hrInicio);
     hoy.setUTCMinutes(minInicio);
     hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-    return { hoy, aten, ok: false, flag: 3 };
+    return { hoy, aten, ok: false, flag: 3, finAgenda: false };
   }
   if (hora === hrInicio && minutos < minInicio) {
     hoy.setUTCHours(hrInicio);
     hoy.setUTCMinutes(minInicio);
     hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-    return { hoy, aten, ok: false, flag: 4 };
+    return { hoy, aten, ok: false, flag: 4, finAgenda: false };
   }
   if (hora > hrFin) {
-    const nuevaFecha = new Date(hoy);
-    nuevaFecha.setUTCDate(nuevaFecha.getUTCDate() + 1);
-    nuevaFecha.setUTCHours(0, 0, 0, 0);
-    nuevaFecha.setMinutes(hoy.getMinutes() - minutosTurno);
-    return { hoy: nuevaFecha, aten, ok: false, flag: 5 };
+    return { aten, ok: false, flag: 5, finAgenda: true };
   }
   if (hora === hrFin && minutos >= minFin) {
-    const nuevaFecha = new Date(hoy);
-    nuevaFecha.setUTCDate(nuevaFecha.getUTCDate() + 1);
-    nuevaFecha.setUTCHours(0, 0, 0, 0);
-    nuevaFecha.setMinutes(hoy.getMinutes() - minutosTurno);
-    return { hoy: nuevaFecha, aten, ok: false, flag: 6 };
+    return { aten, ok: false, flag: 6, finAgenda: true };
   }
   
   // Verificar horarios de corte solo si están definidos
@@ -399,13 +411,13 @@ const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fe
       hoy.setUTCHours(hrCorteHasta);
       hoy.setUTCMinutes(minCorteHasta);
       hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-      return { hoy, aten, ok: false, flag: 7 };
+      return { hoy, aten, ok: false, flag: 7, finAgenda: false };
     }
     if ((hora === hrCorteDesde && minutos >= minCorteDesde) || (hora === hrCorteHasta && minutos < minCorteHasta)) {
       hoy.setUTCHours(hrCorteHasta);
       hoy.setUTCMinutes(minCorteHasta);
       hoy.setMinutes(hoy.getMinutes() - minutosTurno);
-      return { hoy, aten, ok: false, flag: 8 };
+      return { hoy, aten, ok: false, flag: 8, finAgenda: false };
     }
   }
   
@@ -435,9 +447,9 @@ const analizarTurnosSlots = (feriados, doctor, agenda, hoy, aten, timeOffset, fe
     hoy = new Date(turno[turno.length - 1].hasta);
     hoy.setHours(hoy.getHours() - timeOffset);
     hoy.setMinutes(hoy.getMinutes() - minutosTurno);        
-    return { hoy, aten, ok: false, flag: 9 };
+    return { hoy, aten, ok: false, flag: 9, finAgenda: false };
   }
-  return { hoy, aten, ok: true, flag: 10 };
+  return { hoy, aten, ok: true, flag: 10, finAgenda: false };
 }
 
 
