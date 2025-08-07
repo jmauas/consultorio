@@ -225,6 +225,7 @@ export default function EmpresaPage() {
                 value={datos.telefono}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
+                autoComplete="off"
               />
             </div>
             

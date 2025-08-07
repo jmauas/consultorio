@@ -931,7 +931,7 @@ const DisponibilidadPage = ({dniParam, celularParam, pacienteIdParam}) => {
                     <input
                       type="number"
                       inputMode="tel"
-                      autoComplete='tel'
+                      autoComplete='off'
                       id="celular"
                       className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 
                         ${fieldErrors.celular ? 'border-red-500' : 'border-gray-300'}`}

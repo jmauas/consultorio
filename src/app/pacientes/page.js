@@ -258,6 +258,7 @@ export default function PacientesPage() {
               onChange={handleFiltroChange}
               className="w-full border border-gray-300 rounded px-3 py-2"
               placeholder="Número de celular"
+              autoComplete="off"
             />
           </div>
           <div>

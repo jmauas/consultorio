@@ -316,6 +316,7 @@ export default function NuevoPacientePage() {
                     className="w-full border border-gray-300 rounded px-3 py-2"
                     placeholder="Número de celular sin 0 ni 15"
                     required
+                    autoComplete="off"
                   />
                   <p className="mt-1 text-xs">
                     Formato: código de área + número, sin 0 ni 15. Ej: 1123456789
