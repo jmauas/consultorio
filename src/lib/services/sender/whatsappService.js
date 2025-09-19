@@ -254,11 +254,11 @@ function normalizarNumeroCelular(celular) {
   numero = numero.toString().replace(/\D/g, '')//QUITO CUALQUIER COSA QUE NO SEA NUMERO
   if (numero.length < 8) return false;
   if (numero.length === 8) numero = '54911' + numero;
+  if (numero.substring(0, 4) == '0011') numero = '54911' + numero.substring(4);
+  if (numero.substring(0, 3) == '011') numero = '54911' + numero.substring(3);
   //if (numero.substr(0, 2) == '15') numero = '54911' + numero.substr(2);
-  numero = numero.replace('0011', '11')
-  numero = numero.replace('011', '11')
-  if (numero.substr(0, 2) != '54') numero = '54' + numero;
-  if (numero.substr(0, 3) != '549') numero = '549' + numero.substr(2);
+  if (numero.substring(0, 2) != '54') numero = '54' + numero;
+  if (numero.substring(0, 3) != '549') numero = '549' + numero.substring(2);
   return numero;
 }
 
